@@ -1,0 +1,1 @@
+module.exports = "var foo = 400; foo += 3;";
