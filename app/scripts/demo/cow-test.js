@@ -1,5 +1,4 @@
 module.exports = '\
-var expect = chai.expect;\n \
 describe("Cow", function() {\n \
   describe("constructor", function() {\n \
     it("should have a default name", function() {\n \

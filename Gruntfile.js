@@ -33,13 +33,13 @@ module.exports = function(grunt) {
                 files: ['bower.json'],
                 tasks: ['bowerInstall']
             },
-            js: {
-                files: ['<%= config.app %>/scripts/{,*/}*.js'],
-                tasks: ['jshint'],
-                options: {
-                    livereload: true
-                }
-            },
+            // js: {
+            //     files: ['<%= config.app %>/scripts/{,*/}*.js'],
+            //     tasks: ['jshint'],
+            //     options: {
+            //         livereload: true
+            //     }
+            // },
             emberTemplates: {
                 files: ['<%= config.app %>/templates/{,*/}*.hbs'],
                 tasks: ['emberTemplates'],
@@ -52,8 +52,13 @@ module.exports = function(grunt) {
                 tasks: ['test:watch']
             },
             browserify: {
-                files: ['<%= config.app %>/scripts/{,*/}*.js'],
-                tasks: ['browserify']
+                files: ['<%= config.app %>/scripts/{,*,*/*}/*.js'],
+                tasks: ['browserify'],
+                options: {
+                    spawn: false,
+                    interrupt:true,
+                    livereload: true
+                }
             },
             gruntfile: {
                 files: ['Gruntfile.js']
@@ -430,7 +435,9 @@ module.exports = function(grunt) {
             grunt.task.run([
                 'clean:server',
                 'concurrent:test',
-                'autoprefixer'
+                'autoprefixer',
+                'browserify',
+                'emberTemplates',
             ]);
         }
 

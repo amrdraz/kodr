@@ -1,4 +1,14 @@
+function escape(html, encode) {
+        return html
+            .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
 Ember.Handlebars.helper('markdown-helper', function(value, options) {
+
     var marked = require('marked');
     marked.setOptions({
         renderer: new marked.Renderer(),
@@ -9,9 +19,9 @@ Ember.Handlebars.helper('markdown-helper', function(value, options) {
         tables: true,
         breaks: false,
         pedantic: false,
-        sanitize: true,
+        sanitize: false,
         smartLists: true,
     });
 
-    return marked(value);
+    return marked(escape(value));
 });

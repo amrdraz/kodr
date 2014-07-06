@@ -8,7 +8,13 @@
 </head>
 <body>
     <div id="mocha"></div>
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/handlebars/handlebars.js"></script>
+    <script src="../bower_components/ember/ember.js"></script>
+    <script src="../bower_components/ember-data/ember-data.js"></script>
+
     <script src="bower_components/mocha/mocha.js"></script>
+    <script src="bower_components/ember-mocha-adapter/adapter.js"></script>
     <script>mocha.setup('bdd')</script>
     <script src="bower_components/chai/chai.js"></script>
     <script>
@@ -18,6 +24,8 @@
     </script>
 
     <!-- include source files here... -->
+    <script src="scripts/templates.js"></script>
+    <script src="scripts/build.js"></script>
 
     <!-- include spec files here... -->
     <script src="spec/test.js"></script>

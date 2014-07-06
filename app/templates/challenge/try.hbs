@@ -1,0 +1,29 @@
+<div class="col-lg-6">
+    <a id="run" {{action "run"}} class="btn btn-default pull-right"><i class="glyphicon glyphicon-play"></i></a>
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#code" data-toggle="tab">Code</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane  fade in active" id="code">
+        {{view 'App.CodeEditorView'
+          name="codeEditor"
+          id="editor"
+          class="col-lg-12"
+          model=model
+          attr='setup' }}
+      </div>
+    </div>
+</div>
+<div class="col-lg-6">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane fade" id="description">
+        {{view 'App.MarkedMathView' model=model observable='description' }}
+      </div>
+      <div id="sandbox">
+        
+      </div>
+    </div>
+</div>

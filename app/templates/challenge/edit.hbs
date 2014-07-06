@@ -1,0 +1,112 @@
+<section class="challenge-controlles row">
+  <ul class="nav nav-pills pull-right">
+    <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat"></i> Reset</a></li>
+    {{#unless isPublished }}
+    <li {{action "save"}} {{bind-attr class="canSave::disabled"}} ><a href="#">
+        <i class="glyphicon glyphicon-save"></i> Save</a>
+    </li>
+    {{/unless}}
+    {{#unless isPublished }}
+      <li {{action "publish"}} {{bind-attr class="canPublish::disabled"}}><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
+    {{else}}
+      <li {{action "publish"}} {{bind-attr class="canSave::disabled"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
+      <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
+    {{/unless}}
+    <li {{action 'delete' }} class=""><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
+    <li {{action 'validate' }} class=""><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
+  </ul>
+</section>
+<section class="challenge-settings row">
+  <h3 class="editable col-lg-12">
+    {{view Em.TextField value=model.name}}
+  </h3>
+  <div class="challenge-dificulty col-lg-12">
+    {{view Ember.Select
+      content=model.expOptions
+      optionValuePath="content.points"
+      optionLabelPath="content.rank"
+      value=model.exp
+      prompt="Select a Rank"
+    }}
+    <span class="label label-primary">Estimated Rank awards: {{model.exp}} Exp</span>
+  </div>
+</section>
+<section class="challenge-content row">
+  
+  <div class="col-lg-6">
+      <a id="run" {{action "run"}} class="btn btn-default pull-right"><i class="glyphicon glyphicon-play"></i></a>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#code" data-toggle="tab">Code</a></li>
+        <li><a href="#tests" data-toggle="tab">Test</a></li>
+        <li><a href="#structure" data-toggle="tab">Structure</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane  fade in active" id="code">
+          {{view 'App.CodeEditorView'
+            name="codeEditor"
+            id="editor"
+            class="col-lg-12"
+            model=model
+            attr='setup' }}
+        </div>
+        <div class="tab-pane fade" id="tests">
+          {{view 'App.CodeEditorView'
+              name="testsEditor"
+              id="testsEditor"
+              class="col-lg-12"
+              model=model
+              attr='tests' }}
+        </div>
+        <div class="tab-pane fade" id="structure">
+          {{view 'App.CodeEditorView'
+              name="structureEditor"
+              id="structureEditor"
+              class="col-lg-12"
+              model=model
+              attr='structure' }}
+          <hr>
+          <h3>Callbacks for Variables</h3>
+          {{view 'App.CodeEditorView'
+              name="varCallback"
+              id="varCallback"
+              class="col-lg-12"
+              model=model
+              attr='callbacks' }}
+        </div>
+      </div>
+  </div>
+  <div class="col-lg-6">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+        <li><a href="#descriptionPreview" data-toggle="tab">Description Preview</a></li>
+        <li><a href="#solution" data-toggle="tab">Solution</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane  fade in active" id="description">
+          {{view 'App.CodeEditorView'
+            name="descriptionEditor"
+            id="descriptionEditor"
+            class="col-lg-12"
+            model=model
+            attr='description'
+            highlight='markdown'
+            }}
+        </div>
+        <div class="tab-pane fade" id="descriptionPreview">
+          {{view 'App.MarkedMathView' model=model observable='description' }}
+        </div>
+        <div class="tab-pane fade" id="solution">
+          {{view 'App.CodeEditorView'
+              name="solutionEditor"
+              id="solutionEditor"
+              class="col-lg-12"
+              model=model
+              attr='solution' }}
+        </div>
+        <div id="sandbox">
+          
+        </div>
+      </div>
+  
+  </div>
+</section>

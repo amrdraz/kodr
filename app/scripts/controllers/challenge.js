@@ -11,7 +11,7 @@ module.exports = Em.ObjectController.extend({
             var Runner = require('../runners/runner');
 
             var iframe;
-
+            stuff.clear();
             stuff(window.location.origin + '/iframe.html', $('#sandbox')[0], function(context) {
                 iframe = context;
 
