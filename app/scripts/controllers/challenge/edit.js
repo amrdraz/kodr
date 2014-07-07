@@ -1,6 +1,12 @@
 module.exports = App.ChallengeEditController = Em.ObjectController.extend({
-    // needs: [],
+    needs: ['challenge'],
     actions: {
+        run: function() {
+            this.get('controllers.challenge').send('run');
+        },
+        validate: function() {
+            this.get('controllers.challenge').send('run');
+        },
         reset: function() {
             this.get('model').rollback();
         },
@@ -15,7 +21,7 @@ module.exports = App.ChallengeEditController = Em.ObjectController.extend({
             this.transitionToRoute('challenges');
         },
         validate: function() {
-            
+
         },
         publish: function() {
             this.set('model.isPublished', true);

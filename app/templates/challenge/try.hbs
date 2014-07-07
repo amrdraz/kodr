@@ -10,7 +10,7 @@
           id="editor"
           class="col-lg-12"
           model=model
-          attr='setup' }}
+          attr='code' }}
       </div>
     </div>
 </div>
@@ -19,8 +19,8 @@
       <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
     </ul>
     <div class="tab-content">
-      <div class="tab-pane fade" id="description">
-        {{view 'App.MarkedMathView' model=model observable='description' }}
+      <div class="tab-pane fade in active" id="description">
+        {{view 'App.MarkedMathView' model=model.challenge observable='description' }}
       </div>
       <div id="sandbox">
         

@@ -25,14 +25,19 @@ App.ChallengeView = require('./views/challenge');
 
 // Controllers
 App.ChallengeController = require('./controllers/challenge');
+App.ChallengeTryController = require('./controllers/trial');
 App.ChallengeEditController = require('./controllers/challenge/edit');
 
 // Models
 App.Challenge = require('./models/challenge');
+App.Trial = require('./models/trial');
 
 // Routes
 App.IndexRoute = require('./routes/index.js');
+
 App.ChallengeRoute = require('./routes/challenge');
+App.ChallengeTryRoute = require('./routes/challenge/try');
+
 App.ChallengesRoute = require('./routes/challenges');
 App.ChallengesCreateRoute = require('./routes/challenges/create');
 

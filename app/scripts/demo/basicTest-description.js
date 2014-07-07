@@ -1,6 +1,8 @@
 module.exports = '\
 ###Basic Test md \n\
-This will be a description of this Challenge in Markdown(md) text format \n\
+This is a description of this Challenge in Markdown(md) format \n\
+\n\
+---\n\
 Define `foo`\n\
 ```javascript\n\
 var foo = 400;\n\
@@ -8,7 +10,7 @@ var foo = 400;\n\
 \n\
 and incriment it by a value smaller then `400`\n\
 \n\
-Some MathJax test \n\
+Here\'s me showing off some MathJax \n\
 \n \
 When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are \
 $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$ \n\
@@ -21,4 +23,5 @@ You can create a table and specify column alignment with one or two colons:\n\
 | Computer  | 1600 USD |  5   |\n\
 | Phone     |   12 USD |  12  |\n\
 | Pipe      |    1 USD | 234  |\n\
+May need to work on that ^^; \n\
 ';
