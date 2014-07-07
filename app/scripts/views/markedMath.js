@@ -3,10 +3,6 @@
 module.exports =Em.View.extend({
     tagName: 'div',
     classNames: ['preview'],
-
-    value: function () {
-        return this.get('model').get(this.get('observable'));
-    }.property(),
     preview: null, // filled in by Init below
     buffer: null, // filled in by Init below
     mjRunning: false, // true when MathJax is processing
@@ -23,12 +19,12 @@ module.exports =Em.View.extend({
         this.preview.innerHTML = this.marked(text);
     },
     Escape: function(html, encode) {
-        return html
-            .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+        return html.
+            replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;').
+            replace(/</g, '&lt;').
+            replace(/>/g, '&gt;').
+            replace(/"/g, '&quot;').
+            replace(/'/g, '&#39;');
     },
     //
     //  Creates the preview and runs MathJax on it.
@@ -39,7 +35,7 @@ module.exports =Em.View.extend({
     //  
     CreatePreview: function() {
         if (this.mjRunning) return;
-        var text = this.get('value');
+        var text = this.get('model').get(this.get('observable'));
         if (text === this.oldtext) return;
         text = this.Escape(text); //Escape tags before doing stuff
         this.buffer.innerHTML = this.oldtext = text;
@@ -69,14 +65,10 @@ module.exports =Em.View.extend({
             smartLists: true,
             smartypants: false
         });
-
         var callback = MathJax.Callback(["CreatePreview", this]);
         callback.autoReset = true;
-        this.get('model').reopen({
-            descriptionChanged: function () {
-                callback();
-            }.observes(this.get('observable'))
-        });
+        
+        this.get('model').addObserver(this.get('observable'), this.get('model'),callback);
         callback();
     }
 });
