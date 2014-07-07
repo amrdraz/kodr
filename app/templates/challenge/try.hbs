@@ -17,10 +17,14 @@
 <div class="col-lg-6">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+      <li class=""><a href="#results" data-toggle="tab">Results</a></li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane fade in active" id="description">
         {{view 'App.MarkedMathView' model=model.challenge observable='description' }}
+      </div>
+      <div class="tab-pane fade" id="results">
+        {{controller.results}}
       </div>
       <div id="sandbox">
         

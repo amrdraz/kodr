@@ -13,15 +13,13 @@ module.exports = App.ChallengeEditController = Em.ObjectController.extend({
         save: function() {
             var that = this;
             this.get('model').save().then(function(ch) {
-                that.transitionToRoute('challenge.edit', ch.get('id'));
+                if(App.get('currentPath').contains('create'))
+                    that.transitionToRoute('challenge.edit', ch.get('id'));
             });
         },
         delete: function() {
             this.get('model').destroyRecord();
             this.transitionToRoute('challenges');
-        },
-        validate: function() {
-
         },
         publish: function() {
             this.set('model.isPublished', true);

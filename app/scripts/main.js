@@ -1,13 +1,21 @@
 'use strict';
 
 
-window.App = Ember.Application.create({
-  LOG_ACTIVE_GENERATION: true,
-  LOG_MODULE_RESOLVER: true,
-  LOG_TRANSITIONS: true,
-  LOG_TRANSITIONS_INTERNAL: true,
-  LOG_VIEW_LOOKUPS: true,
+var App = window.App = Ember.Application.create({
+    LOG_ACTIVE_GENERATION: true,
+    LOG_MODULE_RESOLVER: true,
+    LOG_TRANSITIONS: true,
+    LOG_TRANSITIONS_INTERNAL: true,
+    LOG_VIEW_LOOKUPS: true,
+    currentPath: '',
 });
+
+App.ApplicationController = Ember.Controller.extend({
+    updateCurrentPath: function() {
+        App.set('currentPath', this.get('currentPath'));
+    }.observes('currentPath')
+});
+
 App.ApplicationAdapter = DS.FixtureAdapter;
 
 require('./router')(App);
@@ -40,7 +48,3 @@ App.ChallengeTryRoute = require('./routes/challenge/try');
 
 App.ChallengesRoute = require('./routes/challenges');
 App.ChallengesCreateRoute = require('./routes/challenges/create');
-
-
-
-

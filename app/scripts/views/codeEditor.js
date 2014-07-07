@@ -17,11 +17,21 @@ module.exports = Em.TextArea.extend({
         });
 
         editor.getDoc().setValue(model.get(attr) || '');
-        editor.on('change', debounce(function (cm) {
+        this.updateEditor = function() {
+            if (editor.getDoc().getValue() !== model.get(attr)){
+                editor.getDoc().setValue(model.get(attr) || '');
+            }
+        };
+        model.addObserver(attr, model, this.updateEditor);
 
+        editor.on('change', debounce(function (cm) {
             model.set(attr, cm.getValue());
         }));
-
+        
         this.set('editor', editor);
+    },
+    willDestroyElement: function() {
+        this.get('model').removeObserver(this.get('attr'), this.get('model'), this.updateEditor);
     }
+
 });

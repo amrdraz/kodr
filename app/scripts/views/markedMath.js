@@ -65,10 +65,21 @@ module.exports =Em.View.extend({
             smartLists: true,
             smartypants: false
         });
-        var callback = MathJax.Callback(["CreatePreview", this]);
+        var callback = this.callback = MathJax.Callback(["CreatePreview", this]);
         callback.autoReset = true;
-        
-        this.get('model').addObserver(this.get('observable'), this.get('model'),callback);
+        // var that = this;
+        // this. once = function () {
+        //     if(!that.isDestroyed){
+        //         callback();
+        //     } else {
+        //         // because the observer is still attached
+        //         this.removeObserver(that.get('observable'), this, once);
+        //     }       
+        // };
+        this.get('model').addObserver(this.get('observable'), this.get('model'),this.callback);
         callback();
+    },
+    willDestroyElement: function () {
+        this.get('model').removeObserver(this.get('observable'), this.get('model'),this.callback);
     }
 });
