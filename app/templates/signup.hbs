@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="page-header">
+    <h3>Create Account</h3>
+  </div>
+  <div class="col-sm-8 col-sm-offset-2">
+
+    {{#if errorMessage}}
+      <div class="alert alert-danger">
+        {{errorMessage}}
+      </div>
+    {{/if}}
+    {{#if fullErrors }}
+      <div class="alert alert-danger">
+        {{#each message in fullErrors }}
+          <p>{{message}}</p>
+        {{/each}}
+      </div>
+    {{/if}}
+
+    <form {{action "signup" on="submit"}}>
+      <div class="form-group text-center">
+        <a class="btn btn-social btn-facebook">
+          <i class="fa fa-facebook"></i>
+          Sign in with Facebook
+        </a>
+      </div>
+      <div class="form-group">
+        <label for="username" class="control-label">Username</label>
+        {{input type="text" class="form-control" value=username autofocus="autofocus"}}
+      </div>
+      <div class="form-group">
+        <label for="email" class="control-label">Email</label>
+        {{input type="text" class="form-control" value=email}}
+      </div>
+      <div class="form-group">
+        <label for="password" class="control-label">Password</label>
+        {{input type="password" class="form-control" value=password}}
+        <small class="help-block">Must be at least 8 characters long.</small>
+      </div>
+      <div class="form-group">
+        <label for="passwordConfirmation" class="control-label">Confirm Password</label>
+        {{input type="password" class="form-control" value=passwordConfirmation}}
+      </div>
+      <button type="submit" class="btn btn-success" {{bind-attr disabled="isProcessing"}}><i class="fa fa-rocket"></i> Sign up</button>
+    </form>
+  </div>
+</div>

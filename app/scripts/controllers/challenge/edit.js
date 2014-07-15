@@ -13,8 +13,10 @@ module.exports = App.ChallengeEditController = Em.ObjectController.extend({
         save: function() {
             var that = this;
             this.get('model').save().then(function(ch) {
-                if(App.get('currentPath').contains('create'))
+                if (App.get('currentPath').contains('create'))
                     that.transitionToRoute('challenge.edit', ch.get('id'));
+            }).fail(function(xhr) {
+                that.set('errorMessage', xhr.responseText);
             });
         },
         delete: function() {

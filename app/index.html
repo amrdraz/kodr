@@ -10,15 +10,18 @@
         <!-- build:css styles/vendor.css -->
         <link rel="stylesheet" href="styles/atelier-heath.light.css">
         <!-- bower:css -->
-        <link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css" />
-        <link rel="stylesheet" href="../bower_components/mocha/mocha.css" />
+        <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css" />
+        <link rel="stylesheet" href="lib/mocha/mocha.css" />
+        <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.css" />
+        <link rel="stylesheet" href="lib/bootstrap-social/bootstrap-social.css" />
         <!-- endbower -->
         <!-- endbuild -->
         <!-- build:css(.tmp) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
         <!-- build:js scripts/vendor/modernizr.js -->
-        <script src="../bower_components/modernizr/modernizr.js"></script>
+        <script src="./lib/modernizr/modernizr.js"></script>
         <!-- endbuild -->
 
     </head>
@@ -40,20 +43,36 @@
         
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->
-        <script src="../bower_components/jquery/dist/jquery.js"></script>
-        <script src="../bower_components/codemirror/lib/codemirror.js"></script>
-        <script src="../bower_components/mocha/mocha.js"></script>
-        <script src="../bower_components/chai/chai.js"></script>
-        <script src="../bower_components/esprima/esprima.js"></script>
-        <script src="../bower_components/underscore/underscore.js"></script>
-        <script src="../bower_components/structured/structured.js"></script>
-        <script src="../bower_components/handlebars/handlebars.js"></script>
-        <script src="../bower_components/ember/ember.js"></script>
-        <script src="../bower_components/ember-data/ember-data.js"></script>
+        <script src="lib/jquery/dist/jquery.js"></script>
+        <script src="lib/modernizr/modernizr.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/affix.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/alert.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/button.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/carousel.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/collapse.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/dropdown.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/tab.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/transition.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/scrollspy.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/modal.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/tooltip.js"></script>
+        <script src="lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/popover.js"></script>
+        <script src="lib/codemirror/lib/codemirror.js"></script>
+        <script src="lib/mocha/mocha.js"></script>
+        <script src="lib/chai/chai.js"></script>
+        <script src="lib/esprima/esprima.js"></script>
+        <script src="lib/underscore/underscore.js"></script>
+        <script src="lib/structured/structured.js"></script>
+        <script src="lib/handlebars/handlebars.js"></script>
+        <script src="lib/ember/ember.js"></script>
+        <script src="lib/ember-data/ember-data.js"></script>
+        <script src="lib/bootstrap/dist/js/bootstrap.js"></script>
         <!-- endbower -->
-        <script src="../bower_components/codemirror/mode/javascript/javascript.js"></script>
-        <script src="../bower_components/codemirror/mode/markdown/markdown.js"></script>
-        <script type="text/javascript" src="./scripts/vendor/MathJax/MathJax.js?config=TeX-AMS_HTML-full"></script>
+        <script src="./vendor/ember-simple-auth.js"></script>
+        <script src="./lib/ember-validations-bower/ember-validations.js"></script>
+        <script src="./lib/codemirror/mode/javascript/javascript.js"></script>
+        <script src="./lib/codemirror/mode/markdown/markdown.js"></script>
+        <script type="text/javascript" src="./vendor/MathJax/MathJax.js?config=TeX-AMS_HTML-full"></script>
         <!-- endbuild -->
 
 
@@ -68,23 +87,25 @@
         </script>
 
         <!-- build:js scripts/plugins.js -->
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/affix.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/alert.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/dropdown.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/tooltip.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/modal.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/transition.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/button.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/popover.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/carousel.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/scrollspy.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/collapse.js"></script>
-        <script src="../bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/tab.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/affix.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/alert.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/dropdown.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/tooltip.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/modal.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/transition.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/button.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/popover.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/carousel.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/scrollspy.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/collapse.js"></script>
+        <script src="./lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/tab.js"></script>
         <!-- endbuild -->
 
         <!-- build:js({app,.tmp}) scripts/main.js -->
         <script src="scripts/templates.js"></script>
         <script src="scripts/build.js"></script>
         <!-- endbuild -->
+
+        <script src="http://localhost:35729/livereload.js?snipver=1" type="text/javascript"></script>
 </body>
 </html>

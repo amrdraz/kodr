@@ -1,71 +1,105 @@
-$icon-font-path: "/bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";
+// Typography
+$icon-font-path: "../lib/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";
+$font-family-sans-serif: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+// Brand colors
+$brand-primary: #4f8edd;
+$brand-success: #85c844;
+$brand-warning: #cba50d;
+$brand-danger: #e72c3c;
+$brand-info: #2bbce1;
+
+// Navbar
+$navbar-height: 40px;
+$navbar-inverse-bg: #313338;
+
+// Buttons
+$btn-font-weight: 600;
+$btn-default-bg: #e6e7e7;
+$btn-default-border: #e6e7e7;
+
+// Alerts and form states
+$state-success-text: #527f26;
+$state-success-bg: #ebf6e1;
+$state-success-border: #b8df92;
+$state-info-text: #157890;
+$state-info-bg: #ddf4fb;
+$state-info-border: #84d8ed;
+$state-warning-text: #917608;
+$state-warning-bg: #fbf3d0;
+$state-warning-border: #f6dc6f;
+$state-danger-text: #a81515;
+$state-danger-bg: #fdf2f2;
+$state-danger-border: #f29797;
+
+// Forms
+$input-border-radius: 0;
+$input-border-focus: #2598f9;
+
 
 // bower:scss
-@import "../../bower_components/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap.scss";
+@import "../lib/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap.scss";
 // endbower
+@import "../lib/bootstrap-social/bootstrap-social.scss";
 
-.browsehappy {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
+html, body {
+  height: 100%;
 }
 
-/* Space out content a bit */
+// Needed to make sticky footer work with Ember
+.ember-view {
+  height: 100%;
+}
+
 body {
-    padding-top: 20px;
-    padding-bottom: 20px;
+  padding-top: 60px;
 }
 
-/* Everything but the jumbotron gets side spacing for mobile first views */
-.header,
-.marketing,
-.footer {
-    padding-left: 15px;
-    padding-right: 15px;
+#wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by its height */
+  margin: 0 auto -120px;
+  /* Pad bottom by footer height */
+  // I am using 140px instead of 120px to give some room between #wrap and #footer
+  // Otherwise footer will be almost touching your page content
+  padding: 0 0 140px;
 }
 
-/* Custom page header */
-.header {
-    border-bottom: 1px solid #e5e5e5;
-
-    /* Make the masthead heading the same height as the navigation */
-    h3 {
-        margin-top: 0;
-        margin-bottom: 0;
-        line-height: 40px;
-        padding-bottom: 19px;
-    }
+.alert {
+  border-radius: 1px;
 }
 
-/* Custom page footer */
-.footer {
-    padding-top: 19px;
-    color: #777;
-    border-top: 1px solid #e5e5e5;
+.form-control:focus {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) inset;
 }
 
-.container-narrow > hr {
-    margin: 30px 0;
+.navbar-brand {
+  background-image: url(http://www.joyent.com/content/07-blog/722-joyent-to-sponsor-and-present-at-mongosv-2012/mongodb-leaf.png);
+  background-repeat: no-repeat;
+  background-size: 30px;
+  background-position: left center;
+  padding-left: 40px;
+  margin-left: 15px;
 }
 
-/* Main marketing message and sign up button */
-.jumbotron {
-    text-align: center;
-    border-bottom: 1px solid #e5e5e5;
-    .btn {
-        font-size: 21px;
-        padding: 14px 24px;
-    }
+.btn {
+  padding: 8px 16px;
+  border-width: 0;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.09);
 }
 
-/* Supporting marketing content */
-.marketing {
-    margin: 40px 0;
-    p + h4 {
-        margin-top: 28px;
-    }
+.btn-social {
+  padding-left: 44px !important;
 }
+
+[class^="fa-"],
+[class*="fa-"] {
+  margin-right: 5px;
+}
+
 
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {

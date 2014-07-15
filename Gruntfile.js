@@ -1,6 +1,6 @@
 // Generated on 2014-06-18 using generator-webapp 0.4.9
 'use strict';
-
+var path = require('path');
 // # Globbing
 // for performance reasons we're only matching one level down:
 // 'test/spec/{,*/}*.js'
@@ -18,7 +18,8 @@ module.exports = function(grunt) {
     // Configurable paths
     var config = {
         app: 'app',
-        dist: 'dist'
+        dist: 'dist',
+        server: 'back'
     };
 
     // Define the configuration for all the tasks
@@ -56,7 +57,7 @@ module.exports = function(grunt) {
                 tasks: ['browserify'],
                 options: {
                     spawn: false,
-                    interrupt:true,
+                    interrupt: true,
                     livereload: true
                 }
             },
@@ -73,16 +74,82 @@ module.exports = function(grunt) {
             },
             livereload: {
                 options: {
-                    livereload: '<%= connect.options.livereload %>'
+                    livereload: true
                 },
                 files: [
+                    '!<%= config.app %>/lib',
                     '<%= config.app %>/{,*/}*.html',
                     '.tmp/styles/{,*/}*.css',
-                    '<%= config.app %>/images/{,*/}*'
+                    '<%= config.app %>/images/{,*/}*',
+                    '.rebooted'
                 ]
             }
         },
+        express: {
+            options: {
+                port: 9000
+            },
+            dev: {
+                options: {
+                    script: 'server.js',
+                    port: 9000
+                }
+            },
+            prod: {
+                options: {
+                    script: 'server.js',
+                    node_env: 'production'
+                }
+            },
+            test: {
+                options: {
+                    script: 'test-server.js',
+                    node_env: 'test',
+                    hostname:'localhost',
+                    port: 9001
+                }
+            }
+        },
+        open: {
+            server: {
+                url: 'http://localhost:<%= express.options.port %>'
+            }
+        },
+        nodemon: {
+            dev: {
+                script: 'server.js',
+                options: {
+                    watch: ['<%= config.server %>'],
+                    ext: 'js,coffee,jade',
+                    env: {
+                        PORT: '9000'
+                    },
+                    // omit this property if you aren't serving HTML files and 
+                    // don't want to open a browser tab on start
+                    callback: function(nodemon) {
+                        nodemon.on('log', function(event) {
+                            console.log(event.colour);
+                        });
 
+                        // opens browser on initial server start
+                        nodemon.on('config:update', function() {
+                            // Delay before server listens on port
+                            setTimeout(function() {
+                                require('open')('http://localhost:9000');
+                            }, 1000);
+                        });
+
+                        // refreshes browser when server reboots
+                        nodemon.on('restart', function() {
+                            // Delay before server listens on port
+                            setTimeout(function() {
+                                require('fs').writeFileSync('.rebooted', 'rebooted');
+                            }, 1000);
+                        });
+                    }
+                }
+            }
+        },
         // The actual grunt server settings
         connect: {
             options: {
@@ -97,7 +164,7 @@ module.exports = function(grunt) {
                     middleware: function(connect) {
                         return [
                             connect.static('.tmp'),
-                            connect().use('/bower_components', connect.static('./bower_components')),
+                            connect().use('/app/lib', connect.static('./app/lib')),
                             connect.static(config.app)
                         ];
                     }
@@ -111,7 +178,7 @@ module.exports = function(grunt) {
                         return [
                             connect.static('.tmp'),
                             connect.static('test'),
-                            connect().use('/bower_components', connect.static('./bower_components')),
+                            connect().use('/app/lib', connect.static('./app/lib')),
                             connect.static(config.app)
                         ];
                     }
@@ -148,7 +215,7 @@ module.exports = function(grunt) {
         },
         emberTemplates: {
             options: {
-                templateName: function (sourceFile) {
+                templateName: function(sourceFile) {
                     var templatePath = config.app + '/templates/';
                     return sourceFile.replace(templatePath, '');
                 }
@@ -169,7 +236,7 @@ module.exports = function(grunt) {
             all: [
                 'Gruntfile.js',
                 '<%= config.app %>/scripts/{,*/}*.js',
-                '!<%= config.app %>/scripts/vendor/*',
+                '!<%= config.app %>/vendor/*',
                 'test/spec/{,*/}*.js'
             ]
         },
@@ -179,7 +246,7 @@ module.exports = function(grunt) {
             all: {
                 options: {
                     run: true,
-                    urls: ['http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/index.html']
+                    urls: ['http://<%= express.test.options.hostname %>:<%= express.test.options.port %>/index.html']
                 }
             }
         },
@@ -188,7 +255,7 @@ module.exports = function(grunt) {
         sass: {
             options: {
                 includePaths: [
-                    'bower_components'
+                    'app/lib'
                 ]
             },
             dist: {
@@ -230,7 +297,7 @@ module.exports = function(grunt) {
         bowerInstall: {
             app: {
                 src: ['<%= config.app %>/index.html'],
-                exclude: ['bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap.js']
+                exclude: ['app/lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap.js']
             },
             sass: {
                 src: ['<%= config.app %>/styles/{,*/}*.{scss,sass}']
@@ -360,7 +427,7 @@ module.exports = function(grunt) {
                     expand: true,
                     dot: true,
                     cwd: '.',
-                    src: ['bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/*.*'],
+                    src: ['app/lib/bootstrap-sass-official/vendor/assets/fonts/bootstrap/*.*'],
                     dest: '<%= config.dist %>'
                 }]
             },
@@ -377,7 +444,7 @@ module.exports = function(grunt) {
         // reference in your app
         modernizr: {
             dist: {
-                devFile: 'bower_components/modernizr/modernizr.js',
+                devFile: 'app/lib/modernizr/modernizr.js',
                 outputFile: '<%= config.dist %>/scripts/vendor/modernizr.js',
                 files: {
                     src: [
@@ -392,16 +459,29 @@ module.exports = function(grunt) {
 
         // Run some tasks in parallel to speed up build process
         concurrent: {
+            watch: {
+                tasks: ['nodemon:dev', 'watch'],
+                options: {
+                    logConcurrentOutput: true
+                }
+            },
             server: [
                 'sass:server',
+                'browserify',
+                'emberTemplates',
                 'copy:styles'
             ],
             test: [
+
+                'browserify',
+                'emberTemplates',
                 'copy:styles'
             ],
             dist: [
                 'sass',
                 'copy:styles',
+                'browserify',
+                'emberTemplates',
                 'imagemin',
                 'svgmin'
             ]
@@ -411,17 +491,14 @@ module.exports = function(grunt) {
 
     grunt.registerTask('serve', function(target) {
         if (target === 'dist') {
-            return grunt.task.run(['build', 'connect:dist:keepalive']);
+            return grunt.task.run(['build']);
         }
 
         grunt.task.run([
             'clean:server',
             'concurrent:server',
             'autoprefixer',
-            'connect:livereload',
-            'browserify',
-            'emberTemplates',
-            'watch'
+            'concurrent:watch'
         ]);
     });
 
@@ -436,8 +513,6 @@ module.exports = function(grunt) {
                 'clean:server',
                 'concurrent:test',
                 'autoprefixer',
-                'browserify',
-                'emberTemplates',
             ]);
         }
 
@@ -452,8 +527,6 @@ module.exports = function(grunt) {
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
-        'browserify',
-        'emberTemplates',
         'concat',
         'cssmin',
         'uglify',

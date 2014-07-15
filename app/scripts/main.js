@@ -1,5 +1,14 @@
 'use strict';
 
+require('./utils/localStorageShim.js');
+
+Ember.Application.initializer({
+  name: 'authentication',
+  initialize: function(container, application) {
+    Ember.SimpleAuth.setup(container, application, {routeAfterLogin:'profile'});
+  }
+});
+
 
 var App = window.App = Ember.Application.create({
     LOG_ACTIVE_GENERATION: true,
@@ -10,13 +19,17 @@ var App = window.App = Ember.Application.create({
     currentPath: '',
 });
 
-App.ApplicationController = Ember.Controller.extend({
-    updateCurrentPath: function() {
-        App.set('currentPath', this.get('currentPath'));
-    }.observes('currentPath')
+App.ApplicationSerializer = DS.RESTSerializer.extend({
+  primaryKey: '_id'
 });
 
-App.ApplicationAdapter = DS.FixtureAdapter;
+// App.ApplicationAdapter = DS.FixtureAdapter;
+App.ApplicationAdapter = DS.RESTAdapter.extend({
+  namespace: 'api'
+});
+
+// App.ChallengeAdapter = DS.FixtureAdapter;
+App.TrialAdapter = DS.FixtureAdapter;
 
 require('./router')(App);
 
@@ -32,6 +45,9 @@ App.ApplicationView = require('./views/application');
 App.ChallengeView = require('./views/challenge');
 
 // Controllers
+App.ApplicationController = require('./controllers/application');
+App.LoginController = require('./controllers/login');
+App.SignupController = require('./controllers/signup');
 App.ChallengeController = require('./controllers/challenge');
 App.ChallengeTryController = require('./controllers/trial');
 App.ChallengeEditController = require('./controllers/challenge/edit');
@@ -41,7 +57,11 @@ App.Challenge = require('./models/challenge');
 App.Trial = require('./models/trial');
 
 // Routes
+App.ApplicationRoute = require('./routes/application.js');
 App.IndexRoute = require('./routes/index.js');
+App.ProfileRoute = require('./routes/profile.js');
+App.LoginRoute = require('./routes/login.js');
+
 
 App.ChallengeRoute = require('./routes/challenge');
 App.ChallengeTryRoute = require('./routes/challenge/try');

@@ -7,7 +7,7 @@ module.exports = Em.ObjectController.extend({
             var model = this.get('model');
 
             var iframeTemplate = require('../demo/iframe');
-            var stuff = require('../vendor/stuff');
+            var stuff = require('../../vendor/stuff');
             var Runner = require('../runners/runner');
 
             var iframe;

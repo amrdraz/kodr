@@ -1,15 +1,15 @@
 var attr = DS.attr;
 
-module.exports = ChallengeModel = DS.Model.extend({
+var ChallengeModel = module.exports = DS.Model.extend({
     name: attr('string', {defaultValue:"New Challenge"}),
-    setup: attr('string', {defaultValue:"// Starting Code leave blank if you want Student to start from scrach"}),
-    solution: attr('string', {defaultValue:"// Challenge Solution goes here"}),
-    tests: attr('string', {defaultValue:"// Challenge Tests go here"}),
-    structure: attr('string', {defaultValue:"// Challenge Code Structure"}),
+    setup: attr('string', {defaultValue:"// Starting Code leave blank if you want Student to start from scrach\n"}),
+    solution: attr('string', {defaultValue:"// Challenge Solution goes here\n"}),
+    tests: attr('string', {defaultValue:"// Challenge Tests go here\n"}),
+    structure: attr('string', {defaultValue:"// Challenge Code Structure\n"}),
     callbacks: attr('string', {defaultValue:"// callbacks for structure variables if any\n{}"}),
     description: attr('string', {defaultValue:"A new Challenge"}),
-    status: attr('string', {defaultValue:"Draft"}),
-    statusOptions: ['Draft','Saved','Beta', 'Published'], 
+    status: attr('string', {defaultValue:"unPublished"}),
+    statusOptions: ['unPublished','Beta', 'Published'], 
     isPublished: attr('boolean',{defaultValue:false}),
     exp: attr('number'),
     expOptions: [

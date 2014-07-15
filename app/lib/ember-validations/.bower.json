@@ -1,0 +1,14 @@
+{
+  "name": "ember-validations",
+  "homepage": "https://github.com/dockyard/ember-validations",
+  "_release": "2ff28c6ba4",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "2ff28c6ba4d227b0f863b327cdff23c381c37afb"
+  },
+  "_source": "git://github.com/dockyard/ember-validations.git",
+  "_target": "*",
+  "_originalSource": "ember-validations",
+  "_direct": true
+}
