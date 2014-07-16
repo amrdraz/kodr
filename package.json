@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "node_modules/.bin/mocha test/server -R spec --ui bdd"
+    "test": "node_modules/.bin/mocha test/server -R spec --ui bdd",
+    "postinstall":"bower install"
   },
   "dependencies": {
     "express": "~4.0.0",
