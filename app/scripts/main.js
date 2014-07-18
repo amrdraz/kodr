@@ -37,6 +37,8 @@ require('./helpers/markdown-helper');
 
 // Views
 App.CodeEditorView = require('./views/codeEditor');
+App.ConsoleView = require('./views/console');
+App.SandboxView = require('./views/sandbox');
 App.MarkedMathView = require('./views/markedMath');
 App.ToggleView = require('./views/toggle');
 

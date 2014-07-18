@@ -41,12 +41,21 @@
   <div class="col-lg-6">
       <a id="run" {{action "run"}} class="btn btn-default pull-right"><i class="glyphicon glyphicon-play"></i></a>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#code" data-toggle="tab">Code</a></li>
+        <li class="active"><a href="#solution" data-toggle="tab">Solution</a></li>
+        <li><a href="#setup" data-toggle="tab">Setup</a></li>
         <li><a href="#tests" data-toggle="tab">Test</a></li>
         <li><a href="#structure" data-toggle="tab">Structure</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane  fade in active" id="code">
+        <div class="tab-pane fade in active" id="solution">
+          {{view 'App.CodeEditorView'
+              name="solutionEditor"
+              id="solutionEditor"
+              class="col-lg-12"
+              model=model
+              attr='solution' }}
+        </div>
+        <div class="tab-pane fade " id="setup">
           {{view 'App.CodeEditorView'
             name="codeEditor"
             id="editor"
@@ -84,7 +93,7 @@
       <ul class="nav nav-tabs">
         <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
         <li><a href="#descriptionPreview" data-toggle="tab">Description Preview</a></li>
-        <li><a href="#solution" data-toggle="tab">Solution</a></li>
+        <li><a href="#console" data-toggle="tab">Console</a></li>
       </ul>
       <div class="tab-content">
         <div class="tab-pane  fade in active" id="description">
@@ -100,16 +109,11 @@
         <div class="tab-pane fade" id="descriptionPreview">
           {{view 'App.MarkedMathView' model=model observable='description' }}
         </div>
-        <div class="tab-pane fade" id="solution">
-          {{view 'App.CodeEditorView'
-              name="solutionEditor"
-              id="solutionEditor"
-              class="col-lg-12"
-              model=model
-              attr='solution' }}
+        <div class="tab-pane fade" id="console">
+          {{view App.ConsoleView }}
         </div>
         <div id="sandbox">
-          
+          {{view App.SandboxView }}
         </div>
       </div>
   
