@@ -40,9 +40,18 @@ module.exports =Em.View.extend({
         text = this.Escape(text); //Escape tags before doing stuff
         this.buffer.innerHTML = this.oldtext = text;
         this.mjRunning = true;
-        MathJax.Hub.Queue(
+        // MathJax.InputJax.TeX is undefined first time the page loads
+        // don't know if it will cause a bug later but everything seems to work fine
+        if(MathJax.InputJax.TeX) {
+            MathJax.Hub.Queue(
             ["Typeset", MathJax.Hub, this.buffer], ["PreviewDone", this], ["resetEquationNumbers", MathJax.InputJax.TeX]
         );
+        } else {
+            MathJax.Hub.Queue(
+            ["Typeset", MathJax.Hub, this.buffer], ["PreviewDone", this]
+        );
+        }
+        
     },
 
     didInsertElement: function() {
