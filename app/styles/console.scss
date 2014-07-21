@@ -1,0 +1,97 @@
+$cursor: #4f8edd;
+ $prompt: #222;
+ $input: #111;
+ $old: #555;
+ #console {
+    background: #0E1628;
+    position:relative;
+    right: 0px;
+    bottom: 0;
+    height: 400px;
+}
+#console *::selection, #console *::-moz-selection, #console *::-webkit-selection {
+    background: #94A2BB;
+}
+.jqconsole {
+    padding: 15px;
+    padding-top: 17px;
+    color: #F4FFFF;
+    display: block;
+    font-family: monospace;
+    font-size: 14px;
+    /* Force word wrap on all browsers. */
+    white-space: -moz-pre-wrap;
+    /* Mozilla, supported since 1999 */
+    white-space: -o-pre-wrap;
+    /* Opera */
+    white-space: -pre-wrap;
+    /* Opera */
+    white-space: pre-wrap;
+    /* CSS3 (Candidate) */
+    word-wrap: break-word;
+    /* IE 5.5+ */
+}
+pre.jqconsole {
+    background: transparent;
+}
+$prompt:#FC0;
+.jqconsole-prompt {
+    font-weight: bold;
+    color: $prompt;
+    padding-left:20px;
+    background: url(../images/sprite.png) -13px -583px no-repeat;
+    margin-left: -8px;
+    .jqconsole-blurred & {
+        color: #B91;
+        background: url(../images/sprite.png) -13px -615px no-repeat;
+    }
+}
+$old-prompt: #D60;
+.jqconsole-old-prompt {
+    font-weight: bold;
+    color: $old-prompt;
+    padding-left:20px;
+    margin-left: -8px;
+    background: url(../images/sprite.png) -13px -647px no-repeat;
+    position: relative;
+    left: -8px;
+    .jqconsole-blurred & {
+        color: #B41;
+        background: url(../images/sprite.png) -13px -679px no-repeat;
+    }
+}
+.jqconsole-cursor {
+    background: #666;
+    line-height: 115%;
+    margin-right: -8px;
+    .jqconsole-blurred & {
+        background: #333;
+    }
+}
+.error {
+    color: #F06;
+    display: block;
+    position: relative;
+    left: -8px;
+    .jqconsole-blurred & {
+        color: #B14;
+    }
+}
+.result {
+    color: #6F0;
+    display: block;
+    position: relative;
+    left: -8px;
+    .jqconsole-blurred & {
+        color: #4A1;
+    }
+}
+.matching-0, .matching-1, .matching-2, .matching-3, .matching-4 {
+    color: #B3B;
+}
+.jqconsole-blurred {
+    color: #C4CCCC;
+    .matching-0, .matching-1, .matching-2, .matching-3, .matching-4 {
+        color: #808;
+    }
+}
