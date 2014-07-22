@@ -1,84 +1,13 @@
 var User = require('./models/user');
-var Person = require('./models/person');
+var access = require('./routes/access');
 var Challenge = require('./models/challenge');
 
 module.exports = function(app, passport) {
 
-
-     /**
-     * Find challenge by id.
-     *
-     * @param {string} id
-     * @returns {object} challenge
-     */
-
-    app.get('/api/challenges/:id', function(req, res, next) {
-        Challenge.findById(req.params.id, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404, "Not Found");
-            res.json({challenge:model});
-        });
-    });
-
-     /**
-     * get all challenges.
-     *
-     * @param range
-     * @returns {object} person
-     */
-
-    app.get('/api/challenges', function(req, res, next) {
-        Challenge.find({}, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404, "Not Found");
-            res.json({challenge:model});
-        });
-    });
-
-    /**
-     * Create new challenges.
-     *
-     * @param range
-     * @returns {object} person
-     */
-
-    app.post('/api/challenges', hasToken,function(req, res, next) {
-        req.body.author = req.id;
-        Challenge.create(req.body.challenge, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(403, "Not Found");
-            res.json({challenge:model});
-        });
-    });
-
-    /**
-     * Update new challenges.
-     *
-     * @param range
-     * @returns {object} person
-     */
-
-    app.put('/api/challenges/:id', hasToken,function(req, res, next) {
-        Challenge.findByIdAndUpdate(req.params.id,req.body.challenge, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404, "Not Found");
-            res.json({challenge:model});
-        });
-    });
-
-    /**
-     * Delete challenge.
-     *
-     * @param range
-     * @returns {status} 200
-     */
-
-    app.del('/api/challenges/:id', hasToken,function(req, res, next) {
-        Challenge.findByIdAndRemove(req.params.id, function(err, model) {
-            if (err) return next(err);
-            res.send(200);
-        });
-    });
+    // challenge routes
+    require('./routes/challenge')(app, passport);
+    // trial routes
+    require('./routes/trial')(app, passport);
 
     /**
      * POST /token
@@ -115,13 +44,13 @@ module.exports = function(app, passport) {
         })(req, res, next);
     });
 
-    app.get('/profile', hasToken, function(req, res) {
+    app.get('/profile', access.hasToken, function(req, res) {
         res.json(
             req.user
         );
     });
 
-    app.post('/profile', hasToken, function(req, res) {
+    app.post('/profile', access.hasToken, function(req, res) {
         req.user.set(req.body);
         var token = req.user.token;
         req.user.save(function(err, user) {
@@ -130,7 +59,7 @@ module.exports = function(app, passport) {
     });
 
     // logout
-    app.del('/logout', hasToken, function(req, res) {
+    app.del('/logout', access.hasToken, function(req, res) {
         req.logout();
         res.send(200);
     });
@@ -180,35 +109,4 @@ module.exports = function(app, passport) {
         });
 
     });
-
-
-    function isLoggedin(req, res, next) {
-
-        // if user is authenticated continue
-        if (req.isAuthenticated()) return next();
-
-        res.send(401, "Unauthorized");
-
-        // res.redirect('/');
-    }
-
-    function hasToken(req, res, next) {
-
-        if (!req.get('Authorization')) {
-            res.send(401, "Unauthorized");
-            return;
-        }
-        var token = req.get('Authorization');
-
-        User.findOne({
-            token: token.replace('Bearer ', '')
-        }, function(err, user) {
-            if (err) return next(err);
-            if (!user) return res.send(401, "Unauthorized");
-            req.user = user;
-            next();
-        });
-
-        // res.redirect('/');
-    }
 };

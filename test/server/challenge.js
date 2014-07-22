@@ -26,8 +26,8 @@ describe('Challenge', function() {
                 setup: "",
                 solution: "var x = 20;",
                 tests: "",
-                structure: "var _ = 20;",
-                callbacks: "{}",
+                preCode: "",
+                postCode: "",
                 description: "create a variable and assign to it the value 20",
                 exp: 2,
                 isPublished: false

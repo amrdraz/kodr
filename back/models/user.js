@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var bcrypt = require('bcrypt');
+var ObjectId = mongoose.Schema.ObjectId;
+var Mixed = mongoose.Schema.Mixed;
 
 /**
  * User Schema.
@@ -12,7 +14,15 @@ var userSchema = new mongoose.Schema({
   username: { type: String, unique: true },
   email: { type: String, unique: true },
   password: String,
-  token: String
+  token: String,
+  challenges: {
+    type:[ObjectId],
+    ref:'Challenge'
+  },
+  trials: {
+    type:[ObjectId],
+    ref:'Trial'
+  }
 });
 
 /**

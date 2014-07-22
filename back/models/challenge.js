@@ -1,13 +1,19 @@
 var mongoose = require('mongoose');
-var ObjectId = mongoose.Schema.ObjectId;
+var version = require('mongoose-version');
+
+var ObjectId = mongoose.Schema.Types.ObjectId;
+var Mixed = mongoose.Schema.Types.Mixed;
 
 /**
  * Challenge Schema.
+ * A Challenge is a means of testing and awarding users experience points for them
+ * to reach achievements marking thier mastery of a subject
+ * It has versions for users to undo edits etc (not really used yet)
  *
  * @type {mongoose.Schema}
  */
 
-var challengeSchema = new mongoose.Schema({
+var Challenge = new mongoose.Schema({
     name: {
         type: String,
         'default': 'New Challenge'
@@ -16,6 +22,14 @@ var challengeSchema = new mongoose.Schema({
         type: String,
         'default': '// Starting Code leave blank if you want Student to start from scrach\n'
     },
+    preCode: {
+        type: String,
+        'default': '// Code that will run before the student\'s codeh\n'
+    },
+    postCode: {
+        type: String,
+        'default': '// Code that will run after the student\'s code, but not for testing h\n'
+    },
     solution:  {
         type: String,
         'default': '// Challenge Solution goes here\n'
@@ -23,14 +37,6 @@ var challengeSchema = new mongoose.Schema({
     tests:  {
         type: String,
         'default': '// Challenge Tests go here\n'
-    },
-    structure:  {
-        type: String,
-        'default': '// Challenge Code Structure\n'
-    },
-    callbacks:  {
-        type: String,
-        'default': '// callbacks for structure variables if any\n{}'
     },
     description:  {
         type: String,
@@ -54,7 +60,12 @@ var challengeSchema = new mongoose.Schema({
     author: {
         type: ObjectId, ref: 'User'
     },
+    trials: {
+        type: [ObjectId], ref: 'Trial'
+    }
     
 });
 
-module.exports = mongoose.model('Challenge', challengeSchema);
+Challenge.plugin(version, { collection: 'ChallengeVersions', log:true });
+
+module.exports = mongoose.model('Challenge', Challenge);
