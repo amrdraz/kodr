@@ -10,7 +10,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
  *
  * @attribute code      String      Users's code submittion
  * @attribute completed Boolean     Whether the user passes or not
- * @attribute tests     Mixed       The result of the tests run on the code
+ * @attribute report    Mixed       The result of the tests run on the code
  * @attribute challenge Challenge   The Challenge the trial is on
  * @attribute user      User        The User trying the challenge
  *
@@ -23,26 +23,34 @@ var Trial = new mongoose.Schema({
     },
     times: {
         type: Number,
-        'default':0
+        'default': 0
     },
     completed: {
         type: Boolean
     },
-    tests: Mixed,
+    report: Mixed,
     time: {
         type: Date,
         'default': Date.now
     },
     challenge: {
-        type: ObjectId, ref: 'Challenge',
+        type: ObjectId,
+        ref: 'Challenge',
         required: true
     },
     user: {
-        type: ObjectId, ref: 'User'
+        type: ObjectId,
+        ref: 'User'
     },
-    
+
 });
 
-Trial.plugin(version, { collection: 'TrialVersions', log:true });
+Trial.plugin(version, {
+    collection: 'TrialVersions',
+    logError: true,
+    suppressVersionIncrement: false,
+    ignorePaths: 'times',
+    strategy: 'array'
+});
 
 module.exports = mongoose.model('Trial', Trial);

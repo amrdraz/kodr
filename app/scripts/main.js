@@ -29,7 +29,7 @@ App.ApplicationAdapter = DS.RESTAdapter.extend({
 });
 
 // App.ChallengeAdapter = DS.FixtureAdapter;
-App.TrialAdapter = DS.FixtureAdapter;
+// App.TrialAdapter = DS.FixtureAdapter;
 
 require('./router')(App);
 

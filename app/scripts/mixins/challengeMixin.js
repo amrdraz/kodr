@@ -1,7 +1,8 @@
 module.exports = Em.Mixin.create({
-   jshint: function(code, cb, options) {
+    jshint: function(code, cb, options) {
         options = options || {};
         var console = this.get('console') || console;
+        console.Write  = console.Write || console.log;
         var sb = options.sandbox || this.get('csandbox') || window;
         JSHINT(code, {
             "asi": true, // supress simicolon warning
@@ -14,25 +15,57 @@ module.exports = Em.Mixin.create({
             "eqeqeq": true,
             "eqnull": true,
             "immed": false,
-            "latedef": options.run || false,
+            "latedef": true,
             "newcap": false,
             "noarg": true,
-            "undef": options.run || false,
+            "undef": true,
             "strict": false,
             "trailing": false,
             "smarttabs": true,
         });
         var errors = JSHINT.errors;
-        if (cb) {
-            if (!errors.length) {
-                cb.call(this, code, console, sb);
-            } else {
-                console.Write('Syntax Error line(' + errors[0].line + '): ' + errors[0].reason + '\n', 'error');
-            }
-
+        if (!errors.length) {
+            cb && cb.call(this, code, console, sb);
+        } else {
+            this.testError(errors);
         }
+
         // debugger;
         return errors;
+    },
+    testError: function (errors) {
+        var console = this.get('console') || console;
+        console.Write  = console.Write || console.log;
+       console.Write('Syntax Error line(' + errors[0].line + '): ' + errors[0].reason + '\n', 'error');
+    },
+    testSuccess: function(report) {
+        var tests = report.tests.length;
+        var passes = report.passes.length;
+        var failures = report.failures.length;
+        var pass = tests === passes;
+        var console = this.get('console') || console;
+        console.Write  = console.Write || console.log;
+        var writeTest = function(test, pass) {
+            console.Write(test.title + '\n', pass);
+        };
+
+        console.Write("========= Running Submission " + (pass ? 'Passed' : 'Failed') + " ==========\n", pass ? 'result' : 'error');
+
+        if (passes) {
+            report.passes.forEach(function(test) {
+                writeTest(test, 'result');
+            });
+            failures && console.Write('\n-----------------------------------\n\n');
+        }
+
+        if (failures) {
+            report.failures.forEach(function(test) {
+                writeTest(test, 'error');
+            });
+        }
+        console.Write("==============================================\n", pass ? 'result' : 'error');
+
+        return tests === passes;
     },
     actions: {
         sandboxLoaded: function(sb) {
@@ -41,35 +74,9 @@ module.exports = Em.Mixin.create({
                 console.log(msg);
                 that.get('console').Write(msg.toString() + '\n');
             };
-            var writeTest = function(test, pass) {
-                that.get('console').Write(test.title + '\n', pass);
-            };
+
             sb.on('error', log);
-            sb.on('test.done', function(report) {
-                var tests = report.tests.length;
-                var passes = report.passes.length;
-                var failures = report.failures.length;
-                var pass = tests === passes;
-                that.get('console').Write("========= Running Submittion " + (pass ? 'Passed' : 'Failed') + " ==========\n", pass ? 'result' : 'error');
-
-                if (passes) {
-                    report.passes.forEach(function(test) {
-                        writeTest(test, 'result');
-                    });
-                    failures && that.get('console').Write('\n-----------------------------------\n\n');
-                }
-
-                if (failures) {
-                    report.failures.forEach(function(test) {
-                        writeTest(test, 'error');
-                    });
-                }
-                that.get('console').Write("==============================================\n", pass ? 'result' : 'error');
-
-                if (tests === passes) {
-                    that.set('passed', true);
-                }
-            });
+            sb.on('test.done', this.testSuccess.bind(this));
             // sb.on('structure.done', log);
             sb.on('log', log);
             console.log('loaded sandbox');

@@ -19,8 +19,20 @@ module.exports = App.ChallengeTryController = Em.ObjectController.extend(Challen
         //     sb.on('log', handler);
         // });
     },
-    results: "Run Code to see output",
-
+    testError: function function_name (errors) {
+        var model = this.get('model');
+        model.set('report', {errors:errors});
+        model.set('completed', this._super(errors));
+        model.save();
+    },
+    testSuccess: function(report) {
+        var model = this.get('model');
+        model.set('report', report);
+        model.set('completed', this._super(report));
+        model.save().catch(function(err) {
+            console.log(err);
+        });
+    },
     actions: {
         run: debounce(function() {
             var model = this.get('model');
@@ -29,7 +41,7 @@ module.exports = App.ChallengeTryController = Em.ObjectController.extend(Challen
             var sb = controller.get('sandbox');
             var Runner = require('../runners/runner');
             var iframeTemplate = require('../demo/iframe');
-            controller.jshint(model.get('code'), function(code, console, sb) {
+            controller.jshint(model.get('code'), function(code, jconsole, sb) {
                 sb.load(iframeTemplate, function() {
                     sb.evaljs(Runner.test(code, challenge.get('tests')));
                 });

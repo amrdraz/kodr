@@ -43,7 +43,7 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/challenges', access.hasToken,function(req, res, next) {
-        req.body.author = req.id;
+        req.body.challenge.author = req.user.id;
         Challenge.create(req.body.challenge, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(403, "Not Found");

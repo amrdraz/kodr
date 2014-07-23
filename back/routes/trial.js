@@ -44,11 +44,15 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/trials', access.hasToken,function(req, res, next) {
-        req.body.author = req.id;
-        Trial.create(req.body.trial, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(403, "Not Found");
-            res.json({trial:model});
+        req.body.trial.user = req.user.id;
+        Trial.findOne({user: req.user.id}, function(err, model){
+            if(err) return next(err);
+            if(model) return res.json({trial:model});
+            Trial.create(req.body.trial, function(err, model) {
+                if (err) return next(err);
+                if (!model) return res.send(403, "Not Found");
+                res.json({trial:model});
+            });
         });
     });
 
@@ -60,6 +64,9 @@ module.exports = function(app, passport) {
      */
 
     app.put('/api/trials/:id', access.hasToken,function(req, res, next) {
+        var trial = req.body.trial;
+        trial.time = Date.now();
+        trial.times += 1;
         Trial.findByIdAndUpdate(req.params.id,req.body.trial, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");

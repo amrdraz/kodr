@@ -14,7 +14,7 @@ module.exports = Em.Route.extend({
             challenge:challenge,
             code:challenge.get('setup')
         });
-        record.save();
-        return record;
+        // record.save();
+        return record.save();
     }
 });

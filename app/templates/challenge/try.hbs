@@ -1,5 +1,9 @@
-<section class="description row">
-  <div class="col-lg-12">
+<section class="description panel panel-default">
+  <div class="panel-heading">
+    <span class="pull-right label label-primary">awards {{model.challenge.exp}} Exp</span>
+    <h2 class="panel-title">{{model.challenge.name}}</h2>
+</div>
+  <div class="panel-body">
     {{view 'App.MarkedMathView' model=model.challenge observable='description' }}
   </div>
 </section>
@@ -21,7 +25,17 @@
     </div>
 </div>
 <div class="col-lg-6">
-<a id="run" {{action "run"}} class="btn btn-primary pull-right">Submit <i class="glyphicon glyphicon-play"></i></a>
+    <a id="run" {{action "run"}} {{bind-attr class=":btn model.completed:btn-success:btn-primary :pull-right model.canSubmit::disabled" }} >
+      {{#if model.completed}}
+        {{#if model.isDirty}}
+          Re-Submit <i class="glyphicon glyphicon-play"></i>
+        {{else}}
+          Completed <i class="glyphicon glyphicon-ok"></i>
+        {{/if}}
+      {{else}}
+        Submit <i class="glyphicon glyphicon-play"></i>
+      {{/if}}
+    </a>
     <ul class="nav nav-tabs">
       <li class="active"><a href="#console" data-toggle="tab">Console</a></li>
       <li class=""><a href="#results" data-toggle="tab">Results</a></li>
