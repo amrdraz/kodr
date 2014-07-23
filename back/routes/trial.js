@@ -67,10 +67,14 @@ module.exports = function(app, passport) {
         var trial = req.body.trial;
         trial.time = Date.now();
         trial.times += 1;
-        Trial.findByIdAndUpdate(req.params.id,req.body.trial, function(err, model) {
+        Trial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
-            res.json({trial:model});
+            model.set(trial);
+            model.save(function (err, model) {
+                if (err) return next(err);
+                res.json({trial:model});
+            });
         });
     });
 
