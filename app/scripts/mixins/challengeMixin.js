@@ -15,10 +15,10 @@ module.exports = Em.Mixin.create({
             "eqeqeq": true,
             "eqnull": true,
             "immed": false,
-            "latedef": true,
+            "latedef": false,
             "newcap": false,
             "noarg": true,
-            "undef": true,
+            "undef": false,
             "strict": false,
             "trailing": false,
             "smarttabs": true,
@@ -75,7 +75,9 @@ module.exports = Em.Mixin.create({
                 that.get('console').Write(msg.toString() + '\n');
             };
 
-            sb.on('error', log);
+            sb.on('error', function (error) {
+                that.get('console').Write('Syntax Error line(' + error.lineNumber + '): ' + error.message + '\n', 'error');
+            });
             sb.on('test.done', this.testSuccess.bind(this));
             // sb.on('structure.done', log);
             sb.on('log', log);
