@@ -9,7 +9,9 @@ var Challenge = require('../../back/models/challenge');
 
 
 describe('Challenge', function() {
-
+before(function (done) {
+        return setup.clearDB(done);
+    });
     describe("API", function() {
         var url = 'http://localhost:3000';
         var api = url + '/api';

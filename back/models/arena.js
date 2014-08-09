@@ -21,9 +21,9 @@ var ArenaSchema = new mongoose.Schema({
     description: {
         type: String,
     },
-    requiredAchievements: {
-        type: [ObjectId], ref: 'Achievement'
-    },
+    // requiredAchievements: {
+    //     type: [ObjectId], ref: 'Achievement'
+    // },
     challenges: {
         type: [ObjectId], ref: 'Challenge'
     },

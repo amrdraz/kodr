@@ -25,7 +25,7 @@ module.exports = function(app, passport) {
      * get all trials.
      *
      * @param range
-     * @returns {object} person
+     * @returns {object} trials
      */
 
     app.get('/api/trials', function(req, res, next) {
@@ -40,7 +40,7 @@ module.exports = function(app, passport) {
      * Create new trials.
      *
      * @param range
-     * @returns {object} person
+     * @returns {object} trial
      */
 
     app.post('/api/trials', access.hasToken,function(req, res, next) {
@@ -60,13 +60,13 @@ module.exports = function(app, passport) {
      * Update new trials.
      *
      * @param range
-     * @returns {object} person
+     * @returns {object} trial
      */
 
     app.put('/api/trials/:id', access.hasToken,function(req, res, next) {
         var trial = req.body.trial;
         trial.time = Date.now();
-        trial.times += 1;
+        trial.times = (trial.times||0) + 1;
         Trial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
