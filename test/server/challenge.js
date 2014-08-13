@@ -5,6 +5,7 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var setup = require('./setup');
 var Challenge = require('../../back/models/challenge');
+var Arena = require('../../back/models/arena');
 
 
 
@@ -51,16 +52,9 @@ before(function (done) {
                             if (err) return done(err);
                             expect(res.status).to.equal(200);
                             accessToken = res.body.access_token;
-                            done();
+                            setup.challengeTest(done);
                         });
                 });
-        });
-
-        after(function(done) {
-            Challenge.remove({}, function(err) {
-                if (err) return done(err);
-                done();
-            });
         });
 
         describe("POST", function() {
@@ -74,7 +68,9 @@ before(function (done) {
             });
 
             it("should create a challenge", function(done) {
-                request(api)
+                Arena.find({},function (err, arenas) {
+                    challenge.challenge.arena = arenas[0]._id;
+                    request(api)
                     .post("/challenges")
                     .set('Authorization', 'Bearer ' + accessToken)
                     .send(challenge)
@@ -84,9 +80,11 @@ before(function (done) {
                         res.body.challenge._id.should.exist;
                         res.body.challenge.name.should.equal(challenge.challenge.name);
                         res.body.challenge.exp.should.equal(challenge.challenge.exp);
+                        res.body.challenge.arena.should.equal(''+challenge.challenge.arena);
                         challenge.id = res.body.challenge._id;
                         done();
                     });
+                });
             });
         });
 
@@ -98,7 +96,8 @@ before(function (done) {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.challenge._id.should.exist;
+                        res.body.challenge.should.exist;
+                        res.body.arena.should.exist;
                         done();
                     });
             });
@@ -109,7 +108,7 @@ before(function (done) {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.challenge.length.should.equal(1);
+                        res.body.challenge.length.should.equal(3); // 2 from setup + 1 from post
                         done();
                     });
             });

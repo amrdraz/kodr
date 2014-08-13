@@ -1,6 +1,6 @@
 
 {{#if session.isAuthenticated}}
-  {{#link-to 'challenges.create' class="btn btn-primary pull-right" }} <i class="glyphicon glyphicon-plus"></i> Create Challenge{{/link-to}}
+  {{#link-to 'challenges.create' class="btn btn-primary pull-right .create-challenge" }} <i class="glyphicon glyphicon-plus"></i> Create Challenge{{/link-to}}
 {{/if}}
 
 <h3>Challenges</h3>
@@ -10,17 +10,17 @@
     <li class="list-group-item">            
         <span class="pull-right label label-info">awards {{challenge.exp}} Exp</span>
         <h4 class="list-group-item-heading">
-            {{#link-to 'challenge' challenge.id class=""}}
+            {{#link-to 'challenge' challenge.id class=".challenge-name"}}
                 {{challenge.name}}
             {{/link-to}}
         </h4>
         <section class="list-group-item-text">
             <div>
-                <a href="#"><i class="glyphicon glyphicon-comment"></i> Discussion</a>
-                {{#link-to 'challenge.edit' challenge.id class=""}}
+                <a class='challenge-discussion' href="#"><i class="glyphicon glyphicon-comment"></i> Discussion</a>
+                {{#link-to 'challenge.edit' challenge.id class=":challenge-edit"}}
                     <i class="glyphicon glyphicon-pencil"></i> Edit
                 {{/link-to}}
-                {{#link-to 'challenge.try' challenge.id class=""}}
+                {{#link-to 'challenge.try' challenge.id class=":challenge-try"}}
                     <i class="glyphicon glyphicon-play"></i> Try
                 {{/link-to}}
             </div>
@@ -29,5 +29,7 @@
             </div>
         </section>
     </li>
+    {{else}}
+    <p>No Challanges set yet</p>
 {{/each}}
 </ul>

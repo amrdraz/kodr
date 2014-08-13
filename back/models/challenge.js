@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var version = require('mongoose-version');
+var relationship = require("mongoose-relationship");
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
@@ -58,7 +59,10 @@ var Challenge = new mongoose.Schema({
         min:1
     },
     author: {
-        type: ObjectId, ref: 'User'
+        type: ObjectId, ref: 'User', childPath:"challenges"
+    },
+    arena: {
+        type: ObjectId, ref: 'Arena', childPath:"challenges"
     },
     trials: {
         type: [ObjectId], ref: 'Trial'
@@ -67,5 +71,6 @@ var Challenge = new mongoose.Schema({
 });
 
 Challenge.plugin(version, { collection: 'ChallengeVersions', log:true });
+Challenge.plugin(relationship, { relationshipPathName: ['arena', 'author']});
 
 module.exports = mongoose.model('Challenge', Challenge);

@@ -1,10 +1,12 @@
-/*globals before,after,describe,it */
+/*globals before,after,beforeEach,afterEach,describe,it */
+var Async = require('async');
 var should = require('chai').should();
 var assert = require('chai').assert;
 var expect = require('chai').expect;
 var request = require('supertest');
 var setup = require('./setup');
 var Arena = require('../../back/models/arena');
+var Challenge = require('../../back/models/challenge');
 
 /**
  * Test for Arean
@@ -12,18 +14,96 @@ var Arena = require('../../back/models/arena');
  * API
  *
  * GET      areans                  return a list of areans
- * GET      arenas/:id              return an arean with it's challanges
+ * GET      arenas/:id              return an arean with it's challenges
  * POST     arenas/:id              create an arean given name and description
  * PUT      areans/:id              updates name or description of arena
  * put      areans/challenge/:id    add a challenge to the arena
  * DELETE   arenas/:id              delete arean by id
  * delete   arenas/challenge/:id    removes a challenge from this arena
- * 
+ *
  */
 
 describe('Arena', function() {
-    before(function (done) {
+    before(function(done) {
         return setup.clearDB(done);
+    });
+
+    describe('Integration', function() {
+        var arena;
+        before(setup.challengeTest);
+        beforeEach(function(done) {
+            Arena.create({
+                name: "test arena"
+            }, function(err, model) {
+                arena = model;
+                done();
+            });
+        });
+        afterEach(function(done) {
+            arena = Arena.create({
+                name: "test arena"
+            }, done);
+        });
+        after(function(done) {
+            return setup.clearDB(done);
+        });
+
+        describe('Relationships', function() {
+            var challenges = [];
+            before(function(done) {
+                Challenge.find({}, function(err, models) {
+                    if (err) return done(err);
+                    challenges = models;
+                    done();
+                });
+            });
+            it('should add challenge in challenges', function(done) {
+                arena.challenges.length.should.equal(0);
+                challenges[0].set({
+                    arena: arena._id
+                });
+                challenges[0].save(function(err) {
+                    if (err) return done(err);
+                    Arena.findById(arena.id, function(err, model) {
+                        if (err) return done(err);
+                        arena = model;
+                        arena.challenges.length.should.equal(1);
+                        done();
+                    });
+                });
+            });
+            it('should still be able to populate', function(done) {
+                arena.challenges.length.should.equal(0);
+                challenges[0].set({
+                    arena: arena._id
+                });
+                challenges[0].save(function(err) {
+                    if (err) return done(err);
+                    Async.parallel([
+                        function(cb) {
+                            Arena.findById(arena.id, function(err, model) {
+                                if(err) return cb(err);
+                                model.challenges.length.should.equal(1);
+                                model.challenges[0].should.not.be.an.instanceOf(Challenge);
+                                expect(model.challenges[0].name).to.not.exist;
+                                cb(null, model);
+                            });
+                        },
+                        function (cb) {
+                            Arena.findById(arena._id).populate('challenges').exec(function(err, model) {
+                                model.challenges[0].should.be.an.instanceOf(Challenge);
+                                model.challenges[0].name.should.exist;
+                                cb(null, model);
+                            });
+                        }
+                    ],
+                    done);
+                    
+                });
+
+            });
+        });
+
     });
 
     describe("API", function() {
@@ -40,7 +120,7 @@ describe('Arena', function() {
         var arena = {
             arena: {
                 name: 'Basic Arena',
-                description: 'An arean for some challanges that are basic'
+                description: 'An arean for some challenges that are basic'
             }
         };
         var challenge = {
@@ -144,8 +224,10 @@ describe('Arena', function() {
 
             it("should update a arena", function(done) {
                 var update = {
-                        arena:{name: "new name"}
-                    };
+                    arena: {
+                        name: "new name"
+                    }
+                };
                 request(api)
                     .put("/arenas/" + arena.id)
                     .set('Authorization', 'Bearer ' + accessToken)

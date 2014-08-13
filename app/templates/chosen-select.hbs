@@ -1,0 +1,13 @@
+{{#if view.prompt}}
+  <option value="">{{unbound view.prompt}}</option>
+{{/if}}
+
+{{#if view.optionGroupPath}}
+  {{#each view.groupedContent}}
+    {{view view.groupView content=content label=label}}
+  {{/each}}
+{{else}}
+  {{#each view.content}}
+    {{view 'unboundSelectOption' content=this}}
+  {{/each}}
+{{/if}}

@@ -105,7 +105,7 @@ module.exports = function(grunt) {
                 options: {
                     script: 'test-server.js',
                     node_env: 'test',
-                    hostname:'localhost',
+                    hostname: 'localhost',
                     port: 9001
                 }
             }
@@ -136,6 +136,39 @@ module.exports = function(grunt) {
                             // Delay before server listens on port
                             setTimeout(function() {
                                 require('open')('http://localhost:9000');
+                            }, 1000);
+                        });
+
+                        // refreshes browser when server reboots
+                        nodemon.on('restart', function() {
+                            // Delay before server listens on port
+                            setTimeout(function() {
+                                require('fs').writeFileSync('.rebooted', 'rebooted');
+                            }, 1000);
+                        });
+                    }
+                }
+            },
+            test: {
+                script: 'test-server.js',
+                options: {
+                    watch: ['<%= config.server %>'],
+                    ext: 'js,coffee,jade',
+                    env: {
+                        PORT: '3000'
+                    },
+                    // omit this property if you aren't serving HTML files and 
+                    // don't want to open a browser tab on start
+                    callback: function(nodemon) {
+                        nodemon.on('log', function(event) {
+                            console.log(event.colour);
+                        });
+
+                        // opens browser on initial server start
+                        nodemon.on('config:update', function() {
+                            // Delay before server listens on port
+                            setTimeout(function() {
+                                // require('open')('http://localhost:3000');
                             }, 1000);
                         });
 
@@ -239,6 +272,14 @@ module.exports = function(grunt) {
                 '!<%= config.app %>/vendor/*',
                 'test/spec/{,*/}*.js'
             ]
+        },
+
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js',
+                // autoWatch: true
+                background: true
+            }
         },
 
         // Mocha testing framework configuration options
@@ -465,6 +506,12 @@ module.exports = function(grunt) {
                     logConcurrentOutput: true
                 }
             },
+            watchtest: {
+                tasks: ['nodemon:test', 'watch'],
+                options: {
+                    logConcurrentOutput: true
+                }
+            },
             server: [
                 'sass:server',
                 'browserify',
@@ -517,8 +564,7 @@ module.exports = function(grunt) {
         }
 
         grunt.task.run([
-            'connect:test',
-            'mocha'
+            'concurrent:watchtest'
         ]);
     });
 

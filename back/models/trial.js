@@ -2,6 +2,8 @@ var mongoose = require('mongoose');
 var version = require('mongoose-version');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
+var relationship = require("mongoose-relationship");
+
 
 /**
  * Trial Schema.
@@ -46,8 +48,14 @@ var Trial = new mongoose.Schema({
     },
     user: {
         type: ObjectId,
-        ref: 'User'
+        ref: 'User',
+        childPath: "trials"
     },
+    arenaTrial: {
+        type: ObjectId,
+        ref: 'ArenaTrial',
+        childPath: "trials"
+    }
 
 });
 
@@ -55,8 +63,12 @@ Trial.plugin(version, {
     collection: 'TrialVersions',
     logError: true,
     suppressVersionIncrement: false,
-    ignorePaths: ['times', 'exp'],
+    ignorePaths: ['times', 'exp', 'user'],
     strategy: 'array'
+});
+
+Trial.plugin(relationship, {
+    relationshipPathName: ['arenaTrial','user']
 });
 
 module.exports = mongoose.model('Trial', Trial);

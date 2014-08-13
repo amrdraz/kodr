@@ -41,6 +41,7 @@ App.ConsoleView = require('./views/console');
 App.SandboxView = require('./views/sandbox');
 App.MarkedMathView = require('./views/markedMath');
 App.ToggleView = require('./views/toggle');
+require('./views/ember-chosen');
 
 // Route views
 App.ApplicationView = require('./views/application');
@@ -54,8 +55,12 @@ App.ChallengeController = require('./controllers/challenge');
 App.ChallengeTryController = require('./controllers/trial');
 App.ChallengeEditController = require('./controllers/challenge/edit');
 
+App.ArenaController = require('./controllers/arena');
+App.ArenaEditController = require('./controllers/arena/edit');
+
 // Models
 App.Challenge = require('./models/challenge');
+App.Arena = require('./models/arena');
 App.Trial = require('./models/trial');
 
 // Routes
@@ -64,9 +69,14 @@ App.IndexRoute = require('./routes/index.js');
 App.ProfileRoute = require('./routes/profile.js');
 App.LoginRoute = require('./routes/login.js');
 
-
 App.ChallengeRoute = require('./routes/challenge');
 App.ChallengeTryRoute = require('./routes/challenge/try');
 
 App.ChallengesRoute = require('./routes/challenges');
 App.ChallengesCreateRoute = require('./routes/challenges/create');
+
+App.ArenaRoute = require('./routes/arena');
+App.ArenaTryRoute = require('./routes/arena/try');
+
+App.ArenasRoute = require('./routes/arenas');
+App.ArenasCreateRoute = require('./routes/arenas/create');

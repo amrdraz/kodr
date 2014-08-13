@@ -1,0 +1,37 @@
+{{#if errorMessage}}
+      <div class="alert alert-danger">
+        {{errorMessage}}
+      </div>
+    {{/if}}
+<section class="arean-controlles row">
+  <ul class="nav nav-pills pull-right">
+    <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat arean-reset"></i> Reset</a></li>
+    {{#unless isPublished }}
+    <li {{action "save"}} {{bind-attr class="canSave::disabled :arean-save"}} ><a href="#">
+        <i class="glyphicon glyphicon-save"></i> Save</a>
+    </li>
+    {{/unless}}
+    {{#unless isPublished }}
+      <li {{action "publish"}} {{bind-attr class="canPublish::disabled :arean-publish "}}><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
+    {{else}}
+      <li {{action "publish"}} {{bind-attr class="canSave::disabled :arean-unpublish"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
+      <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
+    {{/unless}}
+    <li {{action 'delete' }} class="arean-delete"><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
+  </ul>
+</section>
+<section class="arean-settings row">
+  <h3 class="editable col-lg-12">
+    {{view Em.TextField value=model.name class=":arean-name"}}
+  </h3>
+  <div class="col-lg-12">
+    {{textarea
+      class=":arean-description"
+      value=model.description
+    }}
+  </div>
+</section>
+<section class="arean-challenges row">
+  <button {{action "add"}} ><i class="glyphicon glyphicon-plus"></i>Add Challenge</button>
+  {{render 'challenges' model.challenges }}
+</section>

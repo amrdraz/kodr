@@ -19,7 +19,11 @@
     "ember-validations": "*",
     "ember-validations-bower": "~1.0.0-beta.2",
     "jq-console": "~2.10.0",
-    "jshint": "~2.5.2"
+    "jshint": "~2.5.2",
+    "chosen_v1.1.0": "https://github.com/harvesthq/chosen/releases/download/v1.1.0/chosen_v1.1.0.zip"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "jquery-mockjax": "~1.5.3",
+    "ember-qunit": "~0.1.8"
+  }
 }

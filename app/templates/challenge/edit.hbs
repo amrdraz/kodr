@@ -5,41 +5,54 @@
     {{/if}}
 <section class="challenge-controlles row">
   <ul class="nav nav-pills pull-right">
-    <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat"></i> Reset</a></li>
+    <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat challenge-reset"></i> Reset</a></li>
     {{#unless isPublished }}
-    <li {{action "save"}} {{bind-attr class="canSave::disabled"}} ><a href="#">
+    <li {{action "save"}} {{bind-attr class="canSave::disabled :challenge-save"}} ><a href="#">
         <i class="glyphicon glyphicon-save"></i> Save</a>
     </li>
     {{/unless}}
     {{#unless isPublished }}
-      <li {{action "publish"}} {{bind-attr class="canPublish::disabled"}}><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
+      <li {{action "publish"}} {{bind-attr class="canPublish::disabled :challenge-publish "}}><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
     {{else}}
-      <li {{action "publish"}} {{bind-attr class="canSave::disabled"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
+      <li {{action "publish"}} {{bind-attr class="canSave::disabled :challenge-unpublish"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
       <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
     {{/unless}}
-    <li {{action 'delete' }} class=""><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
-    <li {{action 'validate' }} class=""><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
+    <li {{action 'delete' }} class="challenge-delete"><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
+    <li {{action 'validate' }} class="challenge-validate"><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
   </ul>
 </section>
 <section class="challenge-settings row">
   <h3 class="editable col-lg-12">
-    {{view Em.TextField value=model.name}}
+    {{view Em.TextField value=model.name class=":challenge-name"}}
   </h3>
   <div class="challenge-dificulty col-lg-12">
     {{view Ember.Select
+      class=":challenge-exp-select"
       content=model.expOptions
       optionValuePath="content.points"
       optionLabelPath="content.rank"
       value=model.exp
       prompt="Select a Rank"
     }}
-    <span class="label label-primary">Estimated Rank awards: {{model.exp}} Exp</span>
+    <span class="label label-primary challenge-exp">Estimated Rank awards: {{model.exp}} Exp</span>
+  </div>
+  <div>
+  {{model.arena.name}}
+    {{chosen
+      class=":challenge-arena"
+      content=arenas
+      optionValuePath="content"
+      optionLabelPath="content.name"
+      
+      selection=model.arena
+      prompt="Select an arena"
+    }}
   </div>
 </section>
 <section class="challenge-content row">
   
   <div class="col-lg-6">
-      <a id="run" {{action "run"}} class="btn btn-default pull-right"><i class="glyphicon glyphicon-play"></i></a>
+      <a id="run" {{action "run"}} class="btn btn-default pull-right challenge-run"><i class="glyphicon glyphicon-play"></i></a>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#solution" data-toggle="tab">Solution</a></li>
         <li><a href="#setup" data-toggle="tab">Setup</a></li>

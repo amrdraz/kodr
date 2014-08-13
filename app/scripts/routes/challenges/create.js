@@ -1,4 +1,5 @@
 module.exports = Em.Route.extend({
+  
   // activate: function() {},
   // deactivate: function() {},
   setupController: function(controller, model) {
@@ -10,7 +11,9 @@ module.exports = Em.Route.extend({
   // beforeModel: function() {},
   // afterModel: function() {},
   
-  model: function() {
-      return this.store.createRecord('challenge');
+  model: function(params) {
+      return this.store.createRecord('challenge', {
+        arena:params.arena || null
+      });
   }
 });

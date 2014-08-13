@@ -1,7 +1,27 @@
 var debounce = require('../../utils/debounce');
 var ChallengeMixin = require('../../mixins/challengeMixin');
-module.exports = Em.ObjectController.extend(ChallengeMixin,{
+module.exports = Em.ObjectController.extend(ChallengeMixin, {
     needs: ['challenge'],
+    queryParams: ['arena'],
+    originalArena: null,
+    init: function () {
+        this._super();
+        this.set('originalArena', this.get('model.arena'));
+    },
+    arenaChange: function() {
+        var arena = this.get('model.arena');
+        console.log(arena);
+        if (this.get('originalArena')!==(arena)){
+            // this.set('model.arena', arena);
+            // hack should probably observe relationship
+            this.set('relationshipChanged', true);
+        }
+        // arena && arena.get('challenges').pushObject(this.get('model'));
+        return arena;
+    }.observes('model.arena'),
+    arenas: function() {
+        return this.get('store').find('arena');
+    }.property('@each'),
     actions: {
         run: debounce(function() {
             var model = this.get('model');
@@ -27,6 +47,8 @@ module.exports = Em.ObjectController.extend(ChallengeMixin,{
         save: function() {
             var that = this;
             this.get('model').save().then(function(ch) {
+                this.set('relationshipChanged', false); // should happend in an observer
+                this.set('originalArena', this.get('arena'));
                 if (App.get('currentPath').contains('create'))
                     that.transitionToRoute('challenge.edit', ch.get('id'));
             }).catch(function(xhr) {
