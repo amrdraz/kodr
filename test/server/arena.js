@@ -40,13 +40,9 @@ describe('Arena', function() {
             });
         });
         afterEach(function(done) {
-            arena = Arena.create({
-                name: "test arena"
-            }, done);
+            arena.remove(done);
         });
-        after(function(done) {
-            return setup.clearDB(done);
-        });
+        after(setup.clearDB);
 
         describe('Relationships', function() {
             var challenges = [];

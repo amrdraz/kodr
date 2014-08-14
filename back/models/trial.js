@@ -1,8 +1,10 @@
 var mongoose = require('mongoose');
+var util = require('util');
 var version = require('mongoose-version');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
+var observer = require('../mediator');
 
 
 /**
@@ -21,7 +23,7 @@ var relationship = require("mongoose-relationship");
  * @type {mongoose.Schema}
  */
 
-var Trial = new mongoose.Schema({
+var TrialSchema = new mongoose.Schema({
     code: {
         type: String,
     },
@@ -33,8 +35,13 @@ var Trial = new mongoose.Schema({
         type: Number,
         'default': 0
     },
+    complete: {
+        type: Boolean,
+        'default':false
+    },
     completed: {
-        type: Boolean
+        type: Number,
+        'default': 0
     },
     report: Mixed,
     time: {
@@ -44,7 +51,7 @@ var Trial = new mongoose.Schema({
     challenge: {
         type: ObjectId,
         ref: 'Challenge',
-        required: true
+        // required: true
     },
     user: {
         type: ObjectId,
@@ -59,16 +66,50 @@ var Trial = new mongoose.Schema({
 
 });
 
-Trial.plugin(version, {
+TrialSchema.plugin(version, {
     collection: 'TrialVersions',
     logError: true,
     suppressVersionIncrement: false,
-    ignorePaths: ['times', 'exp', 'user'],
+    ignorePaths: ['times', 'exp', 'user', 'arenaTrial'],
     strategy: 'array'
 });
 
-Trial.plugin(relationship, {
-    relationshipPathName: ['arenaTrial','user']
+TrialSchema.plugin(relationship, {
+    relationshipPathName: ['arenaTrial', 'user']
 });
 
-module.exports = mongoose.model('Trial', Trial);
+TrialSchema.pre('save',true,function(next, done) {
+    next(null,this);
+    if (this.complete) {
+        this.completed++;
+        if (this.completed === 1) {
+            return this.populate('challenge', function(err, trial) {
+                if (err) done(err);
+                trial.exp = trial.challenge.exp;
+                done(null, trial);
+            });
+        }
+    }
+    // next(null, this);
+    done(null,this);
+});
+
+TrialSchema.post('save', function(doc) {
+        // util.log(doc);
+    if (doc.complete) {
+        // util.log('completed doc');
+        if (doc.completed === 1) {
+            // util.log('completed for frst time award user exp '+doc.exp);
+            observer.emit('user.award', 'exp', doc.exp, doc);
+        }
+        observer.emit('trial.complete', doc);
+    }
+});
+
+var Trial = mongoose.model('Trial', TrialSchema);
+
+function computeResult(trial, done) {
+
+}
+
+module.exports = Trial;

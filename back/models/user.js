@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
+var observer = require('../mediator');
 var crypto = require('crypto');
+var util = require('util');
 var bcrypt = require('bcrypt');
 var ObjectId = mongoose.Schema.ObjectId;
 var Mixed = mongoose.Schema.Mixed;
@@ -21,6 +23,9 @@ var userSchema = new mongoose.Schema({
     },
     password: String,
     token: String,
+    role:String,
+    exp:{type:Number, 'default':0}, // experience points
+    rp:{type:Number, 'default':0},  // reputation points
     challenges: {
         type: [ObjectId],
         ref: 'Challenge'
@@ -77,4 +82,23 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
     });
 };
 
-module.exports = mongoose.model('User', userSchema);
+userSchema.methods.award = function(type, value, obj) {
+    this[type] += value;
+    // console.log('assigning user',type,'value',value);
+    // send activity notification
+    this.save(function (err, user) {
+        observer.emit('user.awarded', user, type, value);
+    });
+};
+
+var User = mongoose.model('User', userSchema);
+
+observer.on('user.award', function (type,value,obj) {
+    // console.log('user award hook caought in user');
+    User.findById(obj.user, function (err, user) {
+        if (err) throw err;
+        user.award('exp', value, obj);
+    });
+});
+
+module.exports = User;

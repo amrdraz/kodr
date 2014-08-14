@@ -5,6 +5,7 @@ var app = express();
 var port = process.env.PORT || 3000;
 var passport = require('passport');
 var flash = require('connect-flash');
+var EventEmitter = require('events').EventEmitter;
 
 var morgan = require('morgan');
 var cookiePraser = require('cookie-parser');
@@ -15,7 +16,10 @@ var session = require('express-session');
 var methodOverride = require('method-override');
 
 var path = require('path');
-// var sass = require('node-sass');
+ 
+// Create Event Emiter
+// require('util').inherits(global,require('events').EventEmitter);
+GLOBAL.kodrEventManager = new EventEmitter();
 
 // set up passport strategies
 require('./config/passport.js')(passport);
@@ -52,5 +56,6 @@ app.use(express.static(path.join(__dirname, '../app')));
 app.use('/',express.static(path.join(__dirname, '../.tmp')));
 
 require('./routes')(app, passport);
+require('./events')(app, passport);
 
 module.exports = app;
