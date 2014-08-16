@@ -45,7 +45,7 @@ module.exports = function(app, passport) {
 
     app.post('/api/trials', access.hasToken,function(req, res, next) {
         req.body.trial.user = req.user.id;
-        Trial.findOne({user: req.user.id}, function(err, model){
+        Trial.findOne({user: req.user.id, challenge:req.body.trial.challenge}, function(err, model){
             if(err) return next(err);
             if(model) return res.json({trial:model});
             Trial.create(req.body.trial, function(err, model) {

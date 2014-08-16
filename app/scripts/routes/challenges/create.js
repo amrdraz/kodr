@@ -12,8 +12,9 @@ module.exports = Em.Route.extend({
   // afterModel: function() {},
   
   model: function(params) {
+      var arena = this.modelFor('arena');
       return this.store.createRecord('challenge', {
-        arena:params.arena || null
+        arena:arena || null
       });
   }
 });

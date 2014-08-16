@@ -1,6 +1,6 @@
 
 {{#if session.isAuthenticated}}
-  {{#link-to 'challenges.create' class="btn btn-primary pull-right .create-challenge" }} <i class="glyphicon glyphicon-plus"></i> Create Challenge{{/link-to}}
+  {{#link-to 'challenges.create' class="btn btn-primary pull-right create-challenge" }} <i class="glyphicon glyphicon-plus"></i> Create Challenge{{/link-to}}
 {{/if}}
 
 <h3>Challenges</h3>
@@ -10,7 +10,7 @@
     <li class="list-group-item">            
         <span class="pull-right label label-info">awards {{challenge.exp}} Exp</span>
         <h4 class="list-group-item-heading">
-            {{#link-to 'challenge' challenge.id class=".challenge-name"}}
+            {{#link-to 'challenge' challenge.id class="challenge-name"}}
                 {{challenge.name}}
             {{/link-to}}
         </h4>

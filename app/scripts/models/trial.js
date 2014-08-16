@@ -1,11 +1,11 @@
 module.exports = App.Trial = DS.Model.extend({
     code: DS.attr('string'),
     times: DS.attr('number'),
-    completed: DS.attr('boolean'),
+    complete: DS.attr('boolean'),
     report:DS.attr(),
     challenge: DS.belongsTo('challenge'),
 
     canSubmit: function () {
-        return !this.get('completed') || this.get('isDirty');
-    }.property('completed', 'isDirty')
+        return !this.get('complete') || this.get('isDirty');
+    }.property('complete', 'isDirty')
 });

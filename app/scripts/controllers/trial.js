@@ -22,13 +22,13 @@ module.exports = App.ChallengeTryController = Em.ObjectController.extend(Challen
     testError: function function_name (errors) {
         var model = this.get('model');
         model.set('report', {errors:errors});
-        model.set('completed', this._super(errors));
+        model.set('complete', this._super(errors));
         model.save();
     },
     testSuccess: function(report) {
         var model = this.get('model');
         model.set('report', report);
-        model.set('completed', this._super(report));
+        model.set('complete', this._super(report));
         model.save().catch(function(err) {
             console.log(err);
         });

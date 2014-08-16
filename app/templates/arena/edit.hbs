@@ -21,17 +21,28 @@
   </ul>
 </section>
 <section class="arean-settings row">
-  <h3 class="editable col-lg-12">
-    {{view Em.TextField value=model.name class=":arean-name"}}
-  </h3>
-  <div class="col-lg-12">
+<form role="form">
+<div class="form-group">
+  <div class="editable col-lg-12">
+    <label for="name" class="control-label">Arena name</label>
+    {{input id="name" value=model.name class="arean-name form-control"}}
+  </div>
+  </div>
+  <div class="form-group col-lg-12">
+    <label for="description" class="control-label">Arena description</label>
     {{textarea
-      class=":arean-description"
+      id="description"
+      class="arean-description form-control"
       value=model.description
     }}
   </div>
+</form>
 </section>
 <section class="arean-challenges row">
-  <button {{action "add"}} ><i class="glyphicon glyphicon-plus"></i>Add Challenge</button>
-  {{render 'challenges' model.challenges }}
+<div class="col-lg-12 clearfix">
+  {{#link-to 'challenges.create' class="btn btn-primary create-challenge" }} <i class="glyphicon glyphicon-plus"></i> Add Challenge{{/link-to}}
+</div>
+  <div class="col-lg-12">
+    {{render '_arenaChallengesList' model.challenges }}
+  </div>
 </section>

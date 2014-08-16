@@ -248,7 +248,7 @@ describe('Trial', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.trial.complete.should.be.true;
-                        trial.completed = res.body.trial.completed;
+                        trial.complete = res.body.trial.complete;
                         done();
                     });
             });

@@ -15,7 +15,7 @@ module.exports = function(App) {
             this.route('try');
             this.route('preview');
         });
-        
+
         this.resource('challenges', {
             path: '/challenges'
         }, function() {
@@ -24,8 +24,21 @@ module.exports = function(App) {
         });
 
         this.resource('arena', {
-            path: '/arena/:id'
+            path: '/arena/:arena_id'
         }, function() {
+            this.resource('challenge', {
+                path: '/challenge/:id'
+            }, function() {
+                this.route('edit');
+                this.route('try');
+                this.route('preview');
+            });
+            this.resource('challenges', {
+                path: '/challenges'
+            }, function() {
+                this.route('create');
+                this.route('preview');
+            });
             this.route('edit');
             this.route('try');
             this.route('preview');
