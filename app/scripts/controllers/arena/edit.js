@@ -29,8 +29,26 @@ module.exports = Em.ObjectController.extend({
                 console.log('unPublished');
             });
         },
-        add: function () {
-            this.transitionToRoute('challenges.create', {queryParams: {arena:this.get('model')}});
+        add: function() {
+            this.transitionToRoute('challenges.create', {
+                queryParams: {
+                    arena: this.get('model')
+                }
+            });
+        },
+        togglePublishChallenge: function(challenge) {
+            var published = challenge.get('isPublished');
+            if (confirm('Are you sure you want to '+(published?'un-publish':'publish')+' this challenge?')) {
+                challenge.set('isPublished', !challenge.get('isPublished'));
+                challenge.save();
+            }
+        },
+        removeChallenge: function(challenge) {
+            if (confirm('Are you sure you want to remove this challenge?')) {
+                challenge.deleteRecord();
+                challenge.save();
+
+            }
         }
 
     }

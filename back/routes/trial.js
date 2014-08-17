@@ -86,9 +86,12 @@ module.exports = function(app, passport) {
      */
 
     app.del('/api/trials/:id', access.hasToken,function(req, res, next) {
-        Trial.findByIdAndRemove(req.params.id, function(err, model) {
+        Trial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
-            res.send(200);
+            model.remove(function(err, model) {
+                if (err) return next(err);
+                res.send(200);
+            });
         });
     });
 

@@ -1,5 +1,6 @@
 var Async = require('async');
 var mongoose = require('mongoose');
+
 var config = require('../../back/config/tests');
 var Arena = require('../../back/models/arena');
 var Challenge = require('../../back/models/challenge');

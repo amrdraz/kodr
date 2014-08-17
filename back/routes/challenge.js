@@ -93,9 +93,12 @@ module.exports = function(app, passport) {
      */
 
     app.del('/api/challenges/:id', access.hasToken, function(req, res, next) {
-        Challenge.findByIdAndRemove(req.params.id, function(err, model) {
+        Challenge.findById(req.params.id, function(err, model) {
             if (err) return next(err);
-            res.send(200);
+            model.remove(function(err, model) {
+                if (err) return next(err);
+                res.send(200);
+            });
         });
     });
 

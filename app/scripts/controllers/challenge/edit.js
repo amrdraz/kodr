@@ -47,6 +47,9 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         save: function() {
             var that = this;
             this.get('model').save().then(function(ch) {
+                this.get('arena.challenges').then(function (challenges) {
+                    challenges.pushObject(ch);
+                });
                 // this.set('relationshipChanged', false); // should happend in an observer
                 // this.set('originalArena', this.get('arena'));
                 if (App.get('currentPath').contains('create'))

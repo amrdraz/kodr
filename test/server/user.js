@@ -3,9 +3,11 @@
 var should = require('chai').should();
 var expect = require('chai').expect;
 var request = require('supertest');
-var Async = require('async');
+var Promise = require('bluebird');
 var setup = require('./setup');
 var User = require('../../back/models/user');
+var Arena = require('../../back/models/arena');
+var ArenaTrial = require('../../back/models/arenaTrial');
 var Trial = require('../../back/models/trial');
 var Challenge = require('../../back/models/challenge');
 var observer = require('../../back/mediator');
@@ -13,54 +15,52 @@ var observer = require('../../back/mediator');
 describe('User', function() {
     before(setup.clearDB);
     describe('Trial', function() {
-        var user, trial, trial2, challenge, challenge2;
+        var user, arena, trial, trial2;
         beforeEach(function(done) {
-            Async.parallel([
 
-                    function(cb) {
-                        User.create({
-                            username: 'test',
-                            password: 'testmodel'
-                        }, function(err, model) {
-                            user = model;
-                            cb(err, model);
-                        });
-                    },
-                    function(cb) {
-                        Challenge.create({
-                            exp: 4
-                        }, function(err, model) {
-                            challenge = model;
-                            cb(err, model);
-                        });
-                    },
-                    function(cb) {
-                        Challenge.create({
-                            exp: 4
-                        }, function(err, model) {
-                            challenge2 = model;
-                            cb(err, model);
-                        });
-                    }
-                ],
-                function(err, models) {
-                    if (err) return done(err);
-                    Trial.create({
-                        challenge: challenge._id,
-                        user: user._id
-                    }, function(err, model) {
-                        trial = model;
-                        Trial.create({
-                            challenge: challenge2._id,
-                            user: user._id
-                        }, function(err, model) {
-                            trial2 = model;
-                            done();
-                        });
+            Promise.fulfilled()
+                .then(function() {
+                    var ar = Arena.create({});
+                    var usr = User.create({
+                        username: 'test',
+                        password: 'testmodel'
                     });
-                }
-            );
-
+                    return [ar, usr];
+                })
+                .spread(function(ar, usr) {
+                    arena = ar;
+                    user = usr;
+                    var at = ArenaTrial.create({
+                        arena: arena._id,
+                        user: user._id
+                    });
+                    var ch = Challenge.create({
+                        exp: 4,
+                        arena: arena._id
+                    });
+                    var ch2 = Challenge.create({
+                        exp: 2,
+                        arena: arena._id
+                    });
+                    return [ch, ch2];
+                })
+                .spread(function(ch1, ch2) {
+                    var tr = Trial.create({
+                        challenge: ch1._id,
+                        user: user._id
+                    });
+                    var tr2 = Trial.create({
+                        challenge: ch2._id,
+                        user: user._id
+                    });
+                    return [tr, tr2];
+                })
+                .spread(function(tr, tr2) {
+                    trial = tr;
+                    trial2 = tr2;
+                    done();
+                })
+                .catch(done);
         });
         afterEach(setup.clearDB);
 

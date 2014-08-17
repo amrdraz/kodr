@@ -11,13 +11,23 @@
         <section class="list-group-item-text">
             <div>
                {{!--  <a class='challenge-discussion' href="#"><i class="glyphicon glyphicon-comment"></i> Discussion</a> --}}
-               
+
                 {{#link-to 'challenge.edit' challenge.id class=":challenge-edit"}}
                     <i class="glyphicon glyphicon-pencil"></i> Edit
                 {{/link-to}}
                 {{#link-to 'challenge.try' challenge.id class=":challenge-try"}}
                     <i class="glyphicon glyphicon-play"></i> Try
                 {{/link-to}}
+                <a {{action "togglePublishChallenge" challenge }} href="#" class="challenge-publish disabled">
+                    {{#unless challenge.isPublished }}
+                      <i class="glyphicon glyphicon-ok-circle"></i> Publish
+                    {{else}}
+                      <i class="glyphicon glyphicon-ban-circle"></i> Un-Publish
+                    {{/unless}} 
+                </a>
+                <a {{action "removeChallenge" challenge }} href="#" class="challenge-remove">
+                    <i class="glyphicon glyphicon-remove"></i> Remove 
+                </a>
             </div>
             <div>
                 <span class="label label-default"><i class="glyphicon glyphicon-tags"></i> Tags</span>

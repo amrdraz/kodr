@@ -93,11 +93,11 @@ userSchema.methods.award = function(type, value, obj) {
 
 var User = mongoose.model('User', userSchema);
 
-observer.on('user.award', function (type,value,obj) {
+observer.on('trial.award', function (trial) {
     // console.log('user award hook caought in user');
-    User.findById(obj.user, function (err, user) {
+    User.findById(trial.user, function (err, user) {
         if (err) throw err;
-        user.award('exp', value, obj);
+        user.award('exp', trial.exp, trial);
     });
 });
 

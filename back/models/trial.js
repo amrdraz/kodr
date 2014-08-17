@@ -100,7 +100,7 @@ TrialSchema.post('save', function(doc) {
         // util.log('completed doc');
         if (doc.completed === 1) {
             // util.log('completed for frst time award user exp '+doc.exp);
-            observer.emit('user.award', 'exp', doc.exp, doc);
+            observer.emit('trial.award', doc);
         }
         observer.emit('trial.complete', doc);
     }

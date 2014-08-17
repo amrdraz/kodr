@@ -6,13 +6,14 @@ module.exports = Em.Route.extend({
     // },
     // renderTemplate: function() {},
     // beforeModel: function() {},
-    // afterModel: function() {},
+    afterModel: function() {
+
+    },
 
     model: function() {
-        var challenge = this.modelFor('arena');
-        var record = this.store.createRecord('arenaUser', {
-            challenge:challenge,
-            code:challenge.get('setup')
+        var arena = this.modelFor('arena');
+        var record = this.store.createRecord('arenaTrial', {
+            arena:arena,
         });
         // record.save();
         return record.save();

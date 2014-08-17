@@ -10,6 +10,8 @@ module.exports = function(app, passport) {
     require('./routes/trial')(app, passport);
     // arena routes
     require('./routes/arena')(app, passport);
+    // arena trial routes
+    require('./routes/arenaTrial')(app, passport);
 
     /**
      * POST /token

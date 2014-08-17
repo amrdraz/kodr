@@ -28,6 +28,8 @@ var ChallengeModel = module.exports = DS.Model.extend({
         defaultValue: false
     }),
     arena: DS.belongsTo('arena', {async: true, inverse: 'challenges'}),
+    author:DS.belongsTo('user', {async:true, inverse:'challenges'}),
+
     exp: attr('number'),
     expOptions: [{
         rank: "direct",

@@ -102,9 +102,9 @@ describe('Trial', function() {
             function (err, trial2) {
                 trial.complete = true;
                 trial2.complete = true;
-                util.log('saveing trial '+trial._id);
+                // util.log('saveing trial '+trial._id);
                 trial.save();
-                util.log('saveing trial2 '+trial2._id);
+                // util.log('saveing trial2 '+trial2._id);
                 trial2.save();
             });            
         });

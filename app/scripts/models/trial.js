@@ -4,6 +4,7 @@ module.exports = App.Trial = DS.Model.extend({
     complete: DS.attr('boolean'),
     report:DS.attr(),
     challenge: DS.belongsTo('challenge'),
+    user: DS.belongsTo('user'),
 
     canSubmit: function () {
         return !this.get('complete') || this.get('isDirty');

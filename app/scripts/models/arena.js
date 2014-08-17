@@ -8,6 +8,8 @@ var ArenaModel = module.exports = DS.Model.extend({
         defaultValue: "A new Arena"
     }),
     challenges: DS.hasMany('challenge', {async: true, inverse: 'arena'}),
+    author: DS.belongsTo('user', {async:true, inverse:'arenas'}),
+
 
     canSave: function() {
         return this.get('isDirty') || this.get('isNew');

@@ -28,77 +28,87 @@ describe('Arena', function() {
         return setup.clearDB(done);
     });
 
-    describe('Integration', function() {
-        var arena;
-        before(setup.challengeTest);
+    describe('Challenges', function() {
+        var arena, challenge, challenge2;
         beforeEach(function(done) {
-            Arena.create({
-                name: "test arena"
-            }, function(err, model) {
+            Arena.create({}, function(err, model) {
                 arena = model;
-                done();
-            });
-        });
-        afterEach(function(done) {
-            arena.remove(done);
-        });
-        after(setup.clearDB);
+                Async.parallel([
 
-        describe('Relationships', function() {
-            var challenges = [];
-            before(function(done) {
-                Challenge.find({}, function(err, models) {
-                    if (err) return done(err);
-                    challenges = models;
-                    done();
-                });
-            });
-            it('should add challenge in challenges', function(done) {
-                arena.challenges.length.should.equal(0);
-                challenges[0].set({
-                    arena: arena._id
-                });
-                challenges[0].save(function(err) {
-                    if (err) return done(err);
-                    Arena.findById(arena.id, function(err, model) {
+                    function(cb) {
+                        Challenge.create({}, function(err, model) {
+                            challenge = model;
+                            cb(err, model);
+                        });
+                    },
+                    function(cb) {
+                        Challenge.create({
+                            arena: arena._id
+                        }, function(err, model) {
+                            challenge2 = model;
+                            cb(err, model);
+                        });
+                    }
+                ], function(err, res) {
+                    Arena.findById(arena._id, function(err, model) {
                         if (err) return done(err);
                         arena = model;
-                        arena.challenges.length.should.equal(1);
                         done();
                     });
                 });
-            });
-            it('should still be able to populate', function(done) {
-                arena.challenges.length.should.equal(0);
-                challenges[0].set({
-                    arena: arena._id
-                });
-                challenges[0].save(function(err) {
-                    if (err) return done(err);
-                    Async.parallel([
-                        function(cb) {
-                            Arena.findById(arena.id, function(err, model) {
-                                if(err) return cb(err);
-                                model.challenges.length.should.equal(1);
-                                model.challenges[0].should.not.be.an.instanceOf(Challenge);
-                                expect(model.challenges[0].name).to.not.exist;
-                                cb(null, model);
-                            });
-                        },
-                        function (cb) {
-                            Arena.findById(arena._id).populate('challenges').exec(function(err, model) {
-                                model.challenges[0].should.be.an.instanceOf(Challenge);
-                                model.challenges[0].name.should.exist;
-                                cb(null, model);
-                            });
-                        }
-                    ],
-                    done);
-                    
-                });
 
             });
         });
+        afterEach(setup.clearDB);
+        it('should equal 2 after adding a challenge', function(done) {
+            arena.challenges.length.should.equal(1);
+            challenge.set({
+                arena: arena._id
+            });
+            challenge.save(function(err) {
+                if (err) return done(err);
+                Arena.findById(arena.id, function(err, model) {
+                    if (err) return done(err);
+                    model.challenges.length.should.equal(2);
+                    done();
+                });
+            });
+        });
+        it('should equal 0 after removing a challenge', function(done) {
+            arena.challenges.length.should.equal(1);
+            challenge2.remove(function(err) {
+                if (err) return done(err);
+                Arena.findById(arena.id, function(err, model) {
+                    if (err) return done(err);
+                    model.challenges.length.should.equal(0);
+                    done();
+                });
+            });
+        });
+        it('should still be able to populate', function(done) {
+            arena.challenges.length.should.equal(1);
+            Async.parallel([
+
+                function(cb) {
+                    Arena.findById(arena.id, function(err, model) {
+                        if (err) return cb(err);
+                        model.challenges.length.should.equal(1);
+                        model.challenges[0].should.not.be.an.instanceOf(Challenge);
+                        expect(model.challenges[0].name).to.not.exist;
+                        cb(null, model);
+                    });
+                },
+                function(cb) {
+                    Arena.findById(arena._id).populate('challenges').exec(function(err, model) {
+                        model.challenges[0].should.be.an.instanceOf(Challenge);
+                        model.challenges[0].name.should.exist;
+                        cb(null, model);
+                    });
+                }
+            ], done);
+
+        });
+
 
     });
 
@@ -134,23 +144,35 @@ describe('Arena', function() {
         };
 
         before(function(done) {
-            request(url)
-                .post("/signup")
-                .send(user)
-                .end(function(err, res) {
-                    if (err) return done(err);
-                    console.log(res.text);
-                    expect(res.status).to.equal(200);
+            Async.parallel([
+                function(cb) {
+                    Challenge.create(challenge.challenge, function(err, model) {
+                        challenge.challenge = model;
+                        cb(err, model);
+                    });
+                },
+                function(cb) {
                     request(url)
-                        .post("/token")
+                        .post("/signup")
                         .send(user)
                         .end(function(err, res) {
-                            if (err) return done(err);
+                            if (err) return cb(err);
+                            console.log(res.text);
                             expect(res.status).to.equal(200);
-                            accessToken = res.body.access_token;
-                            done();
+                            request(url)
+                                .post("/token")
+                                .send(user)
+                                .end(function(err, res) {
+                                    if (err) return cb(err);
+                                    expect(res.status).to.equal(200);
+                                    accessToken = res.body.access_token;
+                                    cb();
+                                });
                         });
-                });
+                }
+            ], done);
+
+
         });
 
         describe("POST", function() {
@@ -183,7 +205,7 @@ describe('Arena', function() {
 
         describe("GET", function() {
 
-            it("should return a arena by id with it's challenges", function(done) {
+            it("should return an arena by id with it's challenges", function(done) {
                 request(api)
                     .get("/arenas/" + arena.id)
                     .end(function(err, res) {
@@ -246,7 +268,7 @@ describe('Arena', function() {
                     .end(done);
             });
 
-            it("should delete a arena", function(done) {
+            it("should delete an arena", function(done) {
                 request(api)
                     .del("/arenas/" + arena.id)
                     .set('Authorization', 'Bearer ' + accessToken)
