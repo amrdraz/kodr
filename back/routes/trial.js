@@ -6,7 +6,7 @@ var Trial = require('../models/trial');
 module.exports = function(app, passport) {
 
 
-     /**
+    /**
      * Find trial by id.
      *
      * @param {string} id
@@ -17,11 +17,13 @@ module.exports = function(app, passport) {
         Trial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
-            res.json({trial:model});
+            res.json({
+                trial: model
+            });
         });
     });
 
-     /**
+    /**
      * get all trials.
      *
      * @param range
@@ -32,7 +34,9 @@ module.exports = function(app, passport) {
         Trial.find({}, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
-            res.json({trial:model});
+            res.json({
+                trial: model
+            });
         });
     });
 
@@ -43,17 +47,14 @@ module.exports = function(app, passport) {
      * @returns {object} trial
      */
 
-    app.post('/api/trials', access.hasToken,function(req, res, next) {
+    app.post('/api/trials', access.hasToken, function(req, res, next) {
         req.body.trial.user = req.user.id;
-        Trial.findOne({user: req.user.id, challenge:req.body.trial.challenge}, function(err, model){
-            if(err) return next(err);
-            if(model) return res.json({trial:model});
-            Trial.create(req.body.trial, function(err, model) {
-                if (err) return next(err);
-                if (!model) return res.send(403, "Not Found");
-                res.json({trial:model});
-            });
-        });
+        Trial.findOrCreate(req.body.trial)
+            .then(function(model) {
+                res.json({
+                    trial: model
+                });
+            }).catch(next);
     });
 
     /**
@@ -63,17 +64,19 @@ module.exports = function(app, passport) {
      * @returns {object} trial
      */
 
-    app.put('/api/trials/:id', access.hasToken,function(req, res, next) {
+    app.put('/api/trials/:id', access.hasToken, function(req, res, next) {
         var trial = req.body.trial;
         trial.time = Date.now();
-        trial.times = (trial.times||0) + 1;
+        trial.times = (trial.times || 0) + 1;
         Trial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             model.set(trial);
-            model.save(function (err, model) {
+            model.save(function(err, model) {
                 if (err) return next(err);
-                res.json({trial:model});
+                res.json({
+                    trial: model
+                });
             });
         });
     });
@@ -85,7 +88,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/trials/:id', access.hasToken,function(req, res, next) {
+    app.del('/api/trials/:id', access.hasToken, function(req, res, next) {
         Trial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             model.remove(function(err, model) {

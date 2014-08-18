@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var Promise = require('bluebird');
 var util = require('util');
 var version = require('mongoose-version');
 var ObjectId = mongoose.Schema.Types.ObjectId;
@@ -37,7 +38,7 @@ var TrialSchema = new mongoose.Schema({
     },
     complete: {
         type: Boolean,
-        'default':false
+        'default': false
     },
     completed: {
         type: Number,
@@ -78,8 +79,8 @@ TrialSchema.plugin(relationship, {
     relationshipPathName: ['arenaTrial', 'user']
 });
 
-TrialSchema.pre('save',true,function(next, done) {
-    next(null,this);
+TrialSchema.pre('save', true, function(next, done) {
+    next(null, this);
     if (this.complete) {
         this.completed++;
         if (this.completed === 1) {
@@ -91,11 +92,11 @@ TrialSchema.pre('save',true,function(next, done) {
         }
     }
     // next(null, this);
-    done(null,this);
+    done(null, this);
 });
 
 TrialSchema.post('save', function(doc) {
-        // util.log(doc);
+    // util.log(doc);
     if (doc.complete) {
         // util.log('completed doc');
         if (doc.completed === 1) {
@@ -106,10 +107,26 @@ TrialSchema.post('save', function(doc) {
     }
 });
 
-var Trial = mongoose.model('Trial', TrialSchema);
+TrialSchema.statics.findOrCreate = function(trial) {
+    return Promise.fulfilled().then(function() {
+        return Trial.findOne({
+            user: trial.user,
+            challenge: trial.challenge
+        }).exec();
+    }).then(function(model) {
+        if (model) return model;
+        return Trial.create(trial).then(function(model) {
+            return model;
+        });
+    });
+};
+
 
 function computeResult(trial, done) {
 
 }
+
+var Trial = mongoose.model('Trial', TrialSchema);
+
 
 module.exports = Trial;

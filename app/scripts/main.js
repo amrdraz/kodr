@@ -57,6 +57,7 @@ App.ChallengeEditController = require('./controllers/challenge/edit');
 
 App.ArenaController = require('./controllers/arena');
 App.ArenaEditController = require('./controllers/arena/edit');
+App.ArenaTryController = require('./controllers/arenaTrial');
 
 // Models
 App.User = require('./models/user');

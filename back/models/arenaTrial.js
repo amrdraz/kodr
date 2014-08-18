@@ -6,6 +6,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
 var observer = require('../mediator');
 var Trial = require("./trial");
+var Challenge = require("./challenge");
 
 /**
  * Arena User Schema.
@@ -57,11 +58,52 @@ ArenaTrialSchema.plugin(relationship, {
     relationshipPathName: ['arena', 'user']
 });
 
-ArenaTrialSchema.methods.getCompleted = function() {
+ArenaTrialSchema.methods.getCompletedTrials = function() {
     return Trial.find({
         arenaTrial: this._id,
         complete: true
     }).exec();
+};
+
+/**
+ * Get Challenges in this arena
+ * @return {Promise} contining array of challanges
+ */
+ArenaTrialSchema.methods.getArenaChallenges = function() {
+    return Challenge.find({
+        arena: this.arena,
+    }).sort('exp').exec();
+};
+
+/**
+ * Find ir create an ArenaTrial along with it's associated Trials
+ * @param  {hash} arenaTrial arena trial to create
+ * @return {Promise}         array contianing arenaTrial as first element and trials as second     
+ */
+ArenaTrialSchema.statics.findOrCreate = function(arenaTrial) {
+    return Promise.fulfilled().then(function() {
+        return ArenaTrial.findOne({
+            user: arenaTrial.user,
+            arena: arenaTrial.arena
+        }).exec();
+    }).then(function(model) {
+        if (model) return model;
+        return ArenaTrial.create(arenaTrial)
+            .then(function(model) {
+                var trials = Promise.map(model.getArenaChallenges(),function(challenge) {
+                        return Trial.findOrCreate({
+                            arenaTrial: model._id,
+                            user: model.user,
+                            challenge: challenge._id,
+                            code: challenge.setup
+                        });
+                    });
+                var at = trials.then(function (mods) {
+                    return ArenaTrial.findOne({_id:model._id}).exec();
+                });
+                return [at,trials];
+            });
+    });
 };
 
 var ArenaTrial = mongoose.model('ArenaTrial', ArenaTrialSchema);
@@ -69,7 +111,7 @@ var ArenaTrial = mongoose.model('ArenaTrial', ArenaTrialSchema);
 var queue = Promise.fulfilled();
 var timeout;
 observer.on('trial.award', function(trial) {
-    if (trial.arenaTrial) 
+    if (trial.arenaTrial)
         queue = queue.then(function(model) {
             return ArenaTrial.findOne({
                 _id: trial.arenaTrial

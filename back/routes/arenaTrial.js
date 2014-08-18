@@ -6,7 +6,7 @@ var ArenaTrial = require('../models/arenaTrial');
 module.exports = function(app, passport) {
 
 
-     /**
+    /**
      * Find arenaTrial by id.
      *
      * @param {string} id
@@ -17,11 +17,13 @@ module.exports = function(app, passport) {
         ArenaTrial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
-            res.json({arenaTrial:model});
+            res.json({
+                arenaTrial: model
+            });
         });
     });
 
-     /**
+    /**
      * get all arenaTrials.
      *
      * @param range
@@ -32,7 +34,9 @@ module.exports = function(app, passport) {
         ArenaTrial.find({}, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
-            res.json({arenaTrial:model});
+            res.json({
+                arenaTrial: model
+            });
         });
     });
 
@@ -43,17 +47,15 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrial
      */
 
-    app.post('/api/arenaTrials', access.hasToken,function(req, res, next) {
+    app.post('/api/arenaTrials', access.hasToken, function(req, res, next) {
         req.body.arenaTrial.user = req.user.id;
-        ArenaTrial.findOne({user: req.user.id, arena:req.body.arenaTrial.arena}, function(err, model){
-            if(err) return next(err);
-            if(model) return res.json({arenaTrial:model});
-            ArenaTrial.create(req.body.arenaTrial, function(err, model) {
-                if (err) return next(err);
-                if (!model) return res.send(403, "Not Found");
-                res.json({arenaTrial:model});
-            });
-        });
+        ArenaTrial.findOrCreate(req.body.arenaTrial)
+            .spread(function(model, trials) {
+                res.json({
+                    arenaTrial: model,
+                    trials: trials
+                });
+            }).catch(next);
     });
 
     /**
@@ -63,17 +65,19 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrial
      */
 
-    app.put('/api/arenaTrials/:id', access.hasToken,function(req, res, next) {
+    app.put('/api/arenaTrials/:id', access.hasToken, function(req, res, next) {
         var arenaTrial = req.body.arenaTrial;
         arenaTrial.time = Date.now();
-        arenaTrial.times = (arenaTrial.times||0) + 1;
+        arenaTrial.times = (arenaTrial.times || 0) + 1;
         ArenaTrial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             model.set(arenaTrial);
-            model.save(function (err, model) {
+            model.save(function(err, model) {
                 if (err) return next(err);
-                res.json({arenaTrial:model});
+                res.json({
+                    arenaTrial: model
+                });
             });
         });
     });
@@ -85,7 +89,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/arenaTrials/:id', access.hasToken,function(req, res, next) {
+    app.del('/api/arenaTrials/:id', access.hasToken, function(req, res, next) {
         ArenaTrial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             model.remove(function(err, model) {

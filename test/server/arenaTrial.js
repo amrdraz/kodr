@@ -209,6 +209,8 @@ describe('ArenaTrial', function() {
                     .send(arenaTrial)
                     .then(function(res) {
                         res.status.should.equal(200);
+                        expect(res.body.arenaTrial).to.exist;
+                        res.body.arenaTrial.trials.length.should.equal(res.body.trials.length);
                         arenaTrial.id = res.body.arenaTrial._id;
                         done();
                     });
