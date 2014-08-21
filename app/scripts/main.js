@@ -8,7 +8,10 @@
 
 require('./utils/localStorageShim.js');
 require('../vendor/ember-woof');
-
+require('../lib/ember-breadcrumbs/dist/ember-breadcrumbs');
+BreadCrumbs.BreadCrumbsComponent.reopen({
+  classNames: ["breadcrumb"]
+});
       
 // Ember.Application.initializer({
 //   name: 'authentication',

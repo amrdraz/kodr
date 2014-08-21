@@ -1,4 +1,5 @@
 module.exports = App.ArenaIndexController = Em.ObjectController.extend({
+    
     init: function() {
         this._super();
         // this.addObserver('hasSandbox', this, function () {

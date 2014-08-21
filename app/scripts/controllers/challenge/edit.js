@@ -3,6 +3,8 @@ var ChallengeMixin = require('../../mixins/challengeMixin');
 module.exports = Em.ObjectController.extend(ChallengeMixin, {
     needs: ['challenge', 'arena'],
     arena: Ember.computed.alias("controllers.arena"),
+    breadCrumb:'arena',
+    breadCrumbPath:'arena.edit' ,
     evaluates: 'solution',
     // queryParams: ['arena'],
     // originalArena: null,

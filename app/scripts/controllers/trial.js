@@ -1,6 +1,12 @@
 var debounce = require('../utils/debounce');
 var ChallengeMixin = require('../mixins/challengeMixin');
 module.exports = App.ChallengeTryController = Em.ObjectController.extend(ChallengeMixin, {
+    breadCrumb: function () {
+        return App.get('currentPath').contains('challenge')?'edit':'arena';
+    }.property('App.currentPath'),
+    breadCrumbPath: function () {
+        return App.get('currentPath').contains('challenge')?'arena.edit':'arenaTrial';
+    }.property('App.currentPath') ,
     needs: ['challenge'],
     //
     init: function() {

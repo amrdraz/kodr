@@ -1,4 +1,6 @@
 module.exports = Em.ObjectController.extend({
+    // breadCrumb:'arena',
+    // breadCrumbPath:'arenaTrial',
     needs: ['arenaTrial'],
     arena: Ember.computed.alias("controllers.arenaTrial.model"),
     init: function() {

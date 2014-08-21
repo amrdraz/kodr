@@ -21,7 +21,8 @@
     "jq-console": "~2.10.0",
     "jshint": "~2.5.2",
     "chosen_v1.1.0": "https://github.com/harvesthq/chosen/releases/download/v1.1.0/chosen_v1.1.0.zip",
-    "ember-simple-auth": "~0.6.4"
+    "ember-simple-auth": "~0.6.4",
+    "ember-breadcrumbs": "~0.0.1"
   },
   "devDependencies": {
     "jquery-mockjax": "~1.5.3",

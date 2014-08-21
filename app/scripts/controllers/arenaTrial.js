@@ -1,4 +1,6 @@
 module.exports = App.ArenaTryController = Em.ObjectController.extend({
+    breadCrumb:'arenas',
+    breadCrumbPath:'arenas',
     init: function() {
         this._super();
         // this.addObserver('hasSandbox', this, function () {

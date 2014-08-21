@@ -1,4 +1,6 @@
 module.exports = Em.ObjectController.extend({
+    breadCrumb:'arena',
+    breadCrumbPath:'arena',
     needs: ['arena'],
     actions: {
         reset: function() {
