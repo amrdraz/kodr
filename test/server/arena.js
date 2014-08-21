@@ -116,10 +116,10 @@ describe('Arena', function() {
         var url = 'http://localhost:3000';
         var api = url + '/api';
         var user = {
-            username: "amr",
+            username: "amrd",
             email: "amr.m.draz@gmail.com",
-            password: "drazdraz",
-            passwordConfirmation: "drazdraz"
+            password: "drazdraz12",
+            passwordConfirmation: "drazdraz12"
         };
         var accessToken;
 

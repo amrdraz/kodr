@@ -6,6 +6,11 @@ var bcrypt = require('bcrypt');
 var ObjectId = mongoose.Schema.ObjectId;
 var Mixed = mongoose.Schema.Mixed;
 
+var TEACHER = 'teacher';
+var STUDENT = 'student';
+var GUEST = 'guest';
+var ADMIN = 'guest';
+
 /**
  * User Schema.
  *
@@ -15,15 +20,26 @@ var Mixed = mongoose.Schema.Mixed;
 var userSchema = new mongoose.Schema({
     username: {
         type: String,
-        unique: true
+        unique: true,
+        match: /^\w[\w.-\d]{3,}$/,
+        trim: true
     },
     email: {
         type: String,
-        unique: true
+        unique: true,
+        trim: true
     },
-    password: String,
+    password: {
+        type: String,
+        match: /^.{10,}$/,
+        trim: true
+    },
     token: String,
-    role:String,
+    role: {
+        type: String,
+        'default': 'guest',        
+        'enum': [TEACHER,STUDENT, GUEST, ADMIN]
+    },
     exp:{type:Number, 'default':0}, // experience points
     rp:{type:Number, 'default':0},  // reputation points
     challenges: {
@@ -65,6 +81,7 @@ userSchema.pre('save', function(next) {
 
 userSchema.methods.toJSON = function() {
     var obj = this.toObject();
+    delete obj.__v;
     delete obj.password;
     delete obj.token;
     return obj;

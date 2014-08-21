@@ -35,9 +35,22 @@
             {{/link-to}}
           {{/if}}
         </ul>
+
         <ul class="nav navbar-nav navbar-right">
             {{#if session.isAuthenticated}}
-              <li><a href="#" {{action "logout"}}>Logout</a></li>
+              {{!-- <div class="btn-group">
+                {{#link-to 'profile' tagName="button" type="button" class="btn btn-default" }}{{session.user.username}}{{/link-to}}
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  <span class="caret"></span>
+                  <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                  <li><a href="#">Action</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#" {{action "invalidateSession"}}>Logout</a></li>
+                </ul>
+              </div> --}}
+              <li><a href="#" {{action "invalidateSession"}}>Logout</a></li>
             {{else}}
               <li>{{#link-to "login"}}Sign In{{/link-to}}</li>
               <li>{{#link-to "signup"}}Create Account{{/link-to}}</li>

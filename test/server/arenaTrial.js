@@ -28,7 +28,7 @@ describe('ArenaTrial', function() {
                     var ar = Arena.create({});
                     var usr = User.create({
                         username: 'test',
-                        password: 'testmodel'
+                        password: 'testmodel12'
                     });
                     return [ar, usr];
                 })
@@ -140,10 +140,10 @@ describe('ArenaTrial', function() {
         var url = 'http://localhost:3000';
         var api = url + '/api';
         var user = {
-            username: "amr",
+            username: "amrd",
             email: "amr.m.draz@gmail.com",
-            password: "drazdraz",
-            passwordConfirmation: "drazdraz"
+            password: "drazdraz12",
+            passwordConfirmation: "drazdraz12"
         };
         var accessToken;
         var arena = {

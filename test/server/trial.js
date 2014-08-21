@@ -26,7 +26,7 @@ describe('Trial', function() {
                     function(cb) {
                         User.create({
                             username:'test',
-                            password:'testmodel'
+                            password:'testmodel12'
                         }, function(err, model) {
                             user = model;
                             cb(err, model);
@@ -114,10 +114,10 @@ describe('Trial', function() {
         var url = 'http://localhost:3000';
         var api = url + '/api';
         var user = {
-            username: "amr",
+            username: "amrd",
             email: "amr.m.draz@gmail.com",
-            password: "drazdraz",
-            passwordConfirmation: "drazdraz"
+            password: "drazdraz12",
+            passwordConfirmation: "drazdraz12"
         };
         var accessToken;
         var challenge = {

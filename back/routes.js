@@ -1,6 +1,7 @@
 var User = require('./models/user');
 var access = require('./routes/access');
 var Challenge = require('./models/challenge');
+var sendMail = require('./config/mail');
 
 module.exports = function(app, passport) {
 
@@ -17,7 +18,7 @@ module.exports = function(app, passport) {
 
     /**
      * POST /token
-     * Sign in using email and password.
+     * Sign in using identification and password.
      * @param {string} username
      * @param {string} password
      */
@@ -26,7 +27,8 @@ module.exports = function(app, passport) {
         passport.authenticate('local-login', function(err, user) {
             if (err) return next(err);
             if (user) res.send({
-                access_token: user.token
+                access_token: user.token,
+                user_id: user._id
             });
             else res.send(403, 'Incorrect username or password.');
         })(req, res, next);
@@ -44,7 +46,8 @@ module.exports = function(app, passport) {
         passport.authenticate('local-login', function(err, user) {
             if (err) return next(err);
             if (user) res.send({
-                access_token: user.token
+                access_token: user.token,
+                user_id: user._id
             });
             else res.send(403, 'Incorrect username or password.');
         })(req, res, next);
@@ -106,14 +109,43 @@ module.exports = function(app, passport) {
             if (err) return next(err);
             if (user) return res.send(400, 'User exists');
 
-            var newUser = new User({
+            var email = req.body.email,
+                role = 'guest';
+            if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
+                role = 'teacher';
+            } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
+                role = 'student';
+            }
+
+
+            new User({
                 username: req.body.username,
                 email: req.body.email,
-                password: req.body.password
-            });
-
-            newUser.save(function(err) {
+                password: req.body.password,
+                role: role
+            }).save(function(err, model) {
                 if (err) return res.send(500, err.message);
+
+                if (model.email === 'amrmdraz@gmail.com') {
+                    var confirmURL = req.headers.host + '/confirmAccount/' + model.token;
+                    sendMail({
+                        to: model.email,
+                        subject: 'You\'ve just signup for an awesome experience',
+                        html: "<p>Oh boy, am I glade to here from You \n\
+We're about to embark on a greate journey, I just need you to confirm your account registration. \n\
+Mind following this link into awesome ):D\n\
+ <a href='" + confirmURL + "'>" + confirmURL + "</a>\n\
+</p>"
+                    }, function(err, info) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log('Message sent: ' + info.response);
+                        }
+                        if (err) return res.send(500, err.message);
+                        return res.send(info);
+                    });
+                }
                 res.send(200);
             });
         });

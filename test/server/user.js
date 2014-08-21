@@ -23,11 +23,11 @@ describe('User', function() {
                     var ar = Arena.create({});
                     var usr = User.create({
                         username: 'test',
-                        password: 'testmodel'
+                        password: 'testmodel2'
                     });
                     return [ar, usr];
                 })
-                .spread(function(ar, usr) {
+                .spread(function(ar, usr, t, st, st2) {
                     arena = ar;
                     user = usr;
                     var at = ArenaTrial.create({
@@ -97,10 +97,22 @@ describe('User', function() {
     describe("Auth", function() {
         var url = 'http://localhost:3000';
         var user = {
-            username: "amr",
+            username: "amrd",
             email: "amr.m.draz@gmail.com",
-            password: "draz",
-            passwordConfirmation: "draz"
+            password: "drazdraz12",
+            passwordConfirmation: "drazdraz12"
+        }, 
+        teacher = {
+            username: 'teacher',
+            email: 't.t@guc.edu.eg',
+            password: 'testmodel12',
+            passwordConfirmation: 'testmodel12'
+        }, 
+        student = {
+            username: 'student',
+            email: 's.s@student.guc.edu.eg',
+            password: 'testmodel12',
+            passwordConfirmation: 'testmodel12'
         };
         var accessToken;
 
@@ -116,6 +128,55 @@ describe('User', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         done();
+                    });
+            });
+            it("should assign role student based on email", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send(student)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        User.find({role:'student'}).exec(function(err,users){
+                            if (err) return done(err);
+                            users.length.should.equal(1);
+                            done();
+                        });
+                    });
+            });
+            it("should assign role teacher based on email", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send(teacher)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        User.find({role:'teacher'}).exec(function(err,users){
+                            if (err) return done(err);
+                            users.length.should.equal(1);
+                            done();
+                        },done);
+                    });
+            });
+
+            it("should send and email to amrmdraz@gmail.com", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send({
+                        username: "drazious",
+                        email: "amrmdraz@gmail.com",
+                        password: "drazdraz12",
+                        passwordConfirmation: "drazdraz12"
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        console.log(res.body);
+                        User.findOne({username:'drazious'}).exec(function(err,user){
+                            if (err) return done(err);
+                            expect(user).to.exist;
+                            done();
+                        },done);
                     });
             });
         });
@@ -140,6 +201,7 @@ describe('User', function() {
                     if (err) return done(err);
 
                     res.body.should.have.property("access_token");
+                    res.body.should.have.property("user_id");
                     accessToken = res.body.access_token;
                     done();
                 });
@@ -218,7 +280,7 @@ describe('User', function() {
                     .post("/profile")
                     .set('Authorization', 'Bearer ' + accessToken)
                     .send({
-                        password: 'amr'
+                        password: 'amramree12'
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -228,7 +290,7 @@ describe('User', function() {
                             .post("/token")
                             .send({
                                 username: 'draz',
-                                password: 'amr'
+                                password: 'amramree12'
                             })
                             .expect(200)
                             .end(function(err, res) {
@@ -245,16 +307,16 @@ describe('User', function() {
         var url = 'http://localhost:3000';
         var api = url + '/api';
         var ruser = {
-            username: "amr",
+            username: "draz",
             email: "amr.m.draz@gmail.com",
-            password: "drazdraz",
-            passwordConfirmation: "drazdraz"
+            password: "drazdraz12",
+            passwordConfirmation: "drazdraz12"
         };
         var accessToken;
         var user = {
             user: {
                 username:'testuser',
-                password:'testpass'
+                password:'testspass2'
             }
         };
 
@@ -265,7 +327,6 @@ describe('User', function() {
                 .send(ruser)
                 .end(function(err, res) {
                     if (err) return done(err);
-                    console.log(res.text);
                     expect(res.status).to.equal(200);
                     request(url)
                         .post("/token")
@@ -341,13 +402,13 @@ describe('User', function() {
                     .end(done);
             });
 
-            it("should update a user without user", function(done) {
+            it("should update a user", function(done) {
                 return request(api)
                     .put("/users/" + user.id)
                     .set('Authorization', 'Bearer ' + accessToken)
                     .send({
                         user: {
-                            password:'newtpass'
+                            password:'newpass121'
                         }
                     })
                     .then(function(res) {

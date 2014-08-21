@@ -11,18 +11,16 @@ var Arena = require('../../back/models/arena');
 
 
 describe('Challenge', function() {
-    before(function(done) {
-        return setup.clearDB(done);
-    });
+    before(setup.clearDB);
 
     describe("API", function() {
         var url = 'http://localhost:3000';
         var api = url + '/api';
         var user = {
-            username: "amr",
+            username: "amrd",
             email: "amr.m.draz@gmail.com",
-            password: "drazdraz",
-            passwordConfirmation: "drazdraz"
+            password: "drazdraz12",
+            passwordConfirmation: "drazdraz12"
         };
         var accessToken;
         var arena;
@@ -121,7 +119,7 @@ describe('Challenge', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.challenge.length.should.equal(3); // 2 from setup + 1 from post
+                        res.body.challenge.length.should.equal(4); // 3 from setup + 1 from post
                         done();
                     });
             });
