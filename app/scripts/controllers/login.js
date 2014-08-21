@@ -1,5 +1,5 @@
-var LoginController = Ember.Controller.extend(Ember.SimpleAuth.LoginControllerMixin, Ember.Validations.Mixin, {
-
+var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, Ember.Validations.Mixin, {
+    authenticator: 'simple-auth-authenticator:oauth2-password-grant',
     validations: {
         identification: {
             presence: true,
@@ -19,7 +19,7 @@ var LoginController = Ember.Controller.extend(Ember.SimpleAuth.LoginControllerMi
 
             var that = this;
             return this.validate().then(function() {
-                that.send('login');
+                that.send('authenticate');
             }, function() {
                 var errors = that.get('errors');
                 var fullErrors = [];

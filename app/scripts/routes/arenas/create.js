@@ -1,9 +1,10 @@
 module.exports = Em.Route.extend({
+  controllerName: 'arena.edit',
   // activate: function() {},
   // deactivate: function() {},
-  setupController: function(controller, model) {
-    this.controllerFor('arenaEdit').set('model', model);
-  },
+  // setupController: function(controller, model) {
+  //   this.controllerFor('arenaEdit').set('model', model);
+  // },
   renderTemplate: function() {
     this.render('arena.edit');
   },

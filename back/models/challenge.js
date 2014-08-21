@@ -53,6 +53,10 @@ var Challenge = new mongoose.Schema({
         type: Boolean,
         'default': false
     },
+    valid:  {
+        type: Boolean,
+        'default': false
+    },
     exp: {
         type: Number,
         'default':1,

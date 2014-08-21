@@ -8,46 +8,33 @@ module.exports = function(App) {
         this.route('index', {
             path: '/'
         });
-        this.resource('challenge', {
-            path: '/challenge/:id'
+        this.resource('arenaTrial', {
+            path: '/arena/:arena_id' //used to load arena trial
+        }, function() {
+            this.resource('trial', {
+                path: '/try/:trial_id' //used to load trial
+            });
+        });
+        this.resource('arena', {
+            path: '/arenas/:arena_id'
         }, function() {
             this.route('edit');
-            this.route('try');
-            this.route('preview');
-        });
-
-        this.resource('challenges', {
-            path: '/challenges'
-        }, function() {
-            this.route('create');
-            this.route('preview');
-        });
-
-        this.resource('arena', {
-            path: '/arena/:arena_id'
-        }, function() {
             this.resource('challenge', {
-                path: '/challenge/:id'
+                path: 'challenge/:challenge_id'
             }, function() {
                 this.route('edit');
                 this.route('try');
-                this.route('preview');
             });
             this.resource('challenges', {
-                path: '/challenges'
+                path: 'challenge'
             }, function() {
                 this.route('create');
-                this.route('preview');
             });
-            this.route('edit');
-            this.route('try');
-            this.route('preview');
         });
         this.resource('arenas', {
             path: '/arenas'
         }, function() {
             this.route('create');
-            this.route('preview');
         });
     });
 };

@@ -77,32 +77,33 @@ ArenaTrialSchema.methods.getArenaChallenges = function() {
 
 /**
  * Find ir create an ArenaTrial along with it's associated Trials
- * @param  {hash} arenaTrial arena trial to create
- * @return {Promise}         array contianing arenaTrial as first element and trials as second     
+ * @param  {hash} arenaTrial arena trial to create requires arena and user
+ * @return {Promise}         array contianing arenaTrial as first element and trials as second
  */
 ArenaTrialSchema.statics.findOrCreate = function(arenaTrial) {
     return Promise.fulfilled().then(function() {
         return ArenaTrial.findOne({
             user: arenaTrial.user,
             arena: arenaTrial.arena
-        }).exec();
+        }).exec().then(function(model) {
+            if (model) return Promise.resolve(model);
+            return ArenaTrial.create(arenaTrial);
+        });
     }).then(function(model) {
-        if (model) return model;
-        return ArenaTrial.create(arenaTrial)
-            .then(function(model) {
-                var trials = Promise.map(model.getArenaChallenges(),function(challenge) {
-                        return Trial.findOrCreate({
-                            arenaTrial: model._id,
-                            user: model.user,
-                            challenge: challenge._id,
-                            code: challenge.setup
-                        });
-                    });
-                var at = trials.then(function (mods) {
-                    return ArenaTrial.findOne({_id:model._id}).exec();
-                });
-                return [at,trials];
+        var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
+            return Trial.findOrCreate({
+                arenaTrial: model._id,
+                user: model.user,
+                challenge: challenge._id,
+                code: challenge.setup
             });
+        });
+        var at = trials.then(function(mods) {
+            return ArenaTrial.findOne({
+                _id: model._id
+            }).exec();
+        });
+        return [at, trials];
     });
 };
 

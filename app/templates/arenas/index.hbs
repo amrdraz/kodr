@@ -11,14 +11,14 @@
         
         <h4 class="list-group-item-heading">
             <div class="pull-right">
-            {{#link-to 'arena.edit' arena.id class="btn-default btn-sm arena-edit"}}
+            {{#link-to 'arena.edit' arena class="btn-default btn-sm arena-edit"}}
                 <i class="glyphicon glyphicon-pencil"></i> Edit
             {{/link-to}} 
-            {{#link-to 'arena.try' arena.id class="btn-primary btn-sm arena-try"}}
+            {{#link-to 'arenaTrial' arena class="btn-primary btn-sm arena-try"}}
                 <i class="glyphicon glyphicon-play"></i> Try
             {{/link-to}}
         </div>
-            {{#link-to 'arena' arena.id class="arena-name"}}
+            {{#link-to 'arena' arena class="arena-name"}}
                 {{arena.name}}
             {{/link-to}}
         </h4>

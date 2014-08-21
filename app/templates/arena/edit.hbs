@@ -1,8 +1,5 @@
-{{#if errorMessage}}
-      <div class="alert alert-danger">
-        {{errorMessage}}
-      </div>
-    {{/if}}
+{{x-woof}}
+
 <section class="arean-controlles row">
   <ul class="nav nav-pills pull-right">
     <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat arean-reset"></i> Reset</a></li>

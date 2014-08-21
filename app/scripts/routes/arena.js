@@ -7,6 +7,6 @@ module.exports = Em.Route.extend({
   // afterModel: function() {},
   
   // model: function(params) {
-  //     return this.store.find('arena', params.id);
+  //     return this.store.find('arena', params.arena_id);
   // }
 });

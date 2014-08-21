@@ -99,7 +99,6 @@ describe('ArenaTrial', function() {
                     });
                 }).catch(done);
         });
-
         it('should become complete when all challange trials are complete', function(done) {
             arenaTrial.trials.length.should.equal(0);
             observer.once('arenaTrial.complete', function (arenaTrial) {
@@ -122,6 +121,17 @@ describe('ArenaTrial', function() {
                     });
                     return [t1,t2];
                 }).catch(done);
+        });
+
+        it('should find or create arenaTrial with trials for user given arena and user', function(done) {
+            Promise.fulfilled()
+                .then(function() {
+                    var at = {arena:arena._id, user:user._id};
+                    return ArenaTrial.findOrCreate(at).spread(function (at, trials) {
+                        at._id.should.eql(arenaTrial._id);
+                        trials.length.should.equal(2);
+                    });
+                }).finally(done);
         });
        
     });
@@ -222,6 +232,7 @@ describe('ArenaTrial', function() {
             it("should return a arenaTrial by id", function(done) {
                 request(api)
                     .get("/arenaTrials/" + arenaTrial.id)
+                    .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -233,10 +244,24 @@ describe('ArenaTrial', function() {
             it("should return a list of all arenaTrials", function(done) {
                 request(api)
                     .get("/arenaTrials")
+                    .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.arenaTrial.length.should.equal(1);
+                        done();
+                    });
+            });
+
+            it("should return an arenaTrial by arena_id", function(done) {
+                request(api)
+                    .get("/arenaTrials")
+                    .set('Authorization', 'Bearer ' + accessToken)
+                    .query({arena:arena.id})
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        expect(res.body.arenaTrial._id).to.exist;
                         done();
                     });
             });

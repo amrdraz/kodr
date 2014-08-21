@@ -1,4 +1,4 @@
-var ProfileRoute = Ember.Route.extend(Ember.SimpleAuth.AuthenticatedRouteMixin);
+var ProfileRoute = Ember.Route.extend(SimpleAuth.AuthenticatedRouteMixin);
 
 ProfileRoute.reopen({
     model: function () {

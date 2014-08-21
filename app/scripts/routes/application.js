@@ -1,1 +1,1 @@
-module.exports = Ember.Route.extend(Ember.SimpleAuth.ApplicationRouteMixin);
+module.exports = Ember.Route.extend(SimpleAuth.ApplicationRouteMixin);

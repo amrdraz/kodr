@@ -14,18 +14,14 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/challenges/:id', function(req, res, next) {
-        Challenge.findById(req.params.id, function(err, model) {
-            if (err) return next(err);
+        Challenge.findOne({
+            _id: req.params.id
+        }).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
-            Arena.findById(model.arena, function(err, arena) {
-                if (err) return next(err);
-                if (!model) return res.send(404, "Not Found");
-                res.json({
-                    challenge: model,
-                    arena: arena
-                });
+            res.json({
+                challenge: model
             });
-        });
+        }, next);
     });
 
     /**
@@ -72,17 +68,17 @@ module.exports = function(app, passport) {
      */
 
     app.put('/api/challenges/:id', access.hasToken, function(req, res, next) {
-        Challenge.findById(req.params.id).populate('arena').exec(function(err, model) {
-            if (err) return next(err);
+        Challenge.findOne({
+            _id: req.params.id
+        }).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             model.set(req.body.challenge);
             model.save(function(err, model) {
-                if (err) return next(err);
                 res.json({
                     challenge: model
                 });
             });
-        });
+        }, next);
     });
 
     /**

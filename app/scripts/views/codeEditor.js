@@ -29,6 +29,8 @@ module.exports = Em.TextArea.extend({
         }));
         
         this.set('editor', editor);
+        //inorder to access it by selecting the element
+        this.$().data('CodeMirror', editor);
     },
     willDestroyElement: function() {
         this.get('model').removeObserver(this.get('attr'), this.get('model'), this.updateEditor);

@@ -2,7 +2,7 @@
 
 var should = require('chai').should();
 var expect = require('chai').expect;
-var request = require('supertest');
+var request = require('supertest-as-promised');
 var Promise = require('bluebird');
 var setup = require('./setup');
 var User = require('../../back/models/user');
@@ -104,14 +104,7 @@ describe('User', function() {
         };
         var accessToken;
 
-        after(function(done) {
-            User.findOneAndRemove({
-                email: user.email
-            }, function(err) {
-                if (err) return done(err);
-                done();
-            });
-        });
+        after(setup.clearDB);
 
         describe("Signup", function() {
 
@@ -247,9 +240,147 @@ describe('User', function() {
                     });
             });
         });
+    });
+    describe('API', function () {
+        var url = 'http://localhost:3000';
+        var api = url + '/api';
+        var ruser = {
+            username: "amr",
+            email: "amr.m.draz@gmail.com",
+            password: "drazdraz",
+            passwordConfirmation: "drazdraz"
+        };
+        var accessToken;
+        var user = {
+            user: {
+                username:'testuser',
+                password:'testpass'
+            }
+        };
 
 
+        before(function(done) {
+            request(url)
+                .post("/signup")
+                .send(ruser)
+                .end(function(err, res) {
+                    if (err) return done(err);
+                    console.log(res.text);
+                    expect(res.status).to.equal(200);
+                    request(url)
+                        .post("/token")
+                        .send(ruser)
+                        .end(function(err, res) {
+                            if (err) return done(err);
+                            expect(res.status).to.equal(200);
+                            accessToken = res.body.access_token;
+                           done();
+                        });
+                });
+        });
 
+        after(setup.clearDB);
+
+        describe("POST", function() {
+
+            it("should not work without accessToken", function(done) {
+                request(api)
+                    .post("/users")
+                    .send(user)
+                    .expect(401)
+                    .end(done);
+            });
+
+            it("should create a user", function(done) {
+                request(api)
+                    .post("/users")
+                    .set('Authorization', 'Bearer ' + accessToken)
+                    .send(user)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        expect(res.body.user).to.exist;
+                        user.id = res.body.user._id;
+                        done();
+                    });
+            });
+        });
+
+        describe("GET", function() {
+
+            it("should return a user by id", function(done) {
+                request(api)
+                    .get("/users/" + user.id)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.user._id.should.exist;
+                        done();
+                    });
+            });
+
+            it("should return a list of all users", function(done) {
+                return request(api)
+                    .get("/users")
+                    .then(function (res) {
+                        res.status.should.equal(200);
+                        res.body.user.length.should.equal(2);
+                        done();
+                    });
+            });
+
+        });
+
+        describe("PUT", function() {
+
+            it("should not work without accessToken", function(done) {
+                request(api)
+                    .put("/users/" + user.id)
+                    .send(user)
+                    .expect(401)
+                    .end(done);
+            });
+
+            it("should update a user without user", function(done) {
+                return request(api)
+                    .put("/users/" + user.id)
+                    .set('Authorization', 'Bearer ' + accessToken)
+                    .send({
+                        user: {
+                            password:'newtpass'
+                        }
+                    })
+                    .then(function(res) {
+                        res.status.should.equal(200);
+                        user.complete = res.body.user.complete;
+                        done();
+                    });
+            });
+        });
+
+        describe("DELETE", function() {
+
+            it("should not work without accessToken", function(done) {
+                request(api)
+                    .del("/users/" + user.id)
+                    .expect(401)
+                    .end(done);
+            });
+
+            it("should delete a user without user", function(done) {
+                request(api)
+                    .del("/users/" + user.id)
+                    .set('Authorization', 'Bearer ' + accessToken)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        Trial.findById(user.id, function(err, model) {
+                            expect(model).to.not.exist;
+                            done();
+                        });
+                    });
+            });
+        });
     });
     //*/
 });

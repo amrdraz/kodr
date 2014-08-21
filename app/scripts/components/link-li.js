@@ -7,4 +7,4 @@ var LinkLiComponent = Ember.Component.extend({
   }.property('childViews.@each.active')
 });
 
-export default LinkLiComponent;
+module.exports = LinkLiComponent;

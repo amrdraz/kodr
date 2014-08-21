@@ -27,12 +27,6 @@
               Arenas
             </a>
           {{/link-to}}
-          {{#link-to 'challenges' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn">
-              Callenges
-            </a>
-          {{/link-to}}
-          
           {{#if session.isAuthenticated}}
             {{#link-to 'profile' tagName="li" href=false }}
               <a {{bind-attr href="view.href"}} class="btn">

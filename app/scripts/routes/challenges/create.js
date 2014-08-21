@@ -1,10 +1,10 @@
 module.exports = Em.Route.extend({
-  
+  controllerName: 'challenge.edit',
   // activate: function() {},
   // deactivate: function() {},
-  setupController: function(controller, model) {
-    this.controllerFor('challengeEdit').set('model', model);
-  },
+  // setupController: function(controller, model) {
+  //   // controller.needs('challenge.edit').set('model', model);
+  // },
   renderTemplate: function() {
     this.render('challenge.edit');
   },

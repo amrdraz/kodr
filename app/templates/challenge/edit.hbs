@@ -1,8 +1,4 @@
-{{#if errorMessage}}
-      <div class="alert alert-danger">
-        {{errorMessage}}
-      </div>
-    {{/if}}
+{{x-woof}}
 <section class="challenge-controlles row">
   <ul class="nav nav-pills pull-right">
     <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat challenge-reset"></i> Reset</a></li>
@@ -18,7 +14,7 @@
       <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
     {{/unless}}
     <li {{action 'delete' }} class="challenge-delete"><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
-    <li {{action 'validate' }} class="challenge-validate"><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
+    <li {{action 'validate' }} {{bind-attr class="valid:disabled :challenge-validate "}}><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
   </ul>
 </section>
 <section class="challenge-settings row">
@@ -52,7 +48,7 @@
 <section class="challenge-content row">
   
   <div class="col-lg-6">
-      <a id="run" {{action "run"}} class="btn btn-default pull-right challenge-run"><i class="glyphicon glyphicon-play"></i></a>
+      <a id="run" {{action "runInConsole"}} class="btn btn-default pull-right challenge-run"><i class="glyphicon glyphicon-play"></i></a>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#solution" data-toggle="tab">Solution</a></li>
         <li><a href="#setup" data-toggle="tab">Setup</a></li>
@@ -69,8 +65,8 @@
         </div>
         <div class="tab-pane fade " id="setup">
           {{view 'App.CodeEditorView'
-            name="codeEditor"
-            id="editor"
+            name="setup"
+            id="setupEditor"
             class="col-lg-12"
             model=model
             attr='setup' }}
@@ -94,7 +90,7 @@
       <div class="tab-content">
         <div class="tab-pane  fade in active" id="description">
           {{view 'App.CodeEditorView'
-            name="descriptionEditor"
+            name="description"
             id="descriptionEditor"
             class="col-lg-12"
             model=model

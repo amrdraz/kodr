@@ -1,4 +1,5 @@
 module.exports = Em.Mixin.create({
+    evaluates:'code',
     jshint: function(code, cb, options) {
         options = options || {};
         var console = this.get('console') || console;
@@ -27,16 +28,17 @@ module.exports = Em.Mixin.create({
         if (!errors.length) {
             cb && cb.call(this, code, console, sb);
         } else {
-            this.testError(errors);
+            this.testError({lineNumber:errors[0].line, message:errors[0].reason, rest:errors});
         }
 
         // debugger;
         return errors;
     },
-    testError: function (errors) {
+    testError: function (error) {
         var console = this.get('console') || console;
         console.Write  = console.Write || console.log;
-       console.Write('Syntax Error line(' + errors[0].line + '): ' + errors[0].reason + '\n', 'error');
+        console.Write('Syntax Error line(' + error.lineNumber + '): ' + error.message + '\n', 'error');
+        return false;
     },
     testSuccess: function(report) {
         var tests = report.tests.length;
@@ -75,24 +77,23 @@ module.exports = Em.Mixin.create({
                 that.get('console').Write(msg.toString() + '\n');
             };
 
-            sb.on('error', function (error) {
-                that.get('console').Write('Syntax Error line(' + error.lineNumber + '): ' + error.message + '\n', 'error');
-            });
+            sb.on('error', this.testError.bind(this));
             sb.on('test.done', this.testSuccess.bind(this));
             // sb.on('structure.done', log);
             sb.on('log', log);
             console.log('loaded sandbox');
         },
         runInConsole: function() {
-            this.send('consoleEval', this.get('model.code'));
+            this.send('consoleEval', this.get('model.'+this.get('evaluates')));
         },
         consoleEval: function(command) {
             this.jshint(command, function(code, console, sb) {
-                sb.evaljs(command, function(error, res) {
+                sb.evaljs(code, function(error, res) {
                     if (error) {
                         console.Write(error.name + ': ' + error.message + '\n', 'error');
                     } else {
-                        console.Write('==> ' + (res !== undefined ? res : "") + '\n', 'result');
+                        var run = res !== undefined;
+                        console.Write((run?'==> ' + res:'\n'+code) + '\n', run?'result':'jqconsole-old-prompt');
                     }
                 });
             });

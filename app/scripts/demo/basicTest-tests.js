@@ -1,9 +1,14 @@
 module.exports = '\
-describe("Simple Test", function () {\n\
-\n\
-    it("should be 403", function(){\n\
-        expect(foo).to.equal(403);  \n\
-    })\n\
-\n\
-});\n\
+// Challenge Tests go here\n/*\n\
+describe("simple", function () {\n\
+  it("should describe a test", function () {\n\
+    expect(5).to.equal(5);\n\
+    expect(3===3).to.be.true;\n\
+  });\n\
+  \n\
+  it("async test", function (done) {\n\
+    done();\n\
+  });\n\
+})\n\
+//*/\
 ';

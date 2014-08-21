@@ -68,8 +68,7 @@ module.exports = function(app, passport) {
         var trial = req.body.trial;
         trial.time = Date.now();
         trial.times = (trial.times || 0) + 1;
-        Trial.findById(req.params.id, function(err, model) {
-            if (err) return next(err);
+        Trial.findOne({_id:req.params.id}).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             model.set(trial);
             model.save(function(err, model) {
@@ -78,7 +77,7 @@ module.exports = function(app, passport) {
                     trial: model
                 });
             });
-        });
+        }, next);
     });
 
     /**

@@ -1,6 +1,4 @@
 module.exports = App.ArenaTryController = Em.ObjectController.extend({
-    needs: ['arena'],
-    arena: Ember.computed.alias("controllers.arena"),
     init: function() {
         this._super();
         // this.addObserver('hasSandbox', this, function () {

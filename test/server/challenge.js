@@ -110,8 +110,7 @@ describe('Challenge', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.challenge.should.exist;
-                        res.body.arena.should.exist;
+                        expect(res.body.challenge).to.exist;
                         done();
                     });
             });

@@ -13,7 +13,7 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrial
      */
 
-    app.get('/api/arenaTrials/:id', function(req, res, next) {
+    app.get('/api/arenaTrials/:id', access.hasToken, function(req, res, next) {
         ArenaTrial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
@@ -30,14 +30,25 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrials
      */
 
-    app.get('/api/arenaTrials', function(req, res, next) {
-        ArenaTrial.find({}, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404, "Not Found");
-            res.json({
-                arenaTrial: model
+    app.get('/api/arenaTrials', access.hasToken, function(req, res, next) {
+        var arena = req.query.arena;
+        if (arena) {
+            ArenaTrial.findOrCreate({user:req.user.id,arena:arena})
+                .spread(function(model, trials) {
+                    res.json({
+                        arenaTrial: model,
+                        trials: trials
+                    });
+                }).catch(next);
+        } else {
+            ArenaTrial.find(req.params, function(err, model) {
+                if (err) return next(err);
+                if (!model) return res.send(404, "Not Found");
+                res.json({
+                    arenaTrial: model
+                });
             });
-        });
+        }
     });
 
     /**

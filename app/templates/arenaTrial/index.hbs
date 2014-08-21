@@ -1,0 +1,18 @@
+<section class="row">
+<div class="col-md-12 text-center">
+{{#link-to 'arena.edit' arena class="btn pull-right" }}Edit{{/link-to}}
+    <h2 class="">{{arena.name}}</h2>
+    <p>{{arena.description}}</p>
+    <h2 class="pull-right">{{model.exp}} XP</h2>
+</div>
+</section>
+<hr>
+<section class="row">
+    {{#each trial in model.trials}}
+        {{#if trial.challenge.isPublished}}
+          <button {{action 'try' trial }} {{bind-attr class=":btn  trial.complete:btn-success :col-md-4" }} >
+              {{trial.challenge.exp}} <i class="glyphicon glyphicon-star"></i>
+          </button>
+        {{/if}}
+    {{/each}}
+</section>

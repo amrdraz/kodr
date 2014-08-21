@@ -11,7 +11,7 @@ var ChallengeModel = module.exports = DS.Model.extend({
         defaultValue: "// Challenge Solution goes here\n"
     }),
     tests: attr('string', {
-        defaultValue: "// Challenge Tests go here\n"
+        defaultValue: require('../demo/basicTest-tests')
     }),
     // structure: attr('string', {defaultValue:"// Challenge Code Structure\n"}),
     // callbacks: attr('string', {defaultValue:"// callbacks for structure variables if any\n{}"}),
@@ -27,10 +27,19 @@ var ChallengeModel = module.exports = DS.Model.extend({
     isPublished: attr('boolean', {
         defaultValue: false
     }),
-    arena: DS.belongsTo('arena', {async: true, inverse: 'challenges'}),
-    author:DS.belongsTo('user', {async:true, inverse:'challenges'}),
+    valid: attr('boolean', {
+        defaultValue: false
+    }),
+    arena: DS.belongsTo('arena', {
+        async: true,
+        inverse: 'challenges'
+    }),
+    author: DS.belongsTo('user', {
+        async: true,
+        inverse: 'challenges'
+    }),
 
-    exp: attr('number'),
+    exp: attr('number', {defaultValue:1}),
     expOptions: [{
         rank: "direct",
         points: 1
@@ -51,16 +60,18 @@ var ChallengeModel = module.exports = DS.Model.extend({
         points: 32
     }],
 
-    relationshipChanged:false,
-
+    invalidate: function () {
+        this.set('valid', !this.get('isDirty'));
+    }.observes('solution', 'setup', 'tests'),
+    // relationshipChanged: false,
     canSave: function() {
-        return this.get('isDirty') || this.get('isNew') || this.get('relationshipChanged');
-    }.property('isDirty', 'relationshipChanged'),
+        return this.get('isDirty') || this.get('isNew');
+    }.property('isDirty'),
     canReset: function() {
-        return this.get('isDirty') && !this.get('isNew') && this.get('relationshipChanged');
-    }.property('isDirty', 'relationshipChanged'),
+        return this.get('isDirty') && !this.get('isNew');
+    }.property('isDirty'),
     canPublish: function() {
-        return !this.get('canSave') && !this.get('isPublished');
+        return !this.get('canSave') && !this.get('isPublished') && this.get('isValid');
     }.property('canSave')
 });
 

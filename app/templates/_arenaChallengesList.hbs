@@ -2,9 +2,15 @@
 <ul class="list-group">
 {{#each challenge in model}}
     <li class="list-group-item">            
-        <span class="pull-right label label-info">awards {{challenge.exp}} Exp</span>
+        <span class="pull-right">
+            {{#if challenge.isPublished}}
+            <span class="label label-success"><i class="glyphicon glyphicon-ok"></i> Published</span>
+            {{/if}}
+            <span class="label label-info">awards {{challenge.exp}} Exp</span>
+        </span>
+
         <h4 class="list-group-item-heading">
-            {{#link-to 'challenge' challenge.id class=".challenge-name"}}
+            {{#link-to 'challenge' challenge class=".challenge-name"}}
                 {{challenge.name}}
             {{/link-to}}
         </h4>
@@ -12,19 +18,12 @@
             <div>
                {{!--  <a class='challenge-discussion' href="#"><i class="glyphicon glyphicon-comment"></i> Discussion</a> --}}
 
-                {{#link-to 'challenge.edit' challenge.id class=":challenge-edit"}}
+                {{#link-to 'challenge.edit' challenge class=":challenge-edit"}}
                     <i class="glyphicon glyphicon-pencil"></i> Edit
                 {{/link-to}}
-                {{#link-to 'challenge.try' challenge.id class=":challenge-try"}}
+                {{#link-to 'challenge.try' challenge class=":challenge-try"}}
                     <i class="glyphicon glyphicon-play"></i> Try
                 {{/link-to}}
-                <a {{action "togglePublishChallenge" challenge }} href="#" class="challenge-publish disabled">
-                    {{#unless challenge.isPublished }}
-                      <i class="glyphicon glyphicon-ok-circle"></i> Publish
-                    {{else}}
-                      <i class="glyphicon glyphicon-ban-circle"></i> Un-Publish
-                    {{/unless}} 
-                </a>
                 <a {{action "removeChallenge" challenge }} href="#" class="challenge-remove">
                     <i class="glyphicon glyphicon-remove"></i> Remove 
                 </a>

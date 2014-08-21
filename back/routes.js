@@ -12,6 +12,8 @@ module.exports = function(app, passport) {
     require('./routes/arena')(app, passport);
     // arena trial routes
     require('./routes/arenaTrial')(app, passport);
+    // user routes
+    require('./routes/user')(app, passport);
 
     /**
      * POST /token
@@ -95,7 +97,11 @@ module.exports = function(app, passport) {
         }
 
         User.findOne({
-            'username': req.body.username
+            $or: [{
+                'username': req.body.username
+            }, {
+                'email': req.body.email,
+            }]
         }, function(err, user) {
             if (err) return next(err);
             if (user) return res.send(400, 'User exists');

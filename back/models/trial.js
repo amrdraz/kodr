@@ -6,6 +6,7 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
 var observer = require('../mediator');
+var Challenge = require('./challenge');
 
 
 /**
@@ -35,6 +36,10 @@ var TrialSchema = new mongoose.Schema({
     exp: {
         type: Number,
         'default': 0
+    },
+    started: {
+        type: Boolean,
+        'default': false
     },
     complete: {
         type: Boolean,
@@ -84,11 +89,11 @@ TrialSchema.pre('save', true, function(next, done) {
     if (this.complete) {
         this.completed++;
         if (this.completed === 1) {
-            return this.populate('challenge', function(err, trial) {
-                if (err) done(err);
-                trial.exp = trial.challenge.exp;
+            var trial = this;
+            return Challenge.findOne({_id:this.challenge}).exec().then(function(challenge) {
+                trial.exp = challenge.exp;
                 done(null, trial);
-            });
+            }, done);
         }
     }
     // next(null, this);

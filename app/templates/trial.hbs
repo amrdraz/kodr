@@ -1,0 +1,55 @@
+<section class="description panel panel-default">
+  <div class="panel-heading">
+    <span class="pull-right label label-primary">awards {{model.challenge.exp}} Exp</span>
+    <h2 class="panel-title">{{model.challenge.name}}</h2>
+</div>
+  <div class="panel-body">
+    {{view 'App.MarkedMathView' model=model.challenge observable='description' }}
+  </div>
+</section>
+<section class="row">
+<div class="col-lg-6">
+    <a id="run" {{action "runInConsole"}} class="btn btn-default pull-right challenge-run">Run in Console <i class="glyphicon glyphicon-play"></i></a>
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#code" data-toggle="tab">Code</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane  fade in active" id="code">
+        {{view 'App.CodeEditorView'
+          name="codeEditor"
+          id="editor"
+          class="col-lg-12"
+          model=model
+          attr='code' }}
+      </div>
+    </div>
+</div>
+<div class="col-lg-6">
+    <a id="run" {{action "run"}} {{bind-attr class=":btn model.complete:btn-success:btn-primary :pull-right model.canSubmit::disabled :challenge-submit" }} >
+      {{#if model.complete}}
+        {{#if model.isDirty}}
+          Re-Submit <i class="glyphicon glyphicon-play"></i>
+        {{else}}
+          Completed <i class="glyphicon glyphicon-ok"></i>
+        {{/if}}
+      {{else}}
+        Submit <i class="glyphicon glyphicon-play"></i>
+      {{/if}}
+    </a>
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#console" data-toggle="tab">Console</a></li>
+      <li class=""><a href="#results" data-toggle="tab">Results</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane fade in active" id="console">
+        {{view App.ConsoleView }}
+      </div>
+      <div class="tab-pane fade" id="results">
+        {{controller.results}}
+      </div>
+      <div id="sandbox">
+        {{view App.SandboxView }}
+      </div>
+    </div>
+</div>  
+</section>
