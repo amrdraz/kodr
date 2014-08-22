@@ -11,15 +11,11 @@ var morgan = require('morgan');
 var cookiePraser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-
 var session = require('express-session');
 var methodOverride = require('method-override');
 
 var path = require('path');
- 
-// Create Event Emiter
-// require('util').inherits(global,require('events').EventEmitter);
-GLOBAL.kodrEventManager = new EventEmitter();
+var swig = require('swig');
 
 // set up passport strategies
 require('./config/passport.js')(passport);
@@ -30,8 +26,22 @@ app.use(bodyParser()); // get req.body from normal html form
 // app.use(multer({dest: "./uploads"}));       // get req.files for miltipart/form-data
 app.use(methodOverride());
 
-// app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+
+//  Setting up template engine
+app.engine('html', swig.renderFile);
+
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
+
+if (process.env.NODE_ENV === 'development') {
+
+    // Swig will cache templates for you, but you can disable
+    app.set('view cache', false);
+    // To disable Swig's cache
+    swig.setDefaults({
+        cache: false
+    });
+}
 
 app.set('port', port);
 
@@ -53,7 +63,7 @@ app.use(function(err, req, res, next) {
 //     src: path.join(__dirname, 'app')
 // }));
 app.use(express.static(path.join(__dirname, '../app')));
-app.use('/',express.static(path.join(__dirname, '../.tmp')));
+app.use('/', express.static(path.join(__dirname, '../.tmp')));
 
 require('./routes')(app, passport);
 require('./events')(app, passport);

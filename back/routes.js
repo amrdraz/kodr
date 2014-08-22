@@ -1,7 +1,9 @@
+var Promise = require('bluebird');
 var User = require('./models/user');
+var ExpiringToken = require('./models/expiringToken');
 var access = require('./routes/access');
 var Challenge = require('./models/challenge');
-var sendMail = require('./config/mail');
+var mail = require('./config/mail');
 
 module.exports = function(app, passport) {
 
@@ -73,6 +75,18 @@ module.exports = function(app, passport) {
         res.send(200);
     });
 
+    // logout
+    app.get('/confirmAccount/:token', function(req, res, next) {
+        ExpiringToken.getToken(req.params.token).then(function(token) {
+            console.log(token);
+            var confirmURL = req.headers.host + '/confirmAccount/' + req.params.token;
+            res.render('mail/welcome.html', {
+                confirmURL: confirmURL,
+                token: token
+            });
+        }, next);
+    });
+
     /**
      * POST /signup
      * Create a new local account.
@@ -99,56 +113,70 @@ module.exports = function(app, passport) {
             return res.send(400, 'Passwords do not match.');
         }
 
-        User.findOne({
-            $or: [{
-                'username': req.body.username
-            }, {
-                'email': req.body.email,
-            }]
-        }, function(err, user) {
-            if (err) return next(err);
-            if (user) return res.send(400, 'User exists');
+        Promise.fulfilled()
+            .then(function() {
+                return User.findOne({
+                    $or: [{
+                        'username': req.body.username
+                    }, {
+                        'email': req.body.email,
+                    }]
+                }).exec();
+            })
+            .then(function(user) {
+                if (user) throw new Error(400);
 
-            var email = req.body.email,
-                role = 'guest';
-            if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
-                role = 'teacher';
-            } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
-                role = 'student';
-            }
-
-
-            new User({
-                username: req.body.username,
-                email: req.body.email,
-                password: req.body.password,
-                role: role
-            }).save(function(err, model) {
-                if (err) return res.send(500, err.message);
-
-                if (model.email === 'amrmdraz@gmail.com') {
-                    var confirmURL = req.headers.host + '/confirmAccount/' + model.token;
-                    sendMail({
-                        to: model.email,
+                var email = req.body.email,
+                    role = 'guest';
+                if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
+                    role = 'teacher';
+                } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
+                    role = 'student';
+                }
+                var usr = User.create({
+                    username: req.body.username,
+                    email: req.body.email,
+                    password: req.body.password,
+                    role: role
+                });
+                return usr;
+            })
+            .then(function (user) {
+                var token = ExpiringToken.create({
+                    user: user._id,
+                    'for': 'newaccount',
+                });
+                return [user, token];
+            })
+            .spread(function(user, token) {
+                if (user.email === 'amrmdraz@gmail.com') {
+                    var confirmURL = req.headers.host + '/confirmAccount/' + token._id;
+                    // template in views/mail
+                    mail.renderAndSend('welcome.html', {
+                        confirmURL: confirmURL
+                    }, {
+                        to: user.email,
                         subject: 'You\'ve just signup for an awesome experience',
-                        html: "<p>Oh boy, am I glade to here from You \n\
-We're about to embark on a greate journey, I just need you to confirm your account registration. \n\
-Mind following this link into awesome ):D\n\
- <a href='" + confirmURL + "'>" + confirmURL + "</a>\n\
-</p>"
                     }, function(err, info) {
                         if (err) {
                             console.log(err);
                         } else {
                             console.log('Message sent: ' + info.response);
                         }
-                        if (err) return res.send(500, err.message);
-                        return res.send(info);
+                        if (err) throw err;
+                        return res.send({
+                            token: token,
+                            info: info
+                        });
                     });
                 }
                 res.send(200);
+            }).catch(function (err) {
+                console.log(err);
+                if(err.message===400) {
+                    return res.send(400, 'User exists');
+                }
+                res.send(500, err.message);
             });
-        });
-
     });
 };

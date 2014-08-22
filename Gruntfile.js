@@ -92,7 +92,8 @@ module.exports = function(grunt) {
             dev: {
                 options: {
                     script: 'server.js',
-                    port: 9000
+                    port: 9000,
+                    node_env: 'development'
                 }
             },
             prod: {
@@ -122,7 +123,8 @@ module.exports = function(grunt) {
                     watch: ['<%= config.server %>'],
                     ext: 'js,coffee,jade',
                     env: {
-                        PORT: '9000'
+                        PORT: '9000',
+                        NODE_ENV:'development'
                     },
                     // omit this property if you aren't serving HTML files and 
                     // don't want to open a browser tab on start
@@ -155,7 +157,8 @@ module.exports = function(grunt) {
                     watch: ['<%= config.server %>'],
                     ext: 'js,coffee,jade',
                     env: {
-                        PORT: '3000'
+                        PORT: '3000',
+                        NODE_ENV:'test'
                     },
                     // omit this property if you aren't serving HTML files and 
                     // don't want to open a browser tab on start
