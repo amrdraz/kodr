@@ -28,32 +28,18 @@ module.exports = function(app, passport) {
     app.post('/token', function(req, res, next) {
         passport.authenticate('local-login', function(err, user) {
             if (err) return next(err);
-            if (user) res.send({
-                access_token: user.token,
-                user_id: user._id
-            });
+            if (user) {
+                if(!user.activated) return res.send(400, 'Please Confirm your email');
+
+                res.send({
+                    access_token: user.token,
+                    user_id: user._id
+                });
+            }
             else res.send(403, 'Incorrect username or password.');
         })(req, res, next);
     });
 
-
-    /**
-     * POST /login
-     * Sign in using username and password.
-     * @param {string} username
-     * @param {string} password
-     */
-
-    app.post('/login', function(req, res, next) {
-        passport.authenticate('local-login', function(err, user) {
-            if (err) return next(err);
-            if (user) res.send({
-                access_token: user.token,
-                user_id: user._id
-            });
-            else res.send(403, 'Incorrect username or password.');
-        })(req, res, next);
-    });
 
     app.get('/profile', access.hasToken, function(req, res) {
         res.json(
@@ -78,12 +64,15 @@ module.exports = function(app, passport) {
     // logout
     app.get('/confirmAccount/:token', function(req, res, next) {
         ExpiringToken.getToken(req.params.token).then(function(token) {
-            console.log(token);
-            var confirmURL = req.headers.host + '/confirmAccount/' + req.params.token;
-            res.render('mail/welcome.html', {
-                confirmURL: confirmURL,
-                token: token
-            });
+            User.findOne({_id:token.user}).exec().then(function (user) {
+                user.activated = true;
+                user.save();
+                var confirmURL = req.headers.host + '/confirmAccount/' + req.params.token;
+                res.render('mail/welcome.html', {
+                    confirmURL: confirmURL,
+                    user:user
+                });
+            }, next);
         }, next);
     });
 
@@ -126,10 +115,12 @@ module.exports = function(app, passport) {
             .then(function(user) {
                 if (user) throw new Error(400);
 
-                var email = req.body.email,
-                    role = 'guest';
+                var email = req.body.email;
+                var role = 'student';
+                var activated = true;
                 if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
                     role = 'teacher';
+                    activated = false;
                 } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
                     role = 'student';
                 }
@@ -137,35 +128,34 @@ module.exports = function(app, passport) {
                     username: req.body.username,
                     email: req.body.email,
                     password: req.body.password,
-                    role: role
+                    role: role,
+                    activated:activated
                 });
                 return usr;
             })
             .then(function (user) {
-                var token = ExpiringToken.create({
-                    user: user._id,
-                    'for': 'newaccount',
-                });
+                var token;
+                if(!user.activated)
+                    token = ExpiringToken.create({
+                        user: user._id,
+                        'for': 'newaccount',
+                    });
                 return [user, token];
             })
             .spread(function(user, token) {
-                if (user.email === 'amrmdraz@gmail.com') {
+                if (!user.activated && user.email === 'amr.deraz@guc.edu.eg') {
                     var confirmURL = req.headers.host + '/confirmAccount/' + token._id;
                     // template in views/mail
-                    mail.renderAndSend('welcome.html', {
+                    return mail.renderAndSend('welcome.html', {
                         confirmURL: confirmURL
                     }, {
                         to: user.email,
                         subject: 'You\'ve just signup for an awesome experience',
+                        stub: process.env.NODE_ENV==='test',
                     }, function(err, info) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            console.log('Message sent: ' + info.response);
-                        }
                         if (err) throw err;
                         return res.send({
-                            token: token,
+                            token: token._id,
                             info: info
                         });
                     });

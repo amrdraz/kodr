@@ -6,6 +6,7 @@ var request = require('supertest-as-promised');
 var Promise = require('bluebird');
 var setup = require('./setup');
 var User = require('../../back/models/user');
+var ExpiringToken = require('../../back/models/expiringToken');
 var Arena = require('../../back/models/arena');
 var ArenaTrial = require('../../back/models/arenaTrial');
 var Trial = require('../../back/models/trial');
@@ -114,7 +115,7 @@ describe('User', function() {
             password: 'testmodel12',
             passwordConfirmation: 'testmodel12'
         };
-        var accessToken;
+        var accessToken, activationToken;
 
         after(setup.clearDB);
 
@@ -139,7 +140,7 @@ describe('User', function() {
                         res.status.should.equal(200);
                         User.find({role:'student'}).exec(function(err,users){
                             if (err) return done(err);
-                            users.length.should.equal(1);
+                            users.length.should.equal(2);
                             done();
                         });
                     });
@@ -159,24 +160,21 @@ describe('User', function() {
                     });
             });
 
-            it("should send and email to amrmdraz@gmail.com", function(done) {
+            it("should send and email when a teacher signs up", function(done) {
                 request(url)
                     .post("/signup")
                     .send({
                         username: "drazious",
-                        email: "amrmdraz@gmail.com",
+                        email: "amr.deraz@guc.edu.eg",
                         password: "drazdraz12",
                         passwordConfirmation: "drazdraz12"
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        console.log(res.body);
-                        User.findOne({username:'drazious'}).exec(function(err,user){
-                            if (err) return done(err);
-                            expect(user).to.exist;
-                            done();
-                        },done);
+                        expect(res.body.info.response).to.exist;
+                        activationToken = res.body.token;
+                        done();
                     });
             });
         });
@@ -191,7 +189,7 @@ describe('User', function() {
                     .end(done);
             });
 
-            it("should return a token", function(done) {
+            it("should return a token and user id", function(done) {
                 request(url)
                     .post("/token")
                     .send(user)
@@ -205,6 +203,48 @@ describe('User', function() {
                     accessToken = res.body.access_token;
                     done();
                 });
+            });
+
+            it("should not be able to login as a teacher until activation", function(done) {
+                request(url)
+                    .post("/token")
+                    .send({
+                        username: "drazious",
+                        password: "drazdraz12",
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(400);
+                        done();
+                    });
+            });
+
+            it("should activate by accessing link then in email", function(done) {
+                request(url)
+                    .get("/confirmAccount/"+activationToken)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        ExpiringToken.findById(activationToken, function (err, exp) {
+                            if (err) return done(err);
+                            exp.used.should.be.true;
+                            done();
+                        });
+                    });
+            });
+
+            it("should be able to login as a teacher after activation", function(done) {
+                request(url)
+                    .post("/token")
+                    .send({
+                        username: "drazious",
+                        password: "drazdraz12",
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        done();
+                    });
             });
         });
         describe("Profile", function() {

@@ -34,6 +34,10 @@ var userSchema = new mongoose.Schema({
         match: /^.{10,}$/,
         trim: true
     },
+    activated:{
+        type:Boolean,
+        default:false,
+    },
     token: String,
     role: {
         type: String,
