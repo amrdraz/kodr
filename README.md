@@ -17,19 +17,15 @@ You can get mongodb via brew if you are a mac user
 To run this project clone it locally then run `npm install`
 this shoudl install all dependencies
 
-to run the project you need to run `mongod --bdpath ./data` in ther terminal
+to run the project you need to run `mongod --bdpath ./data` in ther terminal (make sure you create the directory first)
 open another terminal tab and run `grunt serve`
 
 >As a side note I use bycript not node-bycrypt for the user hasing which may have a windows bug.
 
 ###Immidiate Road Map
 
-- do Trial Model (an instance of a challenges with respect to a User (optional) )
-- Integrate Trials with Challenges
-
-- do backend of trials
-- do Achivment Model
-
-- do User Model with respect to Trials and Challanges
-- do User access/privllage mangment
-- do User mentoring, tracking.
+- Do User ACL for students and teachers
+- Create Achievement system
+- User management
+- Quests for students
+- Profile Report
