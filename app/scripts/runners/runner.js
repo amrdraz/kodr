@@ -1,5 +1,5 @@
 module.exports = {
-    test: function(code, tests) {
+    mocha: function(code, tests) {
         return [
             'try {',
             '  window.code = JSON.parse(' + JSON.stringify(JSON.stringify(code)) + ');',
@@ -10,6 +10,23 @@ module.exports = {
             '',
             '  window.mocha.run();',
             '} catch(e) {',
+            '  rethrow(e, JSON.parse(' + JSON.stringify(JSON.stringify(tests)) + '),2);',
+            '}',
+            true
+        ].join('\n');
+    },
+    test: function(code, tests) {
+        return [
+            'try {',
+            '  window.code = JSON.parse(' + JSON.stringify(JSON.stringify(code)) + ');',
+            code,
+            '// Begin Tests',
+            tests,
+            '// End Tests',
+            '',
+            ' run();',
+            '} catch(e) {',
+            'throw e;',
             '  rethrow(e, JSON.parse(' + JSON.stringify(JSON.stringify(tests)) + '),2);',
             '}',
             true
@@ -32,4 +49,4 @@ module.exports = {
             true
         ].join('\n');
     }
-}
+};

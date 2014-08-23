@@ -228,41 +228,6 @@ module.exports = function(grunt) {
             }
         },
 
-        // Empties folders to start fresh
-        clean: {
-            dist: {
-                files: [{
-                    dot: true,
-                    src: [
-                        '.tmp',
-                        '<%= config.dist %>/*',
-                        '!<%= config.dist %>/.git*'
-                    ]
-                }]
-            },
-            server: '.tmp'
-        },
-
-        browserify: {
-            main: {
-                src: '<%= config.app %>/scripts/main.js',
-                dest: '.tmp/scripts/build.js'
-            }
-        },
-        emberTemplates: {
-            options: {
-                templateName: function(sourceFile) {
-                    var templatePath = config.app + '/templates/';
-                    return sourceFile.replace(templatePath, '');
-                }
-            },
-            dist: {
-                files: {
-                    '.tmp/scripts/templates.js': '<%= config.app %>/templates/**/*.hbs'
-                }
-            }
-        },
-
         // Make sure code styles are up to par and there are no obvious mistakes
         jshint: {
             options: {
@@ -295,6 +260,45 @@ module.exports = function(grunt) {
             }
         },
 
+
+        // Empties folders to start fresh
+        clean: {
+            dist: {
+                files: [{
+                    dot: true,
+                    src: [
+                        '.tmp',
+                        '<%= config.dist %>/*',
+                        '!<%= config.dist %>/.git*'
+                    ]
+                }]
+            },
+            server: '.tmp'
+        },
+
+        browserify: {
+            main: {
+                src: '<%= config.app %>/scripts/main.js',
+                dest: '.tmp/scripts/build.js'
+            },
+            iframe: {
+                src: '<%= config.app %>/scripts/iframe-main.js',
+                dest: '.tmp/iframe/main.js'
+            }
+        },
+        emberTemplates: {
+            options: {
+                templateName: function(sourceFile) {
+                    var templatePath = config.app + '/templates/';
+                    return sourceFile.replace(templatePath, '');
+                }
+            },
+            dist: {
+                files: {
+                    '.tmp/scripts/templates.js': '<%= config.app %>/templates/**/*.hbs'
+                }
+            }
+        },
         // Compiles Sass to CSS and generates necessary files if requested
         sass: {
             options: {
@@ -356,13 +360,12 @@ module.exports = function(grunt) {
                         '<%= config.dist %>/scripts/{,*/}*.js',
                         '<%= config.dist %>/styles/{,*/}*.css',
                         '<%= config.dist %>/images/{,*/}*.*',
-                        '<%= config.dist %>/styles/fonts/{,*/}*.*',
+                        // '<%= config.dist %>/styles/fonts/{,*/}*.*',
                         '<%= config.dist %>/*.{ico,png}'
                     ]
                 }
             }
         },
-
         // Reads HTML for usemin blocks to enable smart builds that automatically
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
@@ -373,6 +376,23 @@ module.exports = function(grunt) {
             html: '<%= config.app %>/index.html'
         },
 
+        preprocess : {
+            options: {
+                inline: true,
+                context : {
+                    DEBUG: false
+                }
+            },
+            html : {
+                src : [
+                    // '<%= config.dist %>/index.html', 
+                    '<%= config.dist %>/*.html'
+                ]
+            },
+            js : {
+                src: ['.tmp/scripts/*.js', '.tmp/iframe/*.js']
+            }
+        },
         // Performs rewrites based on rev and the useminPrepare configuration
         usemin: {
             options: {
@@ -439,15 +459,15 @@ module.exports = function(grunt) {
         //         }
         //     }
         // },
-        // uglify: {
-        //     dist: {
-        //         files: {
-        //             '<%= config.dist %>/scripts/scripts.js': [
-        //                 '<%= config.dist %>/scripts/scripts.js'
-        //             ]
-        //         }
-        //     }
-        // },
+        uglify: {
+            dist: {
+                files: {
+                    '<%= config.dist %>/ifrmae/main.js': [
+                        '.tmp/iframe/main.js'
+                    ]
+                }
+            }
+        },
         // concat: {
         //     dist: {}
         // },
@@ -463,9 +483,10 @@ module.exports = function(grunt) {
                     src: [
                         '*.{ico,png,txt}',
                         '.htaccess',
-                        'images/{,*/}*.webp',
+                        'images/{,*/}*',
                         '{,*/}*.html',
-                        'styles/fonts/{,*/}*.*'
+                        'styles/fonts/{,*/}*.*',
+                        // 'vendor/MathJax/**'
                     ]
                 }, {
                     expand: true,
@@ -473,6 +494,12 @@ module.exports = function(grunt) {
                     cwd: '.',
                     src: ['app/lib/bootstrap-sass-official/vendor/assets/fonts/bootstrap/*.*'],
                     dest: '<%= config.dist %>'
+                },{
+                    expand: true,
+                    dot: true,
+                    cwd:'.tmp/iframe',
+                    src:['main.js'],
+                    dest:'<%= config.dist %>/iframe/'
                 }]
             },
             styles: {
@@ -532,7 +559,7 @@ module.exports = function(grunt) {
                 'copy:styles',
                 'browserify',
                 'emberTemplates',
-                'imagemin',
+                // 'imagemin',
                 'svgmin'
             ]
         }
@@ -570,7 +597,7 @@ module.exports = function(grunt) {
             'concurrent:watchtest'
         ]);
     });
-
+    
     grunt.registerTask('build', [
         'clean:dist',
         'useminPrepare',
@@ -578,8 +605,10 @@ module.exports = function(grunt) {
         'autoprefixer',
         'concat',
         'cssmin',
-        'uglify',
         'copy:dist',
+        'preprocess:js',  // Remove DEBUG code from production builds
+        'preprocess:html',  // Remove DEBUG code from production builds
+        'uglify',
         'modernizr',
         'rev',
         'usemin',

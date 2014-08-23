@@ -45,29 +45,30 @@ module.exports = Em.Mixin.create({
         var passes = report.passes.length;
         var failures = report.failures.length;
         var pass = tests === passes;
-        var console = this.get('console') || console;
-        console.Write  = console.Write || console.log;
+        var jconsole = this.get('console') || console;
+        jconsole.Write  = jconsole.Write || console.log;
         var writeTest = function(test, pass) {
-            console.Write(test.title + '\n', pass);
+            jconsole.Write(test.fullName + '\n', pass);
         };
 
-        console.Write("========= Running Submission " + (pass ? 'Passed' : 'Failed') + " ==========\n", pass ? 'result' : 'error');
+        jconsole.Write("========= Running Submission " + (pass ? 'Passed' : 'Failed') + " ==========\n", pass ? 'result' : 'error');
 
         if (passes) {
             report.passes.forEach(function(test) {
                 writeTest(test, 'result');
             });
-            failures && console.Write('\n-----------------------------------\n\n');
+            failures && jconsole.Write('\n-----------------------------------\n\n');
         }
 
         if (failures) {
             report.failures.forEach(function(test) {
                 writeTest(test, 'error');
+                console.error(test.failedExpectations[0].stack);
             });
         }
-        console.Write("==============================================\n", pass ? 'result' : 'error');
+        jconsole.Write("==============================================\n", pass ? 'result' : 'error');
 
-        return tests === passes;
+        return report.passed;
     },
     actions: {
         sandboxLoaded: function(sb) {

@@ -2,7 +2,6 @@
 // get all the tools we need
 var express = require('express');
 var app = express();
-var port = process.env.PORT || 3000;
 var passport = require('passport');
 var flash = require('connect-flash');
 var EventEmitter = require('events').EventEmitter;
@@ -17,14 +16,23 @@ var methodOverride = require('method-override');
 var path = require('path');
 var swig = require('swig');
 
-// set up passport strategies
-require('./config/passport.js')(passport);
+var config = require('./config/server.js')(process.env.NODE_ENV);
+
+process.env.PORT = config.port; //<-----set port
+var port = process.env.PORT || 3000;
+app.set('port', port);
 
 app.use(morgan('dev')); // log every request to the console
 app.use(cookiePraser('you cookie secret here')); // read cookies
 app.use(bodyParser()); // get req.body from normal html form
 // app.use(multer({dest: "./uploads"}));       // get req.files for miltipart/form-data
 app.use(methodOverride());
+
+var mongoose = require('mongoose');
+mongoose.connect(config.db.url);
+mongoose.connection.on('error', function() {
+    console.log('← MongoDB Connection Error →');
+});
 
 
 //  Setting up template engine
@@ -43,12 +51,24 @@ if (process.env.NODE_ENV === 'development') {
     });
 }
 
-app.set('port', port);
 
+
+// set up passport strategies
+require('./config/passport.js')(passport);
 // require for passport
-app.use(session({
-    secret: 'your session secret should go here'
-}));
+if (process.env.NODE_ENV === 'production') {
+    var MongoStore = require('connect-mongo')(session);
+    app.use(session({
+        secret: 'my secret sectret that no one knows about is prod',
+        store: new MongoStore({
+            mongoose_connection: mongoose.connections[0],
+        })
+    }));
+} else {
+    app.use(session({
+        secret: 'my secret sectret that no one knows about is od'
+    }));
+}
 app.use(passport.initialize());
 app.use(passport.session()); // presistent login sessions
 app.use(flash()); // use conect flash to flash message stored in session
@@ -62,8 +82,12 @@ app.use(function(err, req, res, next) {
 // app.use(sass.middleware({
 //     src: path.join(__dirname, 'app')
 // }));
-app.use(express.static(path.join(__dirname, '../app')));
-app.use('/', express.static(path.join(__dirname, '../.tmp')));
+if (process.env.NODE_ENV !== 'production') {
+    app.use(express.static(path.join(__dirname, '../app')));
+    app.use('/', express.static(path.join(__dirname, '../.tmp')));
+} else {
+    app.use(express.static(path.join(__dirname, '../dist')));
+}
 
 require('./routes')(app, passport);
 require('./events')(app, passport);

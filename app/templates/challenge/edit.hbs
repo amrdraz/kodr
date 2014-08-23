@@ -14,7 +14,7 @@
       <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
     {{/unless}}
     <li {{action 'delete' }} class="challenge-delete"><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
-    <li {{action 'validate' }} {{bind-attr class="valid:disabled :challenge-validate "}}><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
+    <li {{action 'validate' }} {{bind-attr class="valid:active :challenge-validate "}}><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
   </ul>
 </section>
 <section class="challenge-settings row">

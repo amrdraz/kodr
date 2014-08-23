@@ -41,11 +41,6 @@
         <script src="lib/jquery/dist/jquery.js"></script>
         <script src="lib/modernizr/modernizr.js"></script>
         <script src="lib/codemirror/lib/codemirror.js"></script>
-        <script src="lib/mocha/mocha.js"></script>
-        <script src="lib/chai/chai.js"></script>
-        <script src="lib/esprima/esprima.js"></script>
-        <script src="lib/underscore/underscore.js"></script>
-        <script src="lib/structured/structured.js"></script>
         <script src="lib/handlebars/handlebars.js"></script>
         <script src="lib/ember/ember.js"></script>
         <script src="lib/ember-data/ember-data.js"></script>
@@ -57,10 +52,14 @@
         <script src="lib/chosen_v1.1.0/chosen.jquery.js"></script>
         <script src="lib/jq-console/lib/jqconsole.js"></script>
         <script src="lib/jshint/dist/jshint.js"></script>
-        <script src="vendor/MathJax/MathJax.js?config=TeX-AMS_HTML-full"></script>
         <script src="vendor/blockies.min.js"></script>
         <!-- endbuild -->
-
+        <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
+        <script>
+        if (!window.Mathjax) {
+            document.write('<script src="vendor/MathJax/MathJax.js?config=TeX-AMS_HTML-full"><\/script>');
+        }
+        </script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
@@ -91,7 +90,9 @@
         <script src="scripts/templates.js"></script>
         <script src="scripts/build.js"></script>
         <!-- endbuild -->
-
+        
+        <!-- @if DEBUG -->
         <script src="http://localhost:35729/livereload.js?snipver=1" type="text/javascript"></script>
+        <!-- @endif -->
 </body>
 </html>

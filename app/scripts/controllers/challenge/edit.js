@@ -69,8 +69,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             this.evaluate();
         }),
         validate: function() {
-            if (!this.get('valid'))
-                this.evaluate();
+            this.evaluate();
         },
         reset: function() {
             this.get('model.canReset') && this.get('model').rollback();
