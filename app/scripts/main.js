@@ -8,7 +8,19 @@ window.ENV['simple-auth'] = {
 };
 
 require('./utils/localStorageShim.js');
-require('../vendor/ember-woof');
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "positionClass": "toast-bottom-right",
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+};
 require('../lib/ember-breadcrumbs/dist/ember-breadcrumbs');
 BreadCrumbs.BreadCrumbsComponent.reopen({
     classNames: ["breadcrumb"]

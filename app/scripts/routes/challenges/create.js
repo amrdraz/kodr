@@ -1,7 +1,12 @@
 module.exports = Em.Route.extend({
   controllerName: 'challenge.edit',
   // activate: function() {},
-  // deactivate: function() {},
+  deactivate: function() {
+    var model = this.modelFor('challenges.create');
+    if(model.get('isNew')) {
+      model.deleteRecord();
+    }
+  },
   // setupController: function(controller, model) {
   //   // controller.needs('challenge.edit').set('model', model);
   // },

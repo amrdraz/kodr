@@ -34,7 +34,7 @@ module.exports = Em.ObjectController.extend({
                     console.log('published');
                 });
             } else {
-                this.woof.danger('You can not publish an Arena without having at least one published challenge');
+                toastr.info('You can not publish an Arena without having at least one published challenge');
             }
         },
         unPublish: function() {

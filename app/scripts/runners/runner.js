@@ -26,7 +26,6 @@ module.exports = {
             '',
             ' run();',
             '} catch(e) {',
-            'throw e;',
             '  rethrow(e, JSON.parse(' + JSON.stringify(JSON.stringify(tests)) + '),2);',
             '}',
             true

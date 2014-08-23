@@ -3,8 +3,8 @@ var ChallengeMixin = require('../../mixins/challengeMixin');
 module.exports = Em.ObjectController.extend(ChallengeMixin, {
     needs: ['challenge', 'arena'],
     arena: Ember.computed.alias("controllers.arena"),
-    breadCrumb:'edit',
-    breadCrumbPath:'arena.edit' ,
+    breadCrumb: 'edit',
+    breadCrumbPath: 'arena.edit',
     evaluates: 'solution',
     // queryParams: ['arena'],
     // originalArena: null,
@@ -31,10 +31,10 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         }
     },
     testError: function(error) {
-        this.woof.danger('There are Errors check Console');
+        toastr.error('There are Errors check Console');
         this.set('model.valid', this._super(error));
         this.unPublish();
-        this.get('model').save();
+        this.save();
     },
     testSuccess: function(report) {
         var model = this.get('model');
@@ -42,12 +42,17 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
 
         model.set('valid', result);
         if (result) {
-            this.woof.success('All Clear' + (this.get('model.isPublished') ? '' : ' you can now publish'));
+            toastr.success('All Clear' + (this.get('model.isPublished') ? '' : ' you can now publish'));
         } else {
-            this.woof.danger('Tests didn\'t pass check console');
+            toastr.success('Tests didn\'t pass check console');
             this.unPublish();
         }
-        model.save();
+        this.save();
+    },
+    transtionIfNew: function() {
+        if (App.get('currentPath').contains('create')) {
+            this.transitionToRoute('challenge.edit', this.get('model'));
+        }
     },
     evaluate: function() {
         var model = this.get('model');
@@ -64,6 +69,20 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             run: true
         });
     },
+    save: function() {
+        var model = this.get('model');
+        var that = this;
+        if (App.get('currentPath').contains('create')) {
+            return model.save().then(function(ch) {
+                that.transitionToRoute('challenge.edit', model);
+            },function(xhr) {
+                console.error(xhr.message);
+                toastr.error(xhr.message);
+            });
+        } else {
+            return model.save();
+        }
+    },
     actions: {
         run: debounce(function() {
             this.evaluate();
@@ -75,28 +94,12 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             this.get('model.canReset') && this.get('model').rollback();
         },
         save: function() {
-            var that = this;
             var model = this.get('model');
             if (model.get('canSave')) {
                 if (!model.get('valid') || model.get('isPublished')) {
-                    that.evaluate();
+                    this.evaluate();
                 } else {
-                    that.get('model').save().then(function(ch) {
-                        var arena = that.get('arena');
-                        if (arena) {
-                            arena.get('challenges').then(function(challenges) {
-                                challenges.pushObject(ch);
-                            });
-                        }
-                        // this.set('relationshipChanged', false); // should happend in an observer
-                        // this.set('originalArena', this.get('arena'));
-                        if (App.get('currentPath').contains('create')) {
-                            that.transitionToRoute('challenge.edit', that.get('model'));
-                        }
-                    }).catch(function(xhr) {
-                        console.error(xhr);
-                        that.woof.danger(xhr.message);
-                    });
+                    this.save();
                 }
             }
         },
@@ -114,7 +117,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             if (!model.get('isPublished')) {
                 if (model.get('valid')) {
                     model.set('isPublished', true);
-                    model.save().then(function(ch) {
+                    this.save().then(function(ch) {
                         console.log('published');
                     }).catch(function(err) {
                         console.log(err.stack);
@@ -126,7 +129,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         },
         unPublish: function() {
             this.set('model.isPublished', false);
-            this.get('model').save().then(function(ch) {
+            this.save().then(function(ch) {
                 console.log('unPublished');
             });
         }
