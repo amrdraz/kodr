@@ -605,14 +605,14 @@ module.exports = function(grunt) {
         'autoprefixer',
         'concat',
         'cssmin',
-        'copy:dist',
         'preprocess:js',  // Remove DEBUG code from production builds
-        'preprocess:html',  // Remove DEBUG code from production builds
+        'copy:dist',
         'uglify',
         'modernizr',
         'rev',
         'usemin',
-        'htmlmin'
+        'htmlmin',
+        'preprocess:html',  // Remove DEBUG code from production builds
     ]);
 
     grunt.registerTask('default', [
