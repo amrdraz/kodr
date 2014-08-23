@@ -44,7 +44,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         if (result) {
             toastr.success('All Clear' + (this.get('model.isPublished') ? '' : ' you can now publish'));
         } else {
-            toastr.success('Tests didn\'t pass check console');
+            toastr.error('Tests didn\'t pass check console');
             this.unPublish();
         }
         this.save();
@@ -55,11 +55,14 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         }
     },
     evaluate: function() {
+        
         var model = this.get('model');
         var controller = this;
         var sb = controller.get('sandbox');
         var Runner = require('../../runners/runner');
         var iframeTemplate = require('../../demo/iframe');
+
+        this.trigger('showConsole');
         controller.jshint(model.get('solution'), function(code, console, sb) {
             sb.load(iframeTemplate, function() {
                 sb.evaljs(Runner.test(code, model.get('tests')));
@@ -96,11 +99,11 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         save: function() {
             var model = this.get('model');
             if (model.get('canSave')) {
-                if (!model.get('valid') || model.get('isPublished')) {
+                if (!model.get('valid') && model.get('isPublished')) {
                     this.evaluate();
-                } else {
-                    this.save();
+                    return false;
                 }
+                this.save();    
             }
         },
         delete: function() {

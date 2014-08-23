@@ -1,4 +1,4 @@
-module.exports = Em.Mixin.create({
+module.exports = Em.Mixin.create(Em.Evented, {
     evaluates:'code',
     jshint: function(code, cb, options) {
         options = options || {};
@@ -50,7 +50,7 @@ module.exports = Em.Mixin.create({
         var writeTest = function(test, pass) {
             jconsole.Write(test.fullName + '\n', pass);
         };
-        console.log(report);
+        // console.log(report);
         jconsole.Write("========= Running Submission " + (pass ? 'Passed' : 'Failed') + " ==========\n", pass ? 'result' : 'error');
 
         if (passes) {
@@ -63,7 +63,8 @@ module.exports = Em.Mixin.create({
         if (failures) {
             report.failures.forEach(function(test) {
                 writeTest(test, 'error');
-                console.error(test.failedExpectations[0].stack);
+                jconsole.Write('\t'+test.failedExpectations[0].message+'\n', 'error');
+                // console.error(test.failedExpectations[0].stack);
             });
         }
         jconsole.Write("==============================================\n", pass ? 'result' : 'error');
@@ -85,10 +86,12 @@ module.exports = Em.Mixin.create({
             console.log('loaded sandbox');
         },
         runInConsole: function() {
+            this.trigger('showConsole');
             this.send('consoleEval', this.get('model.'+this.get('evaluates')));
         },
         consoleEval: function(command) {
             this.jshint(command, function(code, console, sb) {
+                console.Focus();
                 sb.evaljs(code, function(error, res) {
                     if (error) {
                         console.Write(error.name + ': ' + error.message + '\n', 'error');

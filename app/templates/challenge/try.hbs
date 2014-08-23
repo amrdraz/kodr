@@ -1,5 +1,3 @@
-{{x-woof}}
-
 <section class="description panel panel-default">
   <div class="panel-heading">
     <span class="pull-right label label-primary">awards {{model.challenge.exp}} Exp</span>
@@ -29,8 +27,8 @@
 <div class="col-lg-6">
     <a id="run" {{action "run"}} {{bind-attr class=":btn model.complete:btn-success:btn-primary :pull-right model.canSubmit::disabled :challenge-submit" }} >
       {{#if model.complete}}
-        {{#if model.isDirty}}
-          Re-Submit <i class="glyphicon glyphicon-play"></i>
+        {{#if model.isDirtyish}}
+            Re-Submit <i class="glyphicon glyphicon-play"></i>
         {{else}}
           Completed <i class="glyphicon glyphicon-ok"></i>
         {{/if}}

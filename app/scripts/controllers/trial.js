@@ -1,43 +1,45 @@
 var debounce = require('../utils/debounce');
 var ChallengeMixin = require('../mixins/challengeMixin');
-module.exports = App.ChallengeTryController = Em.ObjectController.extend(ChallengeMixin, {
-    breadCrumb: function () {
-        return App.get('currentPath').contains('challenge')?'edit':'arena';
+module.exports = Em.ObjectController.extend(ChallengeMixin, {
+    isChallengeTrial: function() {
+        return App.get('currentPath').contains('challenge');
     }.property('App.currentPath'),
-    breadCrumbPath: function () {
-        return App.get('currentPath').contains('challenge')?'arena.edit':'arenaTrial';
-    }.property('App.currentPath') ,
+
+    breadCrumb: function() {
+        return this.get('isChallengeTrial') ? 'edit' : 'arena';
+    }.property('isChallengeTrial'),
+    breadCrumbPath: function() {
+        return this.get('isChallengeTrial') ? 'arena.edit' : 'arenaTrial';
+    }.property('isChallengeTrial'),
     needs: ['challenge'],
     //
     init: function() {
         this._super();
-        // this.addObserver('hasSandbox', this, function () {
-        //     this.removeObserver('hasSandbox', this);
-        //     var sb = this.get('sandbox');
-        //     var console = this.get('console');
-        //     var handler = function(msg) {
-        //         console.Write('==> ' + msg + '\n');
-        //     };
-
-        //     sb.on('error', handler);
-        //     sb.on('test.done', handler);
-        //     sb.on('structure.done', handler);
-        //     sb.on('log', handler);
-        // });
     },
-    testError: function function_name (errors) {
+    // returns true if dirty but unsaved, so that mock trials show complete instead of resubmit
+    isDirtyish: function() {
+        return this.get('model.isDirty') && !this.get('model.isNew');
+    }.property('model.isDirty', 'model.isNew'),
+    
+    testError: function (errors) {
         var model = this.get('model');
-        model.set('report', {errors:errors});
+        model.set('report', {
+            errors: errors
+        });
         model.set('complete', this._super(errors));
-        model.save();
+        this.save();
     },
     testSuccess: function(report) {
         var model = this.get('model');
         model.set('report', report);
         model.set('complete', this._super(report));
-        model.save().catch(function(err) {
-            console.log(err);
-        });
+        this.save();
+    },
+    save: function() {
+        var model = this.get('model');
+        if (!this.get('isChallengeTrial')) {
+            return model.save();
+        }
     },
     actions: {
         run: debounce(function() {

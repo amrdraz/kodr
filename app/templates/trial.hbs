@@ -27,7 +27,7 @@
 <div class="col-lg-6">
     <a id="run" {{action "run"}} {{bind-attr class=":btn model.complete:btn-success:btn-primary :pull-right model.canSubmit::disabled :challenge-submit" }} >
       {{#if model.complete}}
-        {{#if model.isDirty}}
+        {{#if isDirtyish}}
           Re-Submit <i class="glyphicon glyphicon-play"></i>
         {{else}}
           Completed <i class="glyphicon glyphicon-ok"></i>

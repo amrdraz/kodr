@@ -15,7 +15,7 @@ module.exports = Em.Route.extend({
                 challenge: challenge,
                 code: challenge.get('setup')
             });
-            return record.save();
+            return record;
         } else {
             return this.store.find('trial', params.trial_id);
         }

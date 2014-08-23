@@ -9,5 +9,5 @@ module.exports = App.Trial = DS.Model.extend({
 
     canSubmit: function () {
         return !this.get('complete') || this.get('isDirty');
-    }.property('complete', 'isDirty')
+    }.property('complete', 'isDirty'),
 });

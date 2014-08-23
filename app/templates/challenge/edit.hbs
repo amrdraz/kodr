@@ -1,4 +1,3 @@
-{{x-woof}}
 <section class="challenge-controlles row">
   <ul class="nav nav-pills pull-right">
     <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat challenge-reset"></i> Reset</a></li>
@@ -10,7 +9,7 @@
     {{#unless isPublished }}
       <li {{action "publish"}} {{bind-attr class="canPublish::disabled :challenge-publish "}}><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
     {{else}}
-      <li {{action "publish"}} {{bind-attr class="canSave::disabled :challenge-unpublish"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
+      <li {{action "save"}} {{bind-attr class="canSave::disabled :challenge-unpublish"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
       <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
     {{/unless}}
     <li {{action 'delete' }} class="challenge-delete"><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
@@ -47,7 +46,7 @@
 <section class="challenge-content row">
   
   <div class="col-lg-6">
-      <a id="run" {{action "runInConsole"}} class="btn btn-default pull-right challenge-run"><i class="glyphicon glyphicon-play"></i></a>
+      <a id="run" {{action "runInConsole"}} class="btn btn-default pull-right challenge-run"><i class="glyphicon glyphicon-play"></i> Run in Console</a>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#solution" data-toggle="tab">Solution</a></li>
         <li><a href="#setup" data-toggle="tab">Setup</a></li>
