@@ -107,7 +107,7 @@ module.exports = function(grunt) {
                     script: 'test-server.js',
                     node_env: 'test',
                     hostname: 'localhost',
-                    port: 9001
+                    port: 3000
                 }
             }
         },

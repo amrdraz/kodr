@@ -9,7 +9,7 @@
     </li>
     {{/unless}}
     {{#unless isPublished }}
-      <li {{action "publish"}} {{bind-attr class="canPublish::disabled :arean-publish "}}><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
+      <li {{action "publish"}} {{bind-attr class="canPublish::disabled :arean-publish "}} title="to publish challenge, you need to at least have one published challenge"><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
     {{else}}
       <li {{action "publish"}} {{bind-attr class="canSave::disabled :arean-unpublish"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
       <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
@@ -37,7 +37,7 @@
 </section>
 <section class="arean-challenges row">
 <div class="col-lg-12 clearfix">
-  {{#link-to 'challenges.create' class="btn btn-primary create-challenge" }} <i class="glyphicon glyphicon-plus"></i> Add Challenge{{/link-to}}
+  {{#link-to 'challenges.create' class="btn btn-primary create-challenge" classNameBindings='isNew:disabled'}} <i class="glyphicon glyphicon-plus"></i> Add Challenge{{/link-to}}
 </div>
   <div class="col-lg-12">
     {{render '_arenaChallengesList' model.challenges }}

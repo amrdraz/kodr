@@ -4,7 +4,9 @@
     <li class="list-group-item">            
         <span class="pull-right">
             {{#if challenge.isPublished}}
-            <span class="label label-success"><i class="glyphicon glyphicon-ok"></i> Published</span>
+                <span class="label label-success"><i class="glyphicon glyphicon-ok"></i> Published</span>
+            {{else}}
+                <span class="label label-default">Un-Published</span>
             {{/if}}
             <span class="label label-info">awards {{challenge.exp}} Exp</span>
         </span>

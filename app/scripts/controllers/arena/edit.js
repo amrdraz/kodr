@@ -2,6 +2,9 @@ module.exports = Em.ObjectController.extend({
     breadCrumb:'arena',
     breadCrumbPath:'arena',
     needs: ['arena'],
+    canPublish: function () {
+        return this.get('model.canPublish') && this.get('model.challenges').filterProperty('isPublished', true).length>=1;
+    }.property('model.challenges.@each.isPublished'),
     actions: {
         reset: function() {
             this.get('model').rollback();
@@ -16,14 +19,23 @@ module.exports = Em.ObjectController.extend({
             });
         },
         delete: function() {
+            var newModel = this.get('model.isNew');
             this.get('model').destroyRecord();
+            if(!newModel) {
+                this.get('model').save();
+            }
             this.transitionToRoute('arenas');
         },
         publish: function() {
-            this.set('model.isPublished', true);
-            this.get('model').save().then(function(ch) {
-                console.log('published');
-            });
+            var model = this.get('model');
+            if(this.get('canPublish')) {
+                this.set('model.isPublished', true);
+                this.get('model').save().then(function(ch) {
+                    console.log('published');
+                });
+            } else {
+                this.woof.danger('You can not publish an Arena without having at least one published challenge');
+            }
         },
         unPublish: function() {
             this.set('model.isPublished', false);
@@ -37,13 +49,6 @@ module.exports = Em.ObjectController.extend({
                     arena: this.get('model')
                 }
             });
-        },
-        togglePublishChallenge: function(challenge) {
-            var published = challenge.get('isPublished');
-            if (confirm('Are you sure you want to '+(published?'un-publish':'publish')+' this challenge?')) {
-                challenge.set('isPublished', !challenge.get('isPublished'));
-                challenge.save();
-            }
         },
         removeChallenge: function(challenge) {
             if (confirm('Are you sure you want to remove this challenge?')) {

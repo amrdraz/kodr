@@ -18,8 +18,7 @@ var swig = require('swig');
 
 var config = require('./config/server.js')(process.env.NODE_ENV);
 
-process.env.PORT = config.port; //<-----set port
-var port = process.env.PORT || 3000;
+var port = config.port || process.env.PORT || 3000;
 app.set('port', port);
 
 app.use(morgan('dev')); // log every request to the console

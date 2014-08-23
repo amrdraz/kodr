@@ -10,14 +10,21 @@
     <li class="list-group-item">            
         
         <h4 class="list-group-item-heading">
+
             <div class="pull-right">
+            {{#if arena.isPublished}}
+                <span class="label label-success"><i class="glyphicon glyphicon-ok"></i> Published</span>
+            {{else}}
+                <span class="label label-default">Un-Published</span>
+            {{/if}}
+            
             {{#link-to 'arena.edit' arena class="btn-default btn-sm arena-edit"}}
                 <i class="glyphicon glyphicon-pencil"></i> Edit
             {{/link-to}} 
             {{#link-to 'arenaTrial' arena class="btn-primary btn-sm arena-try"}}
                 <i class="glyphicon glyphicon-play"></i> Try
             {{/link-to}}
-        </div>
+            </div>
             {{#link-to 'arena' arena class="arena-name"}}
                 {{arena.name}}
             {{/link-to}}

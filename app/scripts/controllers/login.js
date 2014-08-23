@@ -4,13 +4,13 @@ var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, E
         identification: {
             presence: true,
             length: {
-                minimum: 3
+                minimum: 4
             }
         },
         password: {
             presence: true,
             length: {
-                minimum: 8
+                minimum: 10
             }
         }
     },
@@ -32,9 +32,12 @@ var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, E
                 that.set('fullErrors',fullErrors);
             });
         },
-        loginFailed: function(xhr) {
-            this.set('errorMessage', xhr.responseText);
-        }
+        authenticate: function() {
+            var _this = this;
+            this._super().then(null, function(error) {
+              _this.set('errorMessage', error);
+            });
+          }
     }
 });
 
