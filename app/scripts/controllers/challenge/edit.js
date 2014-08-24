@@ -75,7 +75,8 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         var that = this;
         if (this.get('isCreating')) {
             return model.save().then(function(ch) {
-                that.transitionToRoute('challenge.edit', ch);
+                // debugger;
+                that.transitionToRoute('challenge.edit', ch.id);
             }, function(xhr) {
                 console.error(xhr.message);
                 toastr.error(xhr.message);

@@ -31,6 +31,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
     },
     testSuccess: function(report) {
         var model = this.get('model');
+        var that = this;
         var complete = this._super(report);
         model.set('report', report);
         model.set('complete', complete);
@@ -43,7 +44,9 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
     save: function(cb) {
         var model = this.get('model');
         if (!this.get('isChallengeTrial')) {
-            return model.save(cb);
+            return model.save().then(cb);
+        } else {
+            toastr.info('You could have earned '+model.get('challenge.exp')+' EXP if you where logged in');
         }
     },
     actions: {

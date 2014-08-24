@@ -61,15 +61,15 @@ var ChallengeModel = module.exports = DS.Model.extend({
     }],
 
     invalidate: function () {
-        this.set('valid', !this.get('isDirty'));
+        this.set('valid', !this.get('canSave'));
     }.observes('solution', 'setup', 'tests'),
     // relationshipChanged: false,
     canSave: function() {
         return !this.get('isSaving') && this.get('isDirty') || this.get('isNew');
     }.property('isDirty', 'isSaving', 'isNew'),
     canReset: function() {
-        return this.get('isDirty') && !this.get('isNew');
-    }.property('isDirty'),
+        return !this.get('isSaving') && this.get('isDirty') && !this.get('isNew');
+    }.property('isDirty', 'isSaving'),
     canPublish: function() {
         return !this.get('canSave') && !this.get('isPublished') && this.get('isValid');
     }.property('canSave')

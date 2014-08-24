@@ -13,10 +13,10 @@ var ArenaModel = module.exports = DS.Model.extend({
 
 
     canSave: function() {
-        return this.get('isDirty') || this.get('isNew');
+        return !this.get('isSaving') && this.get('isDirty') || this.get('isNew');
     }.property('isDirty'),
     canReset: function() {
-        return this.get('isDirty') && !this.get('isNew');
+        return !this.get('isSaving') && this.get('isDirty') && !this.get('isNew');
     }.property('isDirty'),
     canPublish: function() {
         return !this.get('isDirty') && !this.get('isPublished');
