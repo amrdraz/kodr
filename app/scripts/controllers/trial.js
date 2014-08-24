@@ -31,14 +31,19 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
     },
     testSuccess: function(report) {
         var model = this.get('model');
+        var complete = this._super(report);
         model.set('report', report);
-        model.set('complete', this._super(report));
-        this.save();
+        model.set('complete', complete);
+        this.save(function (model) {
+            if(model.get('completed')===1) {
+                toastr.success('You just earned '+model.get('exp')+' EXP');
+            }
+        });
     },
-    save: function() {
+    save: function(cb) {
         var model = this.get('model');
         if (!this.get('isChallengeTrial')) {
-            return model.save();
+            return model.save(cb);
         }
     },
     actions: {

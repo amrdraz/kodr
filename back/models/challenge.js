@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
+var relationship = require("mongoose-relationship");
+var observer = require('../mediator');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
@@ -68,13 +70,17 @@ var Challenge = new mongoose.Schema({
     arena: {
         type: ObjectId, ref: 'Arena', childPath:"challenges"
     },
-    trials: {
-        type: [ObjectId], ref: 'Trial'
-    }
+    trials: [{
+        type: ObjectId, ref: 'Trial'
+    }]
     
 });
 
 Challenge.plugin(version, { collection: 'ChallengeVersions', log:true });
 Challenge.plugin(relationship, { relationshipPathName: ['arena', 'author']});
+
+Challenge.post('remove', function (doc) {
+    observer.emit('challenge.removed', doc);
+});
 
 module.exports = mongoose.model('Challenge', Challenge);

@@ -11,6 +11,9 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
     init: function() {
         this._super();
     },
+    isCreating: function () {
+        return App.get('currentPath').contains('create');
+    }.property('App.currentPath'),
     // arenaChange: function() {
     //     var arena = this.get('model.arena');
     //     console.log(arena);
@@ -49,13 +52,8 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         }
         this.save();
     },
-    transtionIfNew: function() {
-        if (App.get('currentPath').contains('create')) {
-            this.transitionToRoute('challenge.edit', this.get('model'));
-        }
-    },
     evaluate: function() {
-        
+
         var model = this.get('model');
         var controller = this;
         var sb = controller.get('sandbox');
@@ -75,10 +73,10 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
     save: function() {
         var model = this.get('model');
         var that = this;
-        if (App.get('currentPath').contains('create')) {
+        if (this.get('isCreating')) {
             return model.save().then(function(ch) {
-                that.transitionToRoute('challenge.edit', model);
-            },function(xhr) {
+                that.transitionToRoute('challenge.edit', ch);
+            }, function(xhr) {
                 console.error(xhr.message);
                 toastr.error(xhr.message);
             });
@@ -103,7 +101,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                     this.evaluate();
                     return false;
                 }
-                this.save();    
+                this.save();
             }
         },
         delete: function() {

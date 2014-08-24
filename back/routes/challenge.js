@@ -91,7 +91,7 @@ module.exports = function(app, passport) {
     app.del('/api/challenges/:id', access.hasToken, function(req, res, next) {
         Challenge.findById(req.params.id, function(err, model) {
             if (err) return next(err);
-            if(!model) res.send(200);
+            if(!model) return res.send(200);
             model.remove(function(err, model) {
                 if (err) return next(err);
                 res.send(200);

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
+var _ = require('lodash');
 var util = require('util');
 var version = require('mongoose-version');
 var ObjectId = mongoose.Schema.Types.ObjectId;
@@ -57,6 +58,7 @@ var TrialSchema = new mongoose.Schema({
     challenge: {
         type: ObjectId,
         ref: 'Challenge',
+        childPath: "trials"
         // required: true
     },
     user: {
@@ -76,12 +78,12 @@ TrialSchema.plugin(version, {
     collection: 'TrialVersions',
     logError: true,
     suppressVersionIncrement: false,
-    ignorePaths: ['times', 'exp', 'user', 'arenaTrial'],
+    ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge'],
     strategy: 'array'
 });
 
 TrialSchema.plugin(relationship, {
-    relationshipPathName: ['arenaTrial', 'user']
+    relationshipPathName: ['arenaTrial', 'user', 'challenge']
 });
 
 TrialSchema.pre('save', true, function(next, done) {
@@ -90,7 +92,9 @@ TrialSchema.pre('save', true, function(next, done) {
         this.completed++;
         if (this.completed === 1) {
             var trial = this;
-            return Challenge.findOne({_id:this.challenge}).exec().then(function(challenge) {
+            return Challenge.findOne({
+                _id: this.challenge
+            }).exec().then(function(challenge) {
                 trial.exp = challenge.exp;
                 done(null, trial);
             }, done);
@@ -132,6 +136,49 @@ function computeResult(trial, done) {
 }
 
 var Trial = mongoose.model('Trial', TrialSchema);
+
+// removing trial from arena trial so that it wouldn't show up
+// while still retaining the data for the user's histroy (tho maybe that's not a good idea)
+observer.on('challenge.removed', function(challenge) {
+    Promise.fulfilled()
+        .then(function() {
+            return Trial.findOne({
+                challenge: challenge._id
+            }).populate('arenaTrial').exec();
+        })
+        .then(function(trial) {
+            if (!trial) return Promise.resolve(true); // if challenge doesn't have any trials
+            var arenaTrial = trial.arenaTrial;
+            Trial.update({
+                challenge: challenge._id
+            }, {
+                challenge: null,
+                arenaTrial: null
+            }, {
+                multi: true
+            }, function(err, numAffected) {
+                if (err) throw err;
+                Trial.find({
+                    arenaTrial: arenaTrial._id
+                }).exec().then(function(trials) {
+                    arenaTrial.trials = _.map(trials, '_id');
+                    arenaTrial.save(function(err, at) {
+                        //for testing
+                        observer.emit('test.challenge.trials.removed', at.trials.length, challenge.trials.length);
+                    });
+                });
+                // arenaTrial.trials = _.filter(arenaTrial.trials, function (id) {
+                //     return _.remove(challenge.trials, function (oid) {
+                //         return oid.equals(id);
+                //     });
+                // },[]);
+
+            });
+        }).catch(function(err) {
+            util.error(err);
+        });
+
+});
 
 
 module.exports = Trial;

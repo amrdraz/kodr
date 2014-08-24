@@ -1,17 +1,86 @@
 /*globals before,after,beforeEach,afterEach,describe,it */
-var Async = require('async');
+var Promise = require('bluebird');
 var should = require('chai').should();
 var assert = require('chai').assert;
 var expect = require('chai').expect;
 var request = require('supertest');
 var setup = require('./setup');
+var observer = require('../../back/mediator');
 var Challenge = require('../../back/models/challenge');
 var Arena = require('../../back/models/arena');
+var ArenaTrial = require('../../back/models/arenaTrial');
+var Trial = require('../../back/models/trial');
+var User = require('../../back/models/user');
 
 
 
 describe('Challenge', function() {
     before(setup.clearDB);
+
+    describe('Trials', function() {
+        var challenge, arenaTrial, trials, user, num = 10;
+        beforeEach(function(done) {
+            Promise.fulfilled()
+                .then(function() {
+                    var at = ArenaTrial.create({});
+                    var ch = Challenge.create({});
+                    var ch2 = Challenge.create({});
+                    var usr = User.create({
+                        username: 'testuser',
+                        password: 'testuser12'
+                    });
+                    return [at, ch, ch2, usr];
+                })
+                .spread(function(at, ch, ch2, usr) {
+                    challenge = ch;
+                    arenaTrial = at;
+                    user = usr;
+                    var arr = Array(num);
+                    var chs = Promise.each(arr, function() {
+                        return Trial.create({
+                            challenge: ch._id,
+                            arenaTrial: at._id,
+                            user: usr
+                        });
+                    });
+                    var chs2 = Promise.each(arr, function() {
+                        return Trial.create({
+                            challenge: ch2._id,
+                            arenaTrial: at._id,
+                            user: usr
+
+                        });
+                    });
+
+                    return [chs, chs2];
+                }).spread(function(chs, chs2) {
+                    trials = chs.concat(chs2);
+                    return [
+                        ArenaTrial.findOne({
+                            _id: arenaTrial._id
+                        }).exec(),
+                        Challenge.findOne({
+                            _id: challenge._id
+                        }).exec()
+                    ];
+                }).spread(function (at,ch) {
+                    arenaTrial = at;
+                    challenge = ch;
+                })
+                .finally(done);
+        });
+        afterEach(setup.clearDB);
+        it('should remove themselves from their arenaTrial after cahllenge is removed', function(done) {
+            trials.length.should.equal(num * 2);
+            arenaTrial.trials.length.should.equal(num * 2);
+            challenge.trials.length.should.equal(num);
+            observer.on('test.challenge.trials.removed', function(arenaTrialTrials, challengeTrials) {
+                expect(arenaTrialTrials).to.equal(arenaTrial.trials.length - challengeTrials);
+                done();
+            });
+            challenge.remove();
+        });
+    });
 
     describe("API", function() {
         var url = 'http://localhost:3000';
@@ -39,36 +108,31 @@ describe('Challenge', function() {
         };
 
         before(function(done) {
-
-            Async.parallel([
-
-                function(cb) {
-                    Arena.create({}, function(err, model) {
-                        challenge.challenge.arena = model._id;
-                        cb(null, arena);
-                    });
-                },
-                function(cb) {
+            Promise.fulfilled()
+                .then(function() {
+                    return Arena.create({});
+                })
+                .then(function(arena) {
+                    challenge.challenge.arena = arena._id;
+                })
+                .then(function() {
                     request(url)
                         .post("/signup")
                         .send(user)
                         .end(function(err, res) {
-                            if (err) return cb(err);
-                            console.log(res.text);
+                            if (err) return done(err);
                             expect(res.status).to.equal(200);
                             request(url)
                                 .post("/token")
                                 .send(user)
                                 .end(function(err, res) {
-                                    if (err) return cb(err);
+                                    if (err) return done(err);
                                     expect(res.status).to.equal(200);
                                     accessToken = res.body.access_token;
-                                    setup.challengeTest(cb);
+                                    setup.challengeTest(done);
                                 });
                         });
-                }
-            ], done);
-
+                }).catch(done);
         });
 
         describe("POST", function() {
@@ -171,20 +235,16 @@ describe('Challenge', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        Async.parallel([
-                            function(cb) {
-                                Challenge.findById(challenge.id, function(err, model) {
-                                    expect(model).to.not.exist;
-                                    cb();
-                                });
-                            },
-                            function(cb) {
-                                Arena.findById(challenge.challenge.arena, function(err, arena) {
-                                    arena.challenges.length.should.equal(0);
-                                    cb();
-                                })
-                            }
-                        ], done);
+                        Challenge.findOne({
+                            _id: challenge.id
+                        }).exec().then(function(model) {
+                            expect(model).to.not.exist;
+                        }, done).then(function() {
+                            Arena.findById(challenge.challenge.arena, function(err, arena) {
+                                arena.challenges.length.should.equal(0);
+                                done();
+                            });
+                        }, done);
                     });
             });
         });

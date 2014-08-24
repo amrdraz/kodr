@@ -2,6 +2,7 @@ module.exports = App.Trial = DS.Model.extend({
     code: DS.attr('string'),
     times: DS.attr('number'),
     complete: DS.attr('boolean'),
+    completed: DS.attr('number'),
     report:DS.attr(),
     challenge: DS.belongsTo('challenge'),
     user: DS.belongsTo('user'),

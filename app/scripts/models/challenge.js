@@ -65,8 +65,8 @@ var ChallengeModel = module.exports = DS.Model.extend({
     }.observes('solution', 'setup', 'tests'),
     // relationshipChanged: false,
     canSave: function() {
-        return this.get('isDirty') || this.get('isNew');
-    }.property('isDirty'),
+        return !this.get('isSaving') && this.get('isDirty') || this.get('isNew');
+    }.property('isDirty', 'isSaving', 'isNew'),
     canReset: function() {
         return this.get('isDirty') && !this.get('isNew');
     }.property('isDirty'),
