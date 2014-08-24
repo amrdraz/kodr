@@ -40,21 +40,6 @@ module.exports = function(app, passport) {
         })(req, res, next);
     });
 
-
-    app.get('/profile', access.hasToken, function(req, res) {
-        res.json(
-            req.user
-        );
-    });
-
-    app.post('/profile', access.hasToken, function(req, res) {
-        req.user.set(req.body);
-        var token = req.user.token;
-        req.user.save(function(err, user) {
-            res.json(user);
-        });
-    });
-
     // logout
     app.del('/logout', access.hasToken, function(req, res) {
         req.logout();

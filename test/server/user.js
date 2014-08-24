@@ -98,23 +98,23 @@ describe('User', function() {
     describe("Auth", function() {
         var url = 'http://localhost:3000';
         var user = {
-            username: "amrd",
-            email: "amr.m.draz@gmail.com",
-            password: "drazdraz12",
-            passwordConfirmation: "drazdraz12"
-        }, 
-        teacher = {
-            username: 'teacher',
-            email: 't.t@guc.edu.eg',
-            password: 'testmodel12',
-            passwordConfirmation: 'testmodel12'
-        }, 
-        student = {
-            username: 'student',
-            email: 's.s@student.guc.edu.eg',
-            password: 'testmodel12',
-            passwordConfirmation: 'testmodel12'
-        };
+                username: "amrd",
+                email: "amr.m.draz@gmail.com",
+                password: "drazdraz12",
+                passwordConfirmation: "drazdraz12"
+            },
+            teacher = {
+                username: 'teacher',
+                email: 't.t@guc.edu.eg',
+                password: 'testmodel12',
+                passwordConfirmation: 'testmodel12'
+            },
+            student = {
+                username: 'student',
+                email: 's.s@student.guc.edu.eg',
+                password: 'testmodel12',
+                passwordConfirmation: 'testmodel12'
+            };
         var accessToken, activationToken;
 
         after(setup.clearDB);
@@ -138,7 +138,9 @@ describe('User', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        User.find({role:'student'}).exec(function(err,users){
+                        User.find({
+                            role: 'student'
+                        }).exec(function(err, users) {
                             if (err) return done(err);
                             users.length.should.equal(2);
                             done();
@@ -152,11 +154,13 @@ describe('User', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        User.find({role:'teacher'}).exec(function(err,users){
+                        User.find({
+                            role: 'teacher'
+                        }).exec(function(err, users) {
                             if (err) return done(err);
                             users.length.should.equal(1);
                             done();
-                        },done);
+                        }, done);
                     });
             });
 
@@ -221,11 +225,11 @@ describe('User', function() {
 
             it("should activate by accessing link then in email", function(done) {
                 request(url)
-                    .get("/confirmAccount/"+activationToken)
+                    .get("/confirmAccount/" + activationToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        ExpiringToken.findById(activationToken, function (err, exp) {
+                        ExpiringToken.findById(activationToken, function(err, exp) {
                             if (err) return done(err);
                             exp.used.should.be.true;
                             done();
@@ -343,41 +347,55 @@ describe('User', function() {
             });
         });
     });
-    describe('API', function () {
-        var url = 'http://localhost:3000';
+    describe('API', function() {
+        var url = setup.url;
         var api = url + '/api';
-        var ruser = {
+        var user = {
             username: "draz",
             email: "amr.m.draz@gmail.com",
             password: "drazdraz12",
             passwordConfirmation: "drazdraz12"
         };
-        var accessToken;
-        var user = {
-            user: {
-                username:'testuser',
-                password:'testspass2'
-            }
-        };
+        var student = {
+                username: 'student',
+                email: 'student@place.com',
+                password: 'student123',
+                role: 'student',
+                activated: true
+            },
+            teacher = {
+                username: 'teacher',
+                email: 'teach@place.com',
+                password: 'teacher123',
+                role: 'teacher',
+                activated: true
+            },
+            admin = {
+                username: 'admin',
+                email: 'admin@place.com',
+                password: 'admin12345',
+                role: 'admin',
+                activated: true
+            };
 
 
         before(function(done) {
-            request(url)
-                .post("/signup")
-                .send(ruser)
-                .end(function(err, res) {
-                    if (err) return done(err);
-                    expect(res.status).to.equal(200);
-                    request(url)
-                        .post("/token")
-                        .send(ruser)
-                        .end(function(err, res) {
-                            if (err) return done(err);
-                            expect(res.status).to.equal(200);
-                            accessToken = res.body.access_token;
-                           done();
-                        });
-                });
+
+            Promise.fulfilled()
+                .then(function() {
+                    return [User.create(student),
+                        User.create(teacher),
+                        User.create(admin)
+                    ];
+                }).spread(function(st, t, a) {
+                    // console.log(st,t,a);
+                    student._id = st._id;
+                    student.token = st.token;
+                    admin._id = a._id;
+                    admin.token = a.token;
+                    teacher._id = t._id;
+                    teacher.token = t.token;
+                }).finally(done);
         });
 
         after(setup.clearDB);
@@ -392,15 +410,27 @@ describe('User', function() {
                     .end(done);
             });
 
-            it("should create a user", function(done) {
+            it("should not create as a student", function(done) {
                 request(api)
                     .post("/users")
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send(user)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(401);
+                        done();
+                    });
+            });
+
+             it("should create as a teacher", function(done) {
+                request(api)
+                    .post("/users")
+                    .set('Authorization', 'Bearer ' + teacher.token)
                     .send(user)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        expect(res.body.user).to.exist;
+                        expect(res.body.user._id).to.exist;
                         user.id = res.body.user._id;
                         done();
                     });
@@ -412,6 +442,7 @@ describe('User', function() {
             it("should return a user by id", function(done) {
                 request(api)
                     .get("/users/" + user.id)
+                    .set('Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -423,9 +454,10 @@ describe('User', function() {
             it("should return a list of all users", function(done) {
                 return request(api)
                     .get("/users")
-                    .then(function (res) {
+                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .then(function(res) {
                         res.status.should.equal(200);
-                        res.body.user.length.should.equal(2);
+                        res.body.user.length.should.equal(4);
                         done();
                     });
             });
@@ -445,10 +477,10 @@ describe('User', function() {
             it("should update a user", function(done) {
                 return request(api)
                     .put("/users/" + user.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('Authorization', 'Bearer ' + teacher.token)
                     .send({
                         user: {
-                            password:'newpass121'
+                            password: 'newpass121'
                         }
                     })
                     .then(function(res) {
@@ -461,7 +493,7 @@ describe('User', function() {
 
         describe("DELETE", function() {
 
-            it("should not work without accessToken", function(done) {
+            it("should not work without access_token", function(done) {
                 request(api)
                     .del("/users/" + user.id)
                     .expect(401)
@@ -471,7 +503,7 @@ describe('User', function() {
             it("should delete a user without user", function(done) {
                 request(api)
                     .del("/users/" + user.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);

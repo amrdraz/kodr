@@ -1,6 +1,7 @@
 /*globals before,beforeEach,after,afterEach,describe,it */
-var Async = require('async');
 var mongoose = require('mongoose');
+var expect = require('chai').expect;
+var request = require('supertest-as-promised');
 var util = require('util');
 var Promise = require("bluebird");
 var User = require('../../back/models/user');
@@ -9,6 +10,8 @@ var Trial = require('../../back/models/trial');
 var Arena = require('../../back/models/arena');
 var ArenaTrial = require('../../back/models/arenaTrial');
 var observer = require('../../back/mediator');
+
+var url = 'http://localhost:3000';
 var none = function() {};
 var clearDB = function clearDB(done) {
     for (var i in mongoose.connection.collections) {
@@ -20,6 +23,7 @@ var clearDB = function clearDB(done) {
 var config = require('../../back/config/tests');
 
 process.env.NODE_ENV = 'test';
+
 
 
 before(function(done) {
@@ -41,6 +45,23 @@ after(function(done) {
 });
 
 module.exports = {
+    url:url,
+    login: function (user) {
+        var login = {
+            username:user.username || user.email,
+            password:user.password
+        };
+        // console.log(login);
+        return new Promise(function (resolve, reject) {
+            return request(url)
+                .post("/token")
+                .send(login)
+                .then(function(res) {
+                    expect(res.status).to.equal(200);
+                    resolve(res.body);
+                }, reject);
+        });
+    },
     clearDB: clearDB,
     challengeTest: function(done, db) {
         db = db || {};

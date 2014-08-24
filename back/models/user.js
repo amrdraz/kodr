@@ -9,7 +9,7 @@ var Mixed = mongoose.Schema.Mixed;
 var TEACHER = 'teacher';
 var STUDENT = 'student';
 var GUEST = 'guest';
-var ADMIN = 'guest';
+var ADMIN = 'admin';
 
 /**
  * User Schema.

@@ -3,6 +3,26 @@ var access = require('./access');
 
 module.exports = function(app, passport) {
 
+    /**
+     * Returns the data for the currently logged in user
+     *
+     * @returns {object} arenaTrial
+     */
+    
+    app.get('/profile', access.requireRole(), function(req, res) {
+        res.json(
+            req.user
+        );
+    });
+
+    app.post('/profile', access.requireRole(), function(req, res) {
+        req.user.set(req.body);
+        var token = req.user.token;
+        req.user.save(function(err, user) {
+            res.json(user);
+        });
+    });
+
 
     /**
      * Find arenaTrial by id.
@@ -11,7 +31,7 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrial
      */
 
-    app.get('/api/users/:id', function(req, res, next) {
+    app.get('/api/users/:id', access.requireRole(),function(req, res, next) {
         User.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
@@ -28,7 +48,7 @@ module.exports = function(app, passport) {
      * @returns {object} users
      */
 
-    app.get('/api/users', function(req, res, next) {
+    app.get('/api/users', access.requireRole(['students', 'teacher']),function(req, res, next) {
         User.find({}).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({
@@ -44,8 +64,7 @@ module.exports = function(app, passport) {
      * @returns {object} user
      */
 
-    app.post('/api/users', access.hasToken, function(req, res, next) {
-        req.body.user.user = req.user.id;
+    app.post('/api/users', access.requireRole(['teacher']), function(req, res, next) {
         User.create(req.body.user)
             .then(function(model) {
                 res.json({
@@ -55,13 +74,13 @@ module.exports = function(app, passport) {
     });
 
     /**
-     * Update new users.
+     * Update users.
      *
      * @param range
      * @returns {object} user
      */
 
-    app.put('/api/users/:id', access.hasToken, function(req, res, next) {
+    app.put('/api/users/:id', access.requireRole(['$self','teacher']), function(req, res, next) {
         var user = req.body.user;
         User.findOne({_id:req.params.id}).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
@@ -82,7 +101,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/users/:id', access.hasToken, function(req, res, next) {
+    app.del('/api/users/:id', access.requireRole(['teacher']), function(req, res, next) {
         User.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if(!model) return res.send(200);
