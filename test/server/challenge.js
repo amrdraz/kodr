@@ -63,7 +63,7 @@ describe('Challenge', function() {
                             _id: challenge._id
                         }).exec()
                     ];
-                }).spread(function (at,ch) {
+                }).spread(function(at, ch) {
                     arenaTrial = at;
                     challenge = ch;
                 })
@@ -91,6 +91,27 @@ describe('Challenge', function() {
             password: "drazdraz12",
             passwordConfirmation: "drazdraz12"
         };
+        var student = {
+                username: 'student',
+                email: 'student@place.com',
+                password: 'student123',
+                role: 'student',
+                activated: true
+            },
+            teacher = {
+                username: 'teacher',
+                email: 'teach@place.com',
+                password: 'teacher123',
+                role: 'teacher',
+                activated: true
+            },
+            admin = {
+                username: 'admin',
+                email: 'admin@place.com',
+                password: 'admin12345',
+                role: 'admin',
+                activated: true
+            };
         var accessToken;
         var arena;
         var challenge = {
@@ -108,31 +129,24 @@ describe('Challenge', function() {
         };
 
         before(function(done) {
-            Promise.fulfilled()
-                .then(function() {
-                    return Arena.create({});
-                })
-                .then(function(arena) {
-                    challenge.challenge.arena = arena._id;
-                })
-                .then(function() {
-                    request(url)
-                        .post("/signup")
-                        .send(user)
-                        .end(function(err, res) {
-                            if (err) return done(err);
-                            expect(res.status).to.equal(200);
-                            request(url)
-                                .post("/token")
-                                .send(user)
-                                .end(function(err, res) {
-                                    if (err) return done(err);
-                                    expect(res.status).to.equal(200);
-                                    accessToken = res.body.access_token;
-                                    setup.challengeTest(done);
-                                });
-                        });
-                }).catch(done);
+            Promise.fulfilled().then(function() {
+                return [
+                    Arena.create({}),
+                    User.create(student),
+                    User.create(teacher),
+                    User.create(admin)
+                ];
+            }).spread(function(arena, st, t, a) {
+                // console.log(st,t,a);
+                student._id = st._id;
+                student.token = st.token;
+                admin._id = a._id;
+                admin.token = a.token;
+                teacher._id = t._id;
+                accessToken = teacher.token = t.token;
+                challenge.challenge.arena = arena.id;
+                return setup.challengeTest(done);
+            }).catch(done);
         });
 
         describe("POST", function() {
@@ -145,7 +159,17 @@ describe('Challenge', function() {
                     .end(done);
             });
 
-            it("should create a challenge", function(done) {
+            it("should not create a challenge if student", function(done) {
+                request(api)
+                    .post("/challenges")
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send(challenge)
+                    .expect(401)
+                    .end(done);
+
+            });
+
+            it("should create a challenge only if teacher", function(done) {
                 request(api)
                     .post("/challenges")
                     .set('Authorization', 'Bearer ' + accessToken)
@@ -200,7 +224,21 @@ describe('Challenge', function() {
                     .end(done);
             });
 
-            it("should update a challenge without user", function(done) {
+            it("should not create a challenge if student", function(done) {
+                request(api)
+                    .put("/challenges/"+challenge.id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send({
+                        challenge: {
+                            isPublished: true
+                        }
+                    })
+                    .expect(401)
+                    .end(done);
+
+            });
+
+            it("should update a challenge only if teacher", function(done) {
                 request(api)
                     .put("/challenges/" + challenge.id)
                     .set('Authorization', 'Bearer ' + accessToken)
@@ -226,6 +264,16 @@ describe('Challenge', function() {
                     .del("/challenges/" + challenge.id)
                     .expect(401)
                     .end(done);
+            });
+
+            it("should not delete a challenge if student", function(done) {
+                request(api)
+                    .del("/challenges/"+challenge.id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send()
+                    .expect(401)
+                    .end(done);
+
             });
 
             it("should delete a challenge removing it from it's arena", function(done) {

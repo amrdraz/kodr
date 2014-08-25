@@ -49,7 +49,7 @@ module.exports = function(app, passport) {
      * @returns {object} person
      */
 
-    app.post('/api/challenges', access.hasToken, function(req, res, next) {
+    app.post('/api/challenges', access.requireRole(['teacher']), function(req, res, next) {
         req.body.challenge.author = req.user.id;
         Challenge.create(req.body.challenge, function(err, model) {
             if (err) return next(err);
@@ -67,7 +67,7 @@ module.exports = function(app, passport) {
      * @returns {object} person
      */
 
-    app.put('/api/challenges/:id', access.hasToken, function(req, res, next) {
+    app.put('/api/challenges/:id', access.requireRole(['teacher']), function(req, res, next) {
         Challenge.findOne({
             _id: req.params.id
         }).exec().then(function(model) {
@@ -88,7 +88,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/challenges/:id', access.hasToken, function(req, res, next) {
+    app.del('/api/challenges/:id', access.requireRole(['teacher']), function(req, res, next) {
         Challenge.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if(!model) return res.send(200);

@@ -21,6 +21,18 @@ exports.hasToken = function(req, res, next) {
     // res.redirect('/');
 };
 
+function fullfilesRole(roles, user, params){
+    if(_.isEmpty(roles)) return true;
+    if (_.isArray(roles)) {
+        return _.contains(roles, user.role) || ( _.contains(roles,'$self') && user._id.equals(params.id) );
+    }
+    var role = _.find(roles.roles, {role:user.role});
+    console.log(role);
+    if(!role) return false;
+    if(role.all) return true;
+    return _.find(user[role.in], function(id){ return id.equals(params.id);});
+}
+
 // requiering a role will also require that a user is logged in
 exports.requireRole = function(roles) {
     return function(req, res, next) {
@@ -37,14 +49,10 @@ exports.requireRole = function(roles) {
             token: token.replace('Bearer ', '')
         }, function(err, user) {
             // console.log(err, roles, user.role, (roles&& _.contains(roles,user.role)), _.contains(roles,'self'));
-            // user && console.log(_.contains(roles,'self'), user._id,req.params.id, user._id.equals(req.params.id), user.id===req.params.id);
+            // user && console.log(_.contains(roles,'$self'),user._id,req.params.id,user._id.equals(req.params.id));
             if (err) return next(err);
-            if  (
-                !user ||
-                ( roles && !_.contains(roles,user.role) ) ||
-                //self is a special case where user has access to his own data
-                ( roles && !_.contains(roles,user.role) && _.contains(roles,'$self') && !user._id.equals(req.params.id))
-            ) {
+            if  (!user || !fullfilesRole(roles, user, req.params))
+            {
                 return res.send(401, "Unauthorized");
             }
             req.user = user;
@@ -52,5 +60,17 @@ exports.requireRole = function(roles) {
         });
 
         // res.redirect('/');
+    };
+};
+
+/**
+ * checks if id is in one of the users relationship array
+ * eg. an id should be in his trials
+ * @param  {String} attrs     the relationship to look for the id in
+ */
+exports.requireIn = function (attrs) {
+    return function(req,res,next) {
+        if(_.find(req.user[attrs], function(id){ return id.equals(req.params.id);})) return next();
+        res.send(401, "Unauthorized");  
     };
 };

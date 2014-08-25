@@ -145,6 +145,27 @@ describe('ArenaTrial', function() {
             password: "drazdraz12",
             passwordConfirmation: "drazdraz12"
         };
+        var student = {
+                username: 'student',
+                email: 'student@place.com',
+                password: 'student123',
+                role: 'student',
+                activated: true
+            },
+            teacher = {
+                username: 'teacher',
+                email: 'teach@place.com',
+                password: 'teacher123',
+                role: 'teacher',
+                activated: true
+            },
+            admin = {
+                username: 'admin',
+                email: 'admin@place.com',
+                password: 'admin12345',
+                role: 'admin',
+                activated: true
+            };
         var accessToken;
         var arena = {
             arena: {
@@ -175,29 +196,24 @@ describe('ArenaTrial', function() {
 
 
         before(function(done) {
-            return request(url)
-                .post("/signup")
-                .send(user)
-                .expect(200)
-                .then(function(res) {
-                    expect(res.status).to.equal(200);
-                    return request(url)
-                        .post("/token")
-                        .send(user);
-                })
-                .then(function(res) {
-                    expect(res.status).to.equal(200);
-                    accessToken = res.body.access_token;
-                    return request(api)
-                        .post("/arenas")
-                        .set('Authorization', 'Bearer ' + accessToken)
-                        .send(arena);
-                }).then(function(res) {
-                    res.status.should.equal(200);
-                    arena.id = res.body.arena._id;
-                    arenaTrial.arenaTrial.arena = arena.id;
-                    done();
-                }).catch(done);
+            Promise.fulfilled().then(function() {
+                return [
+                    User.create(student),
+                    User.create(teacher),
+                    User.create(admin),
+                    Arena.create(arena.arena),
+                ];
+            }).spread(function(st, t, a, ar) {
+                // console.log(st,t,a);
+                student._id = st._id;
+                student.token = st.token;
+                admin._id = a._id;
+                admin.token = a.token;
+                teacher._id = t._id;
+                accessToken= teacher.token = t.token;
+                arena.id = ar.id;
+                arenaTrial.arenaTrial.arena = arena.id;
+            }).finally(done);
         });
 
         after(setup.clearDB);
@@ -260,6 +276,7 @@ describe('ArenaTrial', function() {
                     .query({arena:arena.id})
                     .end(function(err, res) {
                         if (err) return done(err);
+                        // console.log(res.text);
                         res.status.should.equal(200);
                         expect(res.body.arenaTrial._id).to.exist;
                         done();
@@ -276,6 +293,37 @@ describe('ArenaTrial', function() {
                     .send(arenaTrial)
                     .expect(401)
                     .end(done);
+            });
+
+            it("should not update someone elses arenaTrial", function(done) {
+                request(api)
+                    .put("/arenaTrials/" + arenaTrial.id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send({
+                        arenaTrial: {
+                            complete: true
+                        }
+                    })
+                    .expect(401)
+                    .end(done);
+            });
+
+            it("should update own arenaTrial if you're a student", function(done) {
+                ArenaTrial.create({
+                    user:student._id,
+                    arena:arena.id,
+                }).then(function(tr){
+                    request(api)
+                    .put("/arenaTrials/" + tr.id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send({
+                        arenaTrial: {
+                            complete: true
+                        }
+                    })
+                    .expect(200)
+                    .end(done);
+                });
             });
 
             it("should update a arenaTrial without user", function(done) {
@@ -306,8 +354,35 @@ describe('ArenaTrial', function() {
                     .end(done);
             });
 
-            it("should delete a arenaTrial without user", function(done) {
+            it("should not delete someone elses arenaTrial if you're a student", function(done) {
                 request(api)
+                    .del("/arenaTrials/" + arenaTrial.id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send()
+                    .expect(401)
+                    .end(done);
+            });
+
+            it("should delete own arenaTrial if you're a student", function(done) {
+                ArenaTrial.create({
+                    user:student._id,
+                    arena:arena.id,
+                }).then(function(tr){
+                    request(api)
+                    .del("/arenaTrials/" + tr.id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send()
+                    .expect(200)
+                    .end(done);
+                });
+            });
+
+            it("should delete a arenaTrial if teacher regardless of ownership", function(done) {
+                ArenaTrial.create({
+                    user:student._id,
+                    arena:arena.id,
+                }).then(function(arenaTrial){
+                    request(api)
                     .del("/arenaTrials/" + arenaTrial.id)
                     .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
@@ -318,6 +393,7 @@ describe('ArenaTrial', function() {
                             done();
                         });
                     });
+                });
             });
         });
 

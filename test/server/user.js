@@ -349,7 +349,7 @@ describe('User', function() {
     });
     describe('API', function() {
         var url = setup.url;
-        var api = url + '/api';
+        var api = setup.api;
         var user = {
             username: "draz",
             email: "amr.m.draz@gmail.com",
@@ -474,7 +474,22 @@ describe('User', function() {
                     .end(done);
             });
 
-            it("should update a user", function(done) {
+            it("should not update a user if student", function(done) {
+                return request(api)
+                    .put("/users/" + user.id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send({
+                        user: {
+                            password: 'newpass121'
+                        }
+                    })
+                    .then(function(res) {
+                        res.status.should.equal(401);
+                        done();
+                    });
+            });
+
+            it("should update a user if teacher", function(done) {
                 return request(api)
                     .put("/users/" + user.id)
                     .set('Authorization', 'Bearer ' + teacher.token)
@@ -485,7 +500,21 @@ describe('User', function() {
                     })
                     .then(function(res) {
                         res.status.should.equal(200);
-                        user.complete = res.body.user.complete;
+                        done();
+                    });
+            });
+
+            it("should update a user if updating himself", function(done) {
+                return request(api)
+                    .put("/users/" + student._id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send({
+                        user: {
+                            password: 'newpass121'
+                        }
+                    })
+                    .then(function(res) {
+                        res.status.should.equal(200);
                         done();
                     });
             });
@@ -500,7 +529,18 @@ describe('User', function() {
                     .end(done);
             });
 
-            it("should delete a user without user", function(done) {
+            it("should not work if not teacher", function(done) {
+                request(api)
+                    .del("/users/" + user.id)
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .end(function(err, res) {
+                        if(err) done(err);
+                        res.status.should.equal(401);
+                        done();
+                    });
+            });
+
+            it("should delete a user if teacher", function(done) {
                 request(api)
                     .del("/users/" + user.id)
                     .set('Authorization', 'Bearer ' + teacher.token)

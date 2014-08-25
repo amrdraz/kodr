@@ -13,7 +13,7 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrial
      */
 
-    app.get('/api/arenaTrials/:id', access.hasToken, function(req, res, next) {
+    app.get('/api/arenaTrials/:id', access.requireRole(), function(req, res, next) {
         ArenaTrial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
@@ -30,7 +30,7 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrials
      */
 
-    app.get('/api/arenaTrials', access.hasToken, function(req, res, next) {
+    app.get('/api/arenaTrials', access.requireRole(), function(req, res, next) {
         var arena = req.query.arena;
         if (arena) {
             ArenaTrial.findOrCreate({user:req.user.id,arena:arena})
@@ -58,7 +58,7 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrial
      */
 
-    app.post('/api/arenaTrials', access.hasToken, function(req, res, next) {
+    app.post('/api/arenaTrials', access.requireRole(), function(req, res, next) {
         req.body.arenaTrial.user = req.user.id;
         ArenaTrial.findOrCreate(req.body.arenaTrial)
             .spread(function(model, trials) {
@@ -76,7 +76,10 @@ module.exports = function(app, passport) {
      * @returns {object} arenaTrial
      */
 
-    app.put('/api/arenaTrials/:id', access.hasToken, function(req, res, next) {
+    app.put('/api/arenaTrials/:id',  access.requireRole({roles:[
+        {role:'student', in:'arenasTried'},
+        {role:'teacher', all:true},
+    ]}), function(req, res, next) {
         var arenaTrial = req.body.arenaTrial;
         arenaTrial.time = Date.now();
         arenaTrial.times = (arenaTrial.times || 0) + 1;
@@ -100,7 +103,10 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/arenaTrials/:id', access.hasToken, function(req, res, next) {
+    app.del('/api/arenaTrials/:id',  access.requireRole({roles:[
+        {role:'student', in:'arenasTried'},
+        {role:'teacher', all:true},
+    ]}), function(req, res, next) {
         ArenaTrial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if(!model) return res.send(200);

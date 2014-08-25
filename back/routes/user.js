@@ -17,9 +17,12 @@ module.exports = function(app, passport) {
 
     app.post('/profile', access.requireRole(), function(req, res) {
         req.user.set(req.body);
-        var token = req.user.token;
         req.user.save(function(err, user) {
-            res.json(user);
+            if(err) res.send(500);
+            res.json({
+                model:user,
+                access_token: user.token
+            });
         });
     });
 
@@ -48,7 +51,7 @@ module.exports = function(app, passport) {
      * @returns {object} users
      */
 
-    app.get('/api/users', access.requireRole(['students', 'teacher']),function(req, res, next) {
+    app.get('/api/users', access.requireRole(['student', 'teacher']),function(req, res, next) {
         User.find({}).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({

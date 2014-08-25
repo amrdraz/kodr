@@ -12,6 +12,7 @@ var ArenaTrial = require('../../back/models/arenaTrial');
 var observer = require('../../back/mediator');
 
 var url = 'http://localhost:3000';
+var api = url+"/api";
 var none = function() {};
 var clearDB = function clearDB(done) {
     for (var i in mongoose.connection.collections) {
@@ -46,6 +47,7 @@ after(function(done) {
 
 module.exports = {
     url:url,
+    api:api,
     login: function (user) {
         var login = {
             username:user.username || user.email,
@@ -57,6 +59,7 @@ module.exports = {
                 .post("/token")
                 .send(login)
                 .then(function(res) {
+                    // console.log(res.text);
                     expect(res.status).to.equal(200);
                     resolve(res.body);
                 }, reject);
@@ -69,12 +72,12 @@ module.exports = {
             .then(function() {
                 var ar = Arena.create({});
                 var teacher = User.create({
-                    username: 'teacher',
+                    username: 'teachert',
                     email: 'tw.w@guc.edu.eg',
                     password: 'testsmodel1'
                 });
                 var student = User.create({
-                    username: 'student',
+                    username: 'studentt',
                     email: 's.3@student.guc.edu.eg',
                     password: 'testsmodel1'
                 });
