@@ -108,7 +108,7 @@ module.exports = function(app, passport) {
                 if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
                     role = 'teacher';
                     //TODO uncomment this in production
-                    activated = false;
+                    // activated = false;
                 } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
                     role = 'student';
                 }
@@ -131,7 +131,7 @@ module.exports = function(app, passport) {
                 return [user, token];
             })
             .spread(function(user, token) {
-                if (!user.activated && user.email === 'amr.deraz@guc.edu.eg') {
+                if (!user.activated) {
                     var confirmURL = req.headers.host + '/confirmAccount/' + token._id;
                     // template in views/mail
                     return mail.renderAndSend('welcome.html', {
