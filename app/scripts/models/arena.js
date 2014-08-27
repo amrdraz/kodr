@@ -7,6 +7,7 @@ var ArenaModel = module.exports = DS.Model.extend({
     description: attr('string', {
         defaultValue: "A new Arena"
     }),
+    isPublished: attr('boolean', {defaultValue:false}),
     challenges: DS.hasMany('challenge', {async: true, inverse: 'arena'}),
     users: DS.hasMany('arenaTrial', {async: true, inverse: 'arena'}),
     author: DS.belongsTo('user', {async:true, inverse:'arenas'}),

@@ -101,7 +101,7 @@ var jasmineRequire = require('./jasmine');
   };
 
   
-  env.addReporter(jasmineInterface.jsApiReporter);
+  // env.addReporter(jasmineInterface.jsApiReporter);
   
   /**
    * Setting up timing functions to be able to be overridden. Certain browsers (Safari, IE 8, phantomjs) require this hack.
@@ -123,7 +123,7 @@ var jasmineRequire = require('./jasmine');
       currentWindowOnload();
     }
     // htmlReporter.initialize();
-    env.execute();
+    // env.execute();
   };
 
   /**

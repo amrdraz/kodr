@@ -3,6 +3,8 @@ var observer = require('../mediator');
 var crypto = require('crypto');
 var util = require('util');
 var bcrypt = require('bcrypt');
+var relationship = require("mongoose-relationship");
+
 var ObjectId = mongoose.Schema.ObjectId;
 var Mixed = mongoose.Schema.Mixed;
 
@@ -13,6 +15,20 @@ var ADMIN = 'admin';
 
 /**
  * User Schema.
+ *
+ * @attribute username      String          username used to login
+ * @attribute email         String          email belonging to the user
+ * @attribute password      String          password used to login
+ * @attribute activated     Boolean         whther this user was activated or not
+ * @attribute token         String          used for login and accessing api
+ * @attribute role          String          can be student, teacher, or admin
+ * @attribute exp           Number          indicates the amount of experiance the user poseses
+ * @attribute rp            Number          indicates the amount of reward points the user accumilated
+ * @attribute challenges    [Challenge]     challanges the user created
+ * @attribute trials        [Trial]         trials the user started/passed
+ * @attribute arenasTried   [ArenaTrial]    arneas the user entered/passed
+ * @attribute groups        [Group]         groups owned by the user 
+ * @attribute group         Group           group he is a member of 
  *
  * @type {mongoose.Schema}
  */
@@ -41,8 +57,8 @@ var userSchema = new mongoose.Schema({
     token: String,
     role: {
         type: String,
-        'default': 'guest',        
-        'enum': [TEACHER,STUDENT, GUEST, ADMIN]
+        'default': 'student',        
+        'enum': [TEACHER,STUDENT, ADMIN]
     },
     exp:{type:Number, 'default':0}, // experience points
     rp:{type:Number, 'default':0},  // reputation points
@@ -57,7 +73,22 @@ var userSchema = new mongoose.Schema({
     arenasTried: [{
         type: ObjectId,
         ref: 'ArenaTrial'
-    }]
+    }],
+    groups: [{
+        type: ObjectId,
+        ref: 'Group',
+        childPath: "founder"
+    }],
+    group: {
+        type: ObjectId,
+        ref: 'Group',
+        childPath: "members"
+    }
+});
+
+
+userSchema.plugin(relationship, {
+    relationshipPathName: ['groups', 'group']
 });
 
 /**
@@ -65,20 +96,21 @@ var userSchema = new mongoose.Schema({
  * It is used for hashing and salting user's password and token.
  */
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', true, function(next, done) {
+    next();
     var user = this;
 
-    if (!user.isModified('password')) return next();
+    if (!user.isModified('password')) return done(null, user);
 
     var hashContent = user.username + user.password + Date.now() + Math.random();
     user.token = crypto.createHash('sha1').update(hashContent).digest('hex');
 
     bcrypt.genSalt(5, function(err, salt) {
-        if (err) return next(err);
+        if (err) return done(err);
         bcrypt.hash(user.password, salt, function(err, hash) {
-            if (err) return next(err);
+            if (err) return done(err);
             user.password = hash;
-            next();
+            done(null, user);
         });
     });
 });
@@ -104,10 +136,11 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
 };
 
 userSchema.methods.award = function(type, value, obj) {
-    this[type] += value;
-    // console.log('assigning user',type,'value',value);
-    // send activity notification
-    this.save(function (err, user) {
+    var update = {$inc:{}};
+    update.$inc[type] = value;
+    User.findByIdAndUpdate(this.id,update, function (err, user) {
+        if(err) throw err;
+        // console.log('sending', err,user, obj);
         observer.emit('user.awarded', user, type, value);
     });
 };
@@ -115,7 +148,7 @@ userSchema.methods.award = function(type, value, obj) {
 var User = mongoose.model('User', userSchema);
 
 observer.on('trial.award', function (trial) {
-    // console.log('user award hook caought in user');
+    // console.log('user award hook caought in user', trial.user);
     User.findById(trial.user, function (err, user) {
         if (err) throw err;
         user.award('exp', trial.exp, trial);

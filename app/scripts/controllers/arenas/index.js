@@ -1,4 +1,4 @@
-module.exports = Em.ObjectController.extend({
+module.exports = Em.ArrayController.extend({
     
     init: function() {
         this._super();
@@ -16,6 +16,12 @@ module.exports = Em.ObjectController.extend({
         //     sb.on('log', handler);
         // });
     },
+    arenaRoute: function () {
+        return this.get('session.isAuthenticated')?'arenaTrial':'arena';
+    }.property('session.isAuthenticated'),
+    published:function () {
+        return this.get('model').filterProperty('isPublished', true);
+    }.property('@each.isPublished'),
     actions: {
       
     }

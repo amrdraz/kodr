@@ -1,6 +1,6 @@
 {
   "name": "Kodr",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "repository": {
     "type": "git",
     "url": "https://bitbucket.org/draz/kodr.git"
@@ -91,6 +91,7 @@
     "passport-twitter": "~1.0.2",
     "qunitjs": "^1.14.0",
     "requirejs": "^2.1.14",
+    "sillyname": "0.0.3",
     "sinon": "^1.10.3",
     "structured": "^0.1.2",
     "superagent": "^0.18.2",

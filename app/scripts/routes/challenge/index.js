@@ -5,16 +5,14 @@ module.exports = Em.Route.extend({
         // this.controllerFor('trial').set('model', model);
     // },
     // renderTemplate: function() {},
-    beforeModel: function() {
-        var challenge = this.modelFor('challenge');
-        this.transitionTo('arenaTrial.try', this.store.create('trial', {
-            challenge:challenge
-        }).save());
-    },
+    // beforeModel: function() {
+    //     var challenge = this.modelFor('challenge');
+    //     this.transitionTo('arenaTrial.challenge', );
+    // },
     // afterModel: function() {},
 
     // model: function() {
-    //     var challenge = this.modelFor('challenge');
+    //     var arenaTrial = this.modelFor('arenaTrial');
     //     return challenge;
     // }
 });

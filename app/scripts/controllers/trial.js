@@ -2,7 +2,7 @@ var debounce = require('../utils/debounce');
 var ChallengeMixin = require('../mixins/challengeMixin');
 module.exports = Em.ObjectController.extend(ChallengeMixin, {
     isChallengeTrial: function() {
-        return App.get('currentPath').contains('challenge');
+        return App.get('currentPath').split('.').contains('challenge');
     }.property('App.currentPath'),
 
     breadCrumb: function() {
@@ -46,7 +46,11 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         if (!this.get('isChallengeTrial')) {
             return model.save().then(cb);
         } else {
-            toastr.info('You could have earned '+model.get('challenge.exp')+' EXP if you where logged in');
+            if(model.get('complete')){
+                toastr.info('You could have earned '+model.get('challenge.exp')+' EXP if you where logged in');
+            } else {
+                toastr.info('You meight want to change those failures in your code, check the console');
+            }
         }
     },
     actions: {

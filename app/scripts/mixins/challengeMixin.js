@@ -50,7 +50,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
         var writeTest = function(test, pass) {
             jconsole.Write(test.fullName + '\n', pass);
         };
-        // console.log(report);
+        console.log(report);
         jconsole.Write("========= Running Submission " + (pass ? 'Passed' : 'Failed') + " ==========\n", pass ? 'result' : 'error');
 
         if (passes) {
@@ -63,7 +63,13 @@ module.exports = Em.Mixin.create(Em.Evented, {
         if (failures) {
             report.failures.forEach(function(test) {
                 writeTest(test, 'error');
-                jconsole.Write('\t'+test.failedExpectations[0].message+'\n', 'error');
+                test.failedExpectations.forEach(function (fail) {
+                    if(fail.message.indexOf('Error: Timeout')) {
+                        jconsole.Write('\t'+fail.message+'\n', 'error');
+                    } else {
+                        jconsole.Write('\tTimeout this test ran ('+test.durationSec+'s)\n', 'error');
+                    }
+                });
                 // console.error(test.failedExpectations[0].stack);
             });
         }

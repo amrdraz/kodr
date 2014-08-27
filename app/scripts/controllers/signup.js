@@ -4,7 +4,7 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
         presence:true,
         length:{minimum:3},
         format:{
-          with:/^\w[\w.-\d]{3,}$/,
+          with:/^\w[\w\.\-\d]{3,}$/,
           message: 'username can only be composed of alphabet, digits, _ and -'
         }
       },

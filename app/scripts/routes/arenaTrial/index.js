@@ -1,4 +1,4 @@
-module.exports = Em.Route.extend({
+module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
     // activate: function() {},
     // deactivate: function() {},
     // setupController: function(controller, model) {

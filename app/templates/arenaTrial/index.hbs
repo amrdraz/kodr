@@ -1,9 +1,13 @@
 <section class="row">
 <div class="col-md-12 text-center">
-{{#link-to 'arena.edit' arena class="btn pull-right" }}Edit{{/link-to}}
+{{#if session.isTeacher}}
+  {{#link-to 'arena.edit' arena class="btn pull-right" }}Edit{{/link-to}}
+{{/if}}
     <h2 class="">{{arena.name}}</h2>
     <p>{{arena.description}}</p>
-    <h2 class="pull-right">{{model.exp}} XP</h2>
+    {{#if model.exp}}      
+      <h2 class="pull-right">{{model.exp}} XP</h2>
+    {{/if}}
 </div>
 </section>
 <hr>

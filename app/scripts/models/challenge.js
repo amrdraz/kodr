@@ -60,9 +60,6 @@ var ChallengeModel = module.exports = DS.Model.extend({
         points: 32
     }],
 
-    invalidate: function () {
-        this.set('valid', !this.get('canSave'));
-    }.observes('solution', 'setup', 'tests'),
     // relationshipChanged: false,
     canSave: function() {
         return !this.get('isSaving') && this.get('isDirty') || this.get('isNew');
@@ -71,7 +68,7 @@ var ChallengeModel = module.exports = DS.Model.extend({
         return !this.get('isSaving') && this.get('isDirty') && !this.get('isNew');
     }.property('isDirty', 'isSaving'),
     canPublish: function() {
-        return !this.get('canSave') && !this.get('isPublished') && this.get('isValid');
+        return !this.get('canSave') && !this.get('isPublished') && this.get('valid');
     }.property('canSave')
 });
 

@@ -27,7 +27,7 @@ function fullfilesRole(roles, user, params){
         return _.contains(roles, user.role) || ( _.contains(roles,'$self') && user._id.equals(params.id) );
     }
     var role = _.find(roles.roles, {role:user.role});
-    console.log(role);
+    // console.log(role);
     if(!role) return false;
     if(role.all) return true;
     return _.find(user[role.in], function(id){ return id.equals(params.id);});

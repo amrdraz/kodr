@@ -25,7 +25,7 @@ module.exports = function(app, passport) {
                 }).exec()
             ];
         }).spread(function(arena, challenges) {
-            console.log(arena, challenges);
+            // console.log(arena, challenges);
             if (!arena) {
                 return res.send(404, "Not Found");
             }
@@ -102,7 +102,7 @@ module.exports = function(app, passport) {
     app.del('/api/arenas/:id', access.requireRole(['teacher']), function(req, res, next) {
         Arena.findById(req.params.id, function(err, model) {
             if (err) return next(err);
-            if (!model) return res.send(200);
+            if (!model) return res.send(404);
             model.remove(function(err, model) {
                 if (err) return next(err);
                 res.send(200);

@@ -1,4 +1,4 @@
-module.exports = Em.Route.extend({
+module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
   controllerName: 'arena.edit',
   // activate: function() {},
   deactivate: function() {

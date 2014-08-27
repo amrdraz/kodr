@@ -17,6 +17,8 @@ module.exports = function(app, passport) {
     require('./routes/arenaTrial')(app, passport);
     // user routes
     require('./routes/user')(app, passport);
+    // group routes
+    require('./routes/group')(app, passport);
 
     /**
      * POST /token
@@ -98,13 +100,14 @@ module.exports = function(app, passport) {
                 }).exec();
             })
             .then(function(user) {
-                if (user) throw new Error(400);
+                if (user) throw new Error(400, 'User already defined');
 
                 var email = req.body.email;
                 var role = 'student';
                 var activated = true;
                 if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
                     role = 'teacher';
+                    //TODO uncomment this in production
                     activated = false;
                 } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
                     role = 'student';

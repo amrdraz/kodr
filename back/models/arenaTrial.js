@@ -15,6 +15,8 @@ var Challenge = require("./challenge");
  * and anything related to user and arena
  *
  * @attribute exp           Number      The amount of experiance gained per challenge
+ * @attribute complete      Boolean     Whether Arena was complete or not
+ * @attribute completed     Number      number of trials completed
  * @attribute trials        [Trial]     The challenges the user tried in this arena
  * @attribute arena         Arean       The Arena the metrics is tracked for
  * @attribute user          User        The relevent user

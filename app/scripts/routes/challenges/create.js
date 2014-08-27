@@ -1,4 +1,4 @@
-module.exports = Em.Route.extend({
+module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
   controllerName: 'challenge.edit',
   // activate: function() {},
   deactivate: function() {

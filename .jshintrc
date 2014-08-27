@@ -21,6 +21,7 @@
         "Em": true,
         "Handlebars": true,
         "DS": true,
-        "toastr":true
+        "toastr":true,
+        "SimpleAuth":true
     }
 }

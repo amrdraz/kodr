@@ -296,7 +296,7 @@ describe('Arena', function() {
                 request(api)
                     .del("/arenas/" + arena.id)
                     .set('Authorization', 'Bearer ' + teacher.token)
-                    .expect(200)
+                    .expect(404)
                     .end(done);
             });
         });

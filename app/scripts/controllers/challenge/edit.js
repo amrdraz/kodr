@@ -12,7 +12,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         this._super();
     },
     isCreating: function () {
-        return App.get('currentPath').contains('create');
+        return App.get('currentPath').split('.').contains('create');
     }.property('App.currentPath'),
     // arenaChange: function() {
     //     var arena = this.get('model.arena');
@@ -45,6 +45,10 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
 
         model.set('valid', result);
         if (result) {
+            if (this.get('intentToPublish')) {
+                this.set('intentToPublish', false);
+                this.set('isPublished', true);
+            }
             toastr.success('All Clear' + (this.get('model.isPublished') ? '' : ' you can now publish'));
         } else {
             toastr.error('Tests didn\'t pass check console');
@@ -70,6 +74,9 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             run: true
         });
     },
+    // invalidate: function () {
+    //     this.set('model.valid', !this.get('model.isDirty'));
+    // }.observes('model.solution', 'model.setup', 'model.tests'),
     save: function() {
         var model = this.get('model');
         var that = this;
@@ -98,7 +105,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         save: function() {
             var model = this.get('model');
             if (model.get('canSave')) {
-                if (!model.get('valid') && model.get('isPublished')) {
+                if (model.get('isPublished')) {
                     this.evaluate();
                     return false;
                 }
@@ -118,12 +125,13 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             var model = this.get('model');
             if (!model.get('isPublished')) {
                 if (model.get('valid')) {
-                    model.set('isPublished', true);
-                    this.save().then(function(ch) {
-                        console.log('published');
-                    }).catch(function(err) {
-                        console.log(err.stack);
-                    });
+                    this.set('intentToPublish', true);
+                    this.evaluate(); //until I gifure out how to observe without change
+                    // this.save().then(function(ch) {
+                    //     console.log('published');
+                    // }).catch(function(err) {
+                    //     console.log(err.stack);
+                    // });
                 } else {
                     this.evaluate();
                 }

@@ -82,7 +82,13 @@ App.CustomSession = SimpleAuth.Session.extend({
         if (!Ember.isEmpty(userId)) {
             return this.container.lookup('store:main').find('user', userId);
         }
-    }.property('user_id')
+    }.property('user_id'),
+    isTeacher: function () {
+        return this.get('user.role')==='teacher';
+    }.property('user.role'),
+    isStudent: function () {
+        return this.get('user.role')==='student';
+    }.property('user.role')
 });
 
 // the custom authenticator that handles the authenticated account
@@ -99,8 +105,6 @@ App.CustomAuthenticator = SimpleAuth.Authenticators.OAuth2.extend({
                     password: credentials.password
                 }
             }).then(function(response) {
-                    debugger;
-
                 Ember.run(function() {
                     // resolve (including the user id) as the AJAX request was successful; all properties this promise resolves
                     // with will be available through the session
@@ -140,6 +144,8 @@ App.SignupController = require('./controllers/signup');
 App.ChallengeController = require('./controllers/challenge');
 App.ChallengeTryController = require('./controllers/trial');
 App.ChallengeEditController = require('./controllers/challenge/edit');
+
+App.ArenasIndexController = require('./controllers/arenas/index');
 
 App.ArenaController = require('./controllers/arena');
 App.ArenaIndexController = require('./controllers/arena/index');

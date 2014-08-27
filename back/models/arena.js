@@ -23,6 +23,10 @@ var ArenaSchema = new mongoose.Schema({
     description: {
         type: String,
     },
+    isPublished: {
+        type:Boolean,
+        default:false
+    },
     // requiredAchievements: {
     //     type: [ObjectId], ref: 'Achievement'
     // },
