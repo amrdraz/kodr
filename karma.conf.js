@@ -19,19 +19,24 @@ module.exports = function(config) {
             "app/lib/handlebars/handlebars.js",
             "app/lib/ember/ember.js",
             "app/lib/ember-data/ember-data.js",
+            "app/lib/ember-simple-auth/simple-auth.js",
+            "app/lib/ember-simple-auth/simple-auth-oauth2.js",
+            "app/lib/ember-validations-bower/ember-validations.js",
             "app/lib/ember-qunit/dist/globals/main.js",
             "app/lib/bootstrap/dist/js/bootstrap.js",
             "app/lib/codemirror/lib/codemirror.js",
             "app/lib/mocha/mocha.js",
             "app/lib/chai/chai.js",
-            "app/vendor/ember-simple-auth.js",
-            "app/lib/ember-validations-bower/ember-validations.js",
-            "app/vendor/MathJax/MathJax.js?config=TeX-AMS_HTML-full",
+            "app/lib/MathJax/MathJax.js?config=TeX-AMS_HTML-full",
             "app/lib/jq-console/lib/jqconsole.js",
             "app/lib/jshint/dist/jshint.js",
+            "app/vendor/blockies.min.js",
+            "app/lib/chosen_v1.1.0/chosen.jquery.js",
+            "app/lib/toastr/toastr.js",
             "app/lib/jquery-mockjax/jquery.mockjax.js",
             ".tmp/scripts/templates.js",
             ".tmp/scripts/build.js",
+            ".tmp/iframe/main.js",
             "test/browser/*.js",
         ],
 
@@ -52,7 +57,7 @@ module.exports = function(config) {
 
 
         // web server port
-        port: 9876,
+        port: 3000,
 
 
         // enable / disable colors in the output (reporters and logs)

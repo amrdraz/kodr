@@ -1,3 +1,4 @@
+/* globals test,visit,andThen,stubEndpointForHttpRequest,equal,find,$ */
 module('integration tests', {
     setup: function() {
         Ember.run(function() {
@@ -12,18 +13,18 @@ module('integration tests', {
 
 test('empty ajax response will yield empty table', function() {
     // stubEndpointForHttpRequest('/api/challenges', {challenge:[]});
-    visit("/challenges");
+    visit("/arenas");
     andThen(function() {
         var rows = find("ul.list-group li").length;
         equal(rows, 0, rows);
     });
 });
 
-test('create challenge while sign out', function() {
-    stubEndpointForHttpRequest('/api/challenges', {challenge:[]});
-    visit("/challenges");
+test('create arena while signed out', function() {
+    stubEndpointForHttpRequest('/api/arenas', {arena:[]});
+    visit("/arenas");
     andThen(function() {
-        equal(find('challenge-create').length, 0, 'found create btn');
+        equal(find('arena-create').length, 0, 'found create btn');
     });
 });
 

@@ -1,3 +1,4 @@
+/* globals moduleForModel,test,visit,andThen,stubEndpointForHttpRequest,equal,find,$,setResolver,emq,wait */
 App.setupForTesting();
 App.injectTestHelpers();
 

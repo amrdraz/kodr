@@ -1,22 +1,16 @@
-moduleForModel('challenge', 'Challenge Model', {
-    needs:['model:arena']
-});
+/* globals moduleForModel,test,visit,andThen,stubEndpointForHttpRequest,equal,find,$ */
 
-test('name property returns', function() {
-    var person = this.subject({
-                name: 'Basic Test',
-                setup: "",
-                solution: "var x = 20;",
-                tests: "",
-                preCode: "",
-                postCode: "",
-                description: "create a variable and assign to it the value 20",
-                exp: 2,
-                isPublished: false
-            });
-    var result = person.get('name');
-    equal(result, 'Basic Test', "Name was " + result.name);
-});
+// moduleForModel('arena', 'Arena Model');
+
+// test('name property returns', function() {
+//     var arena = this.subject({
+//                 name: 'Small Arena',
+//                 description: "create a variable and assign to it the value 20",
+//                 isPublished: false
+//             });
+//     var result = arena.get('name');
+//     equal(result, 'Small Arena', "Name was " + result.name);
+// });
 
 // test('fullName property updates when firstName is changed', function() {
 //     var person = App.Person.create({firstName: 'toran', lastName: 'billups'});
