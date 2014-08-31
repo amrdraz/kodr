@@ -1,0 +1,10 @@
+<section class="row">
+    <div class="col-md-12 text-center">
+        {{#if session.isTeacher }}
+            {{#link-to 'group.edit' model class="btn pull-right" }}Edit{{/link-to}}
+        {{/if}}
+        <h2 class="">{{model.name}}</h2>
+    </div>
+</section>
+<hr>
+{{render '_groupMembersList' model.members }}

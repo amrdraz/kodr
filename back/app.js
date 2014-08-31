@@ -89,7 +89,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 require('./routes')(app, passport);
-require('./seed_db');
 
 // require('./events')(app, passport);
 

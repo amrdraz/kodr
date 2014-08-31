@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
+var _ = require('lodash');
 var generateName = require('sillyname');
-var debounce = require('lodash').debounce;
+var debounce = _.debounce;
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
@@ -55,9 +56,14 @@ GroupSchema.plugin(relationship, {
 GroupSchema.methods.push = function(user) {
     
 };
-GroupSchema.methods.poop = function(user) {
-    
+
+GroupSchema.methods.changed = function(members) {
+    return _.isEqual(this.members, members, function (a,b) {
+        return a.equals(b);
+    });
 };
+
+
 
 var Group = mongoose.model('Group', GroupSchema);
 

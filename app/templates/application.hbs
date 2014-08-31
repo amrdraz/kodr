@@ -27,12 +27,18 @@
               Arenas
             </a>
           {{/link-to}}
+
           {{#if session.isAuthenticated}}
-            {{#link-to 'profile' tagName="li" href=false }}
-              <a {{bind-attr href="view.href"}} class="btn">
-                Profile
-              </a>
-            {{/link-to}}
+          {{#link-to 'groups' tagName="li" href=false }}
+            <a {{bind-attr href="view.href"}} class="btn">
+              Groups
+            </a>
+          {{/link-to}}
+          {{#link-to 'profile' tagName="li" href=false }}
+            <a {{bind-attr href="view.href"}} class="btn">
+              Profile
+            </a>
+          {{/link-to}}
           {{/if}}
         </ul>
 

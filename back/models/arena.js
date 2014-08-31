@@ -32,16 +32,21 @@ var ArenaSchema = new mongoose.Schema({
     // },
     challenges: [{
         type: ObjectId,
-        ref: 'Challenge'
+        ref: 'Challenge',
     }],
     author: {
         type: ObjectId,
-        ref: 'User'
+        ref: 'User',
+        childPath: "arenas"
     },
     users: [{
         type: ObjectId,
         ref: 'ArenaTrial'
     }]
+});
+
+ArenaSchema.plugin(relationship, {
+    relationshipPathName: ['author']
 });
 
 module.exports = mongoose.model('Arena', ArenaSchema);

@@ -92,9 +92,7 @@ describe('Group', function() {
                     _id: student.id
                 }).exec()];
             }).spread(function(t, st) {
-                st.password = student.password;
                 student = st;
-                t.password = teacher.password;
                 teacher = t;
             }).finally(done);
         });
@@ -102,47 +100,63 @@ describe('Group', function() {
 
         it('should add memeber', function(done) {
             group.members.length.should.equal(1);
-            group.members.push(student2._id);
+            group.members = [student._id, student2._id];
             group.save(function(err, group) {
                 if (err) return done(err);
                 group.members.length.should.equal(2);
-                // console.log(student2._id);
-                User.findById(student2._id, function(err, user) {
+                User.find({
+                    group: group.id
+                }, function(err, users) {
                     if (err) return done(err);
-                    // console.log(user);
-                    user.group.toString().should.equal(group.id);
+                    users.length.should.equal(2);
                     done();
                 });
             });
         });
 
-        it('should remove memeber', function(done) {
-            group.members.length.should.equal(1);
-            group.members.splice(0, 1);
-            student.group = null;
-            group.save(function(err, user) {
-                if (err) return done(err);
-                group.members.length.should.equal(0);
-                // console.log(student2._id);
-                User.findById(student2._id, function(err, user) {
-                    if (err) return done(err);
-                    // console.log(user);
-                    expect(user.group).to.not.exist;
-                    done();
-                });
-            });
-        });
+        // it('should remove memeber', function(done) {
+        //     group.members.length.should.equal(1);
+        //     expect(student.group).to.exist;
+        //     // group.members = [];
+        //     student.group = undefined;
+        //     student.save(function(err, user) {
+        //         if (err) return done(err);
+        //         expect(user.group).to.not.exist;
+        //         Group.findById(group.id, function(err, g) {
+        //             if (err) return done(err);
+        //             g.members.length.should.equal(0);
+        //             done();
+        //         });
+        //     });
+        //     // group.save(function(err, user) {
+        //     //     if (err) return done(err);
+        //     //     group.members.length.should.equal(0);
+        //     //     User.findById(student._id, function(err, user) {
+        //     //         if (err) return done(err);
+        //     //         expect(user.group).to.not.exist;
+        //     //         done();
+        //     //     });
+        //     // });
+        // });
 
-        it('should update exp when trial is complete', function (done) {
+        it('should update exp when trial is complete', function(done) {
 
             var times = 0;
-            Promise.fulfilled().then(function () {
-               return [
-                    Trial.create({challenge:challenge.id, user:student.id, complete:true}), 
-                    Trial.create({challenge:challenge2.id, user:student.id, complete:true})
-                ]; 
-            }).spread(function (tr, tr2) {
-                
+            Promise.fulfilled().then(function() {
+                return [
+                    Trial.create({
+                        challenge: challenge.id,
+                        user: student.id,
+                        complete: true
+                    }),
+                    Trial.create({
+                        challenge: challenge2.id,
+                        user: student.id,
+                        complete: true
+                    })
+                ];
+            }).spread(function(tr, tr2) {
+
                 observer.on('user.awarded', function(user, type, value) {
                     times++;
                     // console.log('assigned user exp ', user.exp, ' after adding ', value);
@@ -184,13 +198,6 @@ describe('Group', function() {
                 email: 'teach@place.com',
                 password: 'teacher123',
                 role: 'teacher',
-                activated: true
-            },
-            admin = {
-                username: 'admin',
-                email: 'admin@place.com',
-                password: 'admin12345',
-                role: 'admin',
                 activated: true
             };
         var accessToken;
@@ -247,7 +254,7 @@ describe('Group', function() {
                         res.status.should.equal(200);
                         expect(res.body.group._id).to.exist;
                         expect(res.body.group.name).to.exist;
-                        res.body.group.members.length.should.equal(0);
+                        res.body.users.length.should.equal(0);
                         res.body.group.founder.should.equal(teacher.id);
                         group.id = res.body.group._id;
                         group.group = group;
@@ -266,7 +273,7 @@ describe('Group', function() {
                     .end(done);
             });
 
-            it("should return a group by id with its members only if teacher", function(done) {
+            it("should return a group by id with its users only if teacher", function(done) {
                 request(api)
                     .get("/groups/" + group.id)
                     .set('Authorization', 'Bearer ' + teacher.token)
@@ -274,7 +281,7 @@ describe('Group', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.group._id.should.exist;
-                        res.body.members.length.should.equal(0);
+                        res.body.users.length.should.equal(0);
                         done();
                     });
             });
@@ -347,6 +354,44 @@ describe('Group', function() {
                         done();
                     });
             });
+
+            it("should add members", function(done) {
+                var update = {
+                    group: {
+                        members: [student.id, student2.id]
+                    }
+                };
+                request(api)
+                    .put("/groups/" + group.id)
+                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .send(update)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.group.members.length.should.equal(2);
+                        res.body.users.length.should.equal(2);
+                        done();
+                    });
+            });
+
+            // it("should remove members", function(done) {
+            //     var update = {
+            //         group: {
+            //             members: []
+            //         }
+            //     };
+            //     request(api)
+            //         .put("/groups/" + group.id)
+            //         .set('Authorization', 'Bearer ' + teacher.token)
+            //         .send(update)
+            //         .end(function(err, res) {
+            //             if (err) return done(err);
+            //             res.status.should.equal(200);
+            //             res.body.group.members.length.should.equal(0);
+            //             res.body.users.length.should.equal(0);
+            //             done();
+            //         });
+            // });
         });
 
         describe("DELETE", function() {

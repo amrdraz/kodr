@@ -1,4 +1,4 @@
-module.exports = App.Trial = DS.Model.extend({
+module.exports = DS.Model.extend({
     code: DS.attr('string'),
     times: DS.attr('number'),
     exp: DS.attr('number'),

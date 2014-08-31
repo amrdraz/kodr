@@ -1,4 +1,4 @@
-module.exports = App.Trial = DS.Model.extend({
+module.exports = DS.Model.extend({
     username: DS.attr('string'),
     exp: DS.attr('number'),
     rp: DS.attr('number'),
@@ -8,5 +8,8 @@ module.exports = App.Trial = DS.Model.extend({
     arenas: DS.hasMany('arena', {async: true, inverse: 'author'}),
     
     trials: DS.hasMany('trial',{async: true, inverse: 'user'}),
-    arenasTried: DS.hasMany('arenaTrial',{async: true, inverse: 'user'})
+    arenasTried: DS.hasMany('arenaTrial',{async: true, inverse: 'user'}),
+
+    groups: DS.hasMany('group',{async: true, inverse: 'founder'}),
+    group: DS.belongsTo('group',{async: true, inverse: 'members'})
 });

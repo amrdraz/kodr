@@ -67,6 +67,14 @@ App.ApplicationAdapter = DS.RESTAdapter.extend({
     namespace: 'api'
 });
 
+App.GroupSerializer = DS.RESTSerializer.extend(DS.EmbeddedRecordsMixin, {
+    primaryKey:'_id',
+      attrs: {
+        // author: {embedded: 'always'},
+        members: {serialize: 'ids'}
+      }
+});
+
 // App.ChallengeAdapter = DS.FixtureAdapter;
 // App.TrialAdapter = DS.FixtureAdapter;
 
@@ -141,6 +149,13 @@ App.ArenaTrialTrialView = require('./views/challengeEditView');
 App.ApplicationController = require('./controllers/application');
 App.LoginController = require('./controllers/login');
 App.SignupController = require('./controllers/signup');
+
+App.GroupController = require('./controllers/group');
+App.GroupEditController = require('./controllers/group/edit');
+// App.GroupsController = require('./controllers/group');
+App.GroupsIndexController = require('./controllers/groups/index');
+App.GroupsCreateController = require('./controllers/group/edit');
+
 App.ChallengeController = require('./controllers/challenge');
 App.ChallengeTryController = require('./controllers/trial');
 App.ChallengeEditController = require('./controllers/challenge/edit');
@@ -157,6 +172,7 @@ App.TrialController = require('./controllers/trial');
 
 // Models
 App.User = require('./models/user');
+App.Group = require('./models/group');
 App.Arena = require('./models/arena');
 App.ArenaTrial = require('./models/arenaTrial');
 App.Challenge = require('./models/challenge');
@@ -167,6 +183,13 @@ App.ApplicationRoute = require('./routes/application.js');
 App.IndexRoute = require('./routes/index.js');
 App.ProfileRoute = require('./routes/profile.js');
 App.LoginRoute = require('./routes/login.js');
+
+App.GroupRoute = require('./routes/group');
+App.GroupIndexRoute = require('./routes/group/index');
+App.GroupEditRoute = require('./routes/group/edit');
+
+App.GroupsRoute = require('./routes/groups');
+App.GroupsCreateRoute = require('./routes/groups/create');
 
 App.ChallengeRoute = require('./routes/challenge');
 App.ChallengeIndexRoute = require('./routes/challenge/index');

@@ -8,6 +8,20 @@ module.exports = function(App) {
         this.route('index', {
             path: '/'
         });
+         this.resource('group', {path:'group/:group_id'},function () {
+            this.route('edit');
+        });
+        this.resource('groups', {
+            path: '/groups'
+        }, function () {
+            this.route('create');
+        });
+        this.resource('user', {path:'user/:user_id'},function () {
+            this.route('edit');
+        });
+        this.resource('users', function () {
+            this.route('create');
+        });
         this.resource('arenaTrial', {
             path: '/arena/:arena_id' //used to load arena trial
         }, function() {

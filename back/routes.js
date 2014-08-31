@@ -20,6 +20,10 @@ module.exports = function(app, passport) {
     // group routes
     require('./routes/group')(app, passport);
 
+    if(process.env.NODE_ENV!=='production') {
+        app.get('/seed_db', require('./seed_db'));
+    }
+
     /**
      * POST /token
      * Sign in using identification and password.
@@ -108,7 +112,7 @@ module.exports = function(app, passport) {
                 if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
                     role = 'teacher';
                     //TODO uncomment this in production
-                    // activated = false;
+                    activated = false;
                 } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
                     role = 'student';
                 }

@@ -11,6 +11,7 @@ var Arena = require('../../back/models/arena');
 var ArenaTrial = require('../../back/models/arenaTrial');
 var Trial = require('../../back/models/trial');
 var Challenge = require('../../back/models/challenge');
+var Group = require('../../back/models/group');
 var observer = require('../../back/mediator');
 
 describe('User', function() {
@@ -95,6 +96,112 @@ describe('User', function() {
 
         });
     });
+
+    describe('Group', function() {
+        var student,
+            student2,
+            teacher,
+            group, challenge, challenge2;
+        beforeEach(function(done) {
+            student = {
+                username: 'student',
+                email: 'student@place.com',
+                password: 'student123',
+                role: 'student',
+                activated: true
+            };
+            student2 = {
+                username: 'student2',
+                email: 'student2@place.com',
+                password: 'student123',
+                role: 'student',
+                activated: true
+            };
+            teacher = {
+                username: 'teacher',
+                email: 'teach@place.com',
+                password: 'teacher123',
+                role: 'teacher',
+                activated: true
+            };
+            Promise.fulfilled().then(function() {
+                return [
+                    User.create(teacher),
+                    User.create(student),
+                    User.create(student2)
+                ];
+            }).spread(function(t, st, st2) {
+                st.password = student.password;
+                student = st;
+                st2.password = student2.password;
+                student2 = st2;
+                t.password = teacher.password;
+                teacher = t;
+                var at = Group.create({
+                    founder: teacher._id,
+                    members: [st._id]
+                });
+                var ch = Challenge.create({
+                    exp: 4,
+                });
+                var ch2 = Challenge.create({
+                    exp: 2,
+                });
+                return [at, ch, ch2];
+            }).spread(function(g, ch1, ch2) {
+                challenge = ch1;
+                challenge2 = ch2;
+                group = g;
+                return [User.findOne({
+                    _id: teacher.id
+                }).exec(), User.findOne({
+                    _id: student.id
+                }).exec()];
+            }).spread(function(t, st) {
+                st.password = student.password;
+                student = st;
+                t.password = teacher.password;
+                teacher = t;
+            }).finally(done);
+        });
+        afterEach(setup.clearDB);
+
+        // it('should add memeber', function(done) {
+        //     group.members.length.should.equal(1);
+        //     expect(student2.group).to.not.exist;
+        //     student2.group = group._id;
+        //     student2.save(function(err, group) {
+        //         if (err) return done(err);
+        //         expect(student2.group).to.exist;
+        //         // console.log(student2._id);
+        //         Group.findOne({
+        //             _id: group._id
+        //         }, function(err, g) {
+        //             if (err) return done(err);
+        //             // console.log(user);
+        //             g.members.length.should.equal(2);
+        //             done();
+        //         });
+        //     });
+        // });
+
+        // it('should remove memeber', function(done) {
+        //     group.members.length.should.equal(1);
+        //     student.group = undefined;
+        //     student.save(function(err, user) {
+        //         if (err) return done(err);
+        //         expect(student.group).to.not.exist;
+        //         // console.log(student2._id);
+        //         Group.findById(group._id, function(err, group) {
+        //             if (err) return done(err);
+        //             // console.log(group);
+        //             group.members.length.should.equal(0);
+        //             done();
+        //         });
+        //     });
+        // });
+    });
+
     describe("Auth", function() {
         var url = 'http://localhost:3000';
         var user = {
@@ -422,7 +529,7 @@ describe('User', function() {
                     });
             });
 
-             it("should create as a teacher", function(done) {
+            it("should create as a teacher", function(done) {
                 request(api)
                     .post("/users")
                     .set('Authorization', 'Bearer ' + teacher.token)
@@ -534,7 +641,7 @@ describe('User', function() {
                     .del("/users/" + user.id)
                     .set('Authorization', 'Bearer ' + student.token)
                     .end(function(err, res) {
-                        if(err) done(err);
+                        if (err) done(err);
                         res.status.should.equal(401);
                         done();
                     });

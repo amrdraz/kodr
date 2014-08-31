@@ -27,8 +27,8 @@ var ADMIN = 'admin';
  * @attribute challenges    [Challenge]     challanges the user created
  * @attribute trials        [Trial]         trials the user started/passed
  * @attribute arenasTried   [ArenaTrial]    arneas the user entered/passed
- * @attribute groups        [Group]         groups owned by the user 
- * @attribute group         Group           group he is a member of 
+ * @attribute groups        [Group]         groups owned by the user
+ * @attribute group         Group           group he is a member of
  *
  * @type {mongoose.Schema}
  */
@@ -50,21 +50,31 @@ var userSchema = new mongoose.Schema({
         match: /^.{10,}$/,
         trim: true
     },
-    activated:{
-        type:Boolean,
-        default:false,
+    activated: {
+        type: Boolean,
+        default: false,
     },
     token: String,
     role: {
         type: String,
-        'default': 'student',        
-        'enum': [TEACHER,STUDENT, ADMIN]
+        'default': 'student',
+        'enum': [TEACHER, STUDENT, ADMIN]
     },
-    exp:{type:Number, 'default':0}, // experience points
-    rp:{type:Number, 'default':0},  // reputation points
+    exp: {
+        type: Number,
+        'default': 0
+    }, // experience points
+    rp: {
+        type: Number,
+        'default': 0
+    }, // reputation points
     challenges: {
         type: [ObjectId],
         ref: 'Challenge'
+    },
+    arenas: {
+        type: [ObjectId],
+        ref: 'Arena'
     },
     trials: [{
         type: ObjectId,
@@ -136,10 +146,12 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
 };
 
 userSchema.methods.award = function(type, value, obj) {
-    var update = {$inc:{}};
+    var update = {
+        $inc: {}
+    };
     update.$inc[type] = value;
-    User.findByIdAndUpdate(this.id,update, function (err, user) {
-        if(err) throw err;
+    User.findByIdAndUpdate(this.id, update, function(err, user) {
+        if (err) throw err;
         // console.log('sending', err,user, obj);
         observer.emit('user.awarded', user, type, value);
     });
@@ -147,9 +159,9 @@ userSchema.methods.award = function(type, value, obj) {
 
 var User = mongoose.model('User', userSchema);
 
-observer.on('trial.award', function (trial) {
+observer.on('trial.award', function(trial) {
     // console.log('user award hook caought in user', trial.user);
-    User.findById(trial.user, function (err, user) {
+    User.findById(trial.user, function(err, user) {
         if (err) throw err;
         user.award('exp', trial.exp, trial);
     });

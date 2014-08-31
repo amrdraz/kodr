@@ -33,6 +33,12 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             this.set('model.isPublished', false);
         }
     },
+    publish: function() {
+        if (this.get('intentToPublish')) {
+            this.set('intentToPublish', false);
+            this.set('isPublished', true);
+        }
+    },
     testError: function(error) {
         toastr.error('There are Errors check Console');
         this.set('model.valid', this._super(error));
@@ -45,10 +51,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
 
         model.set('valid', result);
         if (result) {
-            if (this.get('intentToPublish')) {
-                this.set('intentToPublish', false);
-                this.set('isPublished', true);
-            }
+            this.publish();
             toastr.success('All Clear' + (this.get('model.isPublished') ? '' : ' you can now publish'));
         } else {
             toastr.error('Tests didn\'t pass check console');
@@ -74,9 +77,15 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             run: true
         });
     },
-    // invalidate: function () {
-    //     this.set('model.valid', !this.get('model.isDirty'));
-    // }.observes('model.solution', 'model.setup', 'model.tests'),
+    valueWillChange: function(obj, key, value){
+        this['changing'+key] = obj.get(key);
+        // console.log('changing',key, obj.get(key));
+    }.observesBefore('model.solution', 'model.setup', 'model.tests'),
+    invalidate: function (obj, key, value) {
+        // console.log('to',key, obj.get(key));
+        var change  = this['changing'+key] === obj.get(key);
+        this.set('model.valid', change && this.get('model.valid'));
+    }.observes('model.solution', 'model.setup', 'model.tests'),
     save: function() {
         var model = this.get('model');
         var that = this;
@@ -122,16 +131,17 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             }
         },
         publish: function() {
+            var that = this;
             var model = this.get('model');
             if (!model.get('isPublished')) {
+                this.set('intentToPublish', true);
                 if (model.get('valid')) {
-                    this.set('intentToPublish', true);
-                    this.evaluate(); //until I gifure out how to observe without change
-                    // this.save().then(function(ch) {
-                    //     console.log('published');
-                    // }).catch(function(err) {
-                    //     console.log(err.stack);
-                    // });
+                    this.publish();
+                    this.save().then(function(ch) {
+                        console.log('published');
+                    }).catch(function(err) {
+                        console.log(err.stack);
+                    });
                 } else {
                     this.evaluate();
                 }

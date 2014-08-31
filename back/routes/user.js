@@ -6,7 +6,7 @@ module.exports = function(app, passport) {
     /**
      * Returns the data for the currently logged in user
      *
-     * @returns {object} arenaTrial
+     * @returns {object} User
      */
     
     app.get('/profile', access.requireRole(), function(req, res) {
@@ -28,10 +28,10 @@ module.exports = function(app, passport) {
 
 
     /**
-     * Find arenaTrial by id.
+     * Find User by id.
      *
      * @param {string} id
-     * @returns {object} arenaTrial
+     * @returns {object} User
      */
 
     app.get('/api/users/:id', access.requireRole(),function(req, res, next) {
@@ -52,7 +52,10 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/users', access.requireRole(['student', 'teacher']),function(req, res, next) {
-        User.find({}).exec().then(function(model) {
+        if(req.query.group==="null") {
+            req.query.group = null;
+        }
+        User.find(req.query).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({
                 user: model
