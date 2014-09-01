@@ -9,17 +9,17 @@ window.ENV['simple-auth'] = {
 
 require('./utils/localStorageShim.js');
 toastr.options = {
-  "closeButton": true,
-  "debug": false,
-  "positionClass": "toast-bottom-right",
-  "showDuration": "300",
-  "hideDuration": "1000",
-  "timeOut": "5000",
-  "extendedTimeOut": "1000",
-  "showEasing": "swing",
-  "hideEasing": "linear",
-  "showMethod": "fadeIn",
-  "hideMethod": "fadeOut"
+    "closeButton": true,
+    "debug": false,
+    "positionClass": "toast-bottom-right",
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "5000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
 };
 require('../lib/ember-breadcrumbs/dist/ember-breadcrumbs');
 BreadCrumbs.BreadCrumbsComponent.reopen({
@@ -56,6 +56,13 @@ var App = window.App = Ember.Application.create({
     // @endif
     // used to monotor current path
     currentPath: '',
+    Socket: EmberSockets.extend({
+        //     host: 'localhost',
+        // port: 3502,
+        // secure:true,
+        controllers: ['application'],
+        autoConnect: true
+    })
 });
 
 App.ApplicationSerializer = DS.RESTSerializer.extend({
@@ -68,11 +75,13 @@ App.ApplicationAdapter = DS.RESTAdapter.extend({
 });
 
 App.GroupSerializer = DS.RESTSerializer.extend(DS.EmbeddedRecordsMixin, {
-    primaryKey:'_id',
-      attrs: {
+    primaryKey: '_id',
+    attrs: {
         // author: {embedded: 'always'},
-        members: {serialize: 'ids'}
-      }
+        members: {
+            serialize: 'ids'
+        }
+    }
 });
 
 // App.ChallengeAdapter = DS.FixtureAdapter;
@@ -91,11 +100,11 @@ App.CustomSession = SimpleAuth.Session.extend({
             return this.container.lookup('store:main').find('user', userId);
         }
     }.property('user_id'),
-    isTeacher: function () {
-        return this.get('user.role')==='teacher';
+    isTeacher: function() {
+        return this.get('user.role') === 'teacher';
     }.property('user.role'),
-    isStudent: function () {
-        return this.get('user.role')==='student';
+    isStudent: function() {
+        return this.get('user.role') === 'student';
     }.property('user.role')
 });
 

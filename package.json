@@ -93,6 +93,8 @@
     "requirejs": "^2.1.14",
     "sillyname": "0.0.3",
     "sinon": "^1.10.3",
+    "socket.io": "^1.0.6",
+    "socket.io-client": "^1.0.6",
     "structured": "^0.1.2",
     "superagent": "^0.18.2",
     "supertest": "^0.13.0",

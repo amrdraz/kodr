@@ -25,7 +25,9 @@
     "ember-breadcrumbs": "~0.0.1",
     "jasmine": "~2.0.1",
     "jasmine-jsreporter-real": "*",
-    "toastr": "~2.0.3"
+    "toastr": "~2.0.3",
+    "socket.io-client": "~1.0.6",
+    "ember-sockets": "~0.6.10"
   },
   "devDependencies": {
     "jquery-mockjax": "~1.5.3",

@@ -2,9 +2,10 @@
 // get all the tools we need
 var express = require('express');
 var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 var passport = require('passport');
 var flash = require('connect-flash');
-var EventEmitter = require('events').EventEmitter;
 
 var morgan = require('morgan');
 var cookiePraser = require('cookie-parser');
@@ -90,6 +91,15 @@ if (process.env.NODE_ENV !== 'production') {
 
 require('./routes')(app, passport);
 
-// require('./events')(app, passport);
+/**
+ * @on connection
+ */
+require('./events')(io);
+
+
+
+server.listen(app.get('port'), function() {
+    console.log('Express server running on port ' + app.get('port'));
+});
 
 module.exports = app;

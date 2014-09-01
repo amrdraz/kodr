@@ -1,6 +1,27 @@
+var observer = require('./mediator');
+var client;
 
+module.exports = function(io) {
 
-module.exports = function(app, passport) {
+    io.on('connection', function(socket) {
+        client = socket;
+        /**
+         * Updates the content when the `applyFilterByWord` event has been received.
+         *
+         * @on cherryPickName
+         */
+        client.on('cherryPickName', function() {
+            client.emit('cherryPickedName', _.sample(names), Math.floor(Math.random() * 30) + 1);
+        });
+
+        client.on('pick name like this', function(name) {
+            client.emit('pick name like this', _.sample(names), Math.floor(Math.random() * 30) + 1);
+        });
+
+        observer.on('user.awarded', function (user, type, value) {
+            client.emit('notification', user, type, value);
+        })
+    });
     //server events
-    
+
 };
