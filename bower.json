@@ -11,7 +11,7 @@
     "esprima": "~1.2.2",
     "underscore": "~1.6.0",
     "structured": "*",
-    "ember": "~1.6.1",
+    "ember": "~1.7.0",
     "handlebars": "~1.3.0",
     "ember-data": "1.0.0-beta.9",
     "marked": "~0.3.2",
@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "jquery-mockjax": "~1.5.3",
-    "ember-qunit": "~0.1.8"
+    "ember-qunit": "~0.1.8",
+    "ember-mocha-adapter": "~0.2.1"
   }
 }

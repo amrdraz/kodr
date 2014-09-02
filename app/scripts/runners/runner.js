@@ -24,7 +24,11 @@ module.exports = {
             tests,
             '// End Tests',
             '',
-            ' run();',
+            ' jasmine.getEnv().execute();\
+    if(!jasmine.getJSReport()) {\
+        window.parent.stuffEmit("waiting");\
+        window.parent.stuffEmit("log", "waiting...");\
+    }',
             '} catch(e) {',
             '  rethrow(e, JSON.parse(' + JSON.stringify(JSON.stringify(tests)) + '),2);',
             '}',

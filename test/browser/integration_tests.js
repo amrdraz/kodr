@@ -1,32 +1,51 @@
 /* globals test,visit,andThen,stubEndpointForHttpRequest,equal,find,$ */
-module('integration tests', {
-    setup: function() {
-        Ember.run(function() {
-            App.reset();
-            // App.Challenge.challenges = [];
-        });
-    },
-    teardown: function() {
-        $.mockjaxClear();
-    }
-});
+var expect = chai.expect;
+chai.should();
 
-test('empty ajax response will yield empty table', function() {
-    // stubEndpointForHttpRequest('/api/challenges', {challenge:[]});
-    visit("/arenas");
-    andThen(function() {
-        var rows = find("ul.list-group li").length;
-        equal(rows, 0, rows);
+describe('Test', function () {
+    beforeEach(function () {
+        App.reset();
+    });
+
+    it('should work', function (done) {
+        expect(1).to.equal(1);
     });
 });
 
-test('create arena while signed out', function() {
-    stubEndpointForHttpRequest('/api/arenas', {arena:[]});
-    visit("/arenas");
-    andThen(function() {
-        equal(find('arena-create').length, 0, 'found create btn');
-    });
-});
+// module('integration tests', {
+//     setup: function() {
+//         Ember.run(function() {
+//             App.reset();
+//             // App.Challenge.challenges = [];
+//         });
+//     },
+//     teardown: function() {
+//         $.mockjaxClear();
+//     }
+// });
+
+// test('one should equal one', function() {
+//     stubEndpointForHttpRequest('/api/arenas', {arena:[]});
+//     visit("/arenas");
+//     equal(1, 1, 'error: one did not equal one');
+// });
+
+// test('empty ajax response will yield empty table', function() {
+//     stubEndpointForHttpRequest('/api/arenas', {arena:[]});
+//     visit("/arenas");
+//     andThen(function() {
+//         var rows = find("ul.list-group li").length;
+//         equal(rows, 0, rows);
+//     });
+// });
+
+// test('create arena while signed out', function() {
+//     stubEndpointForHttpRequest('/api/arenas', {arena:[]});
+//     visit("/arenas");
+//     andThen(function() {
+//         equal(find('arena-create').length, 0, 'found create btn');
+//     });
+// });
 
 
 // test('ajax response with 2 people yields table with 2 rows', function() {

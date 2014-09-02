@@ -11,17 +11,15 @@ module.exports = function(io) {
          * @on cherryPickName
          */
         client.on('cherryPickName', function() {
-            client.emit('cherryPickedName', _.sample(names), Math.floor(Math.random() * 30) + 1);
+            client.emit('cherryPickedName', "Draz");
         });
 
         client.on('pick name like this', function(name) {
             client.emit('pick name like this', _.sample(names), Math.floor(Math.random() * 30) + 1);
         });
-
-        observer.on('user.awarded', function (user, type, value) {
-            client.emit('notification', user, type, value);
-        })
     });
     //server events
-
+    observer.on('user.awarded', function(user, type, value) {
+        client && client.emit('notification', user, type, value);
+    })
 };

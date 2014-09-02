@@ -57,8 +57,8 @@ var App = window.App = Ember.Application.create({
     // used to monotor current path
     currentPath: '',
     Socket: EmberSockets.extend({
-        //     host: 'localhost',
-        // port: 3502,
+        // host: 'localhost',
+        // port: 9000,
         // secure:true,
         controllers: ['application'],
         autoConnect: true

@@ -19,10 +19,10 @@ jasmineEnv.addReporter(new jasmine.JSReporter2(function (report) {
     kodrReporter(report);
 })); //< for jsreporter
 
-window.run = function() {
-    jasmine.getEnv().execute();
-    if(!jasmine.getJSReport()) {
-        window.parent.stuffEmit('waiting');
-        window.parent.stuffEmit('log', 'waiting...');
-    }
-};
+// window.run = function() {
+//     jasmine.getEnv().execute();
+//     if(!jasmine.getJSReport()) {
+//         window.parent.stuffEmit('waiting');
+//         window.parent.stuffEmit('log', 'waiting...');
+//     }
+// };
