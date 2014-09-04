@@ -16,6 +16,23 @@ var observer = require('../../back/mediator');
 
 describe('User', function() {
     before(setup.clearDB);
+
+    describe('Unit', function () {
+        var user;
+        beforeEach(function  () {
+            user = new User({
+                username:'2314',
+                password:'1243j1k2412hj'
+            })
+        })
+
+        it('has points', function () {
+            user.exp = 20;
+            user.rp = 30;
+            user.points.should.equal(50);
+        });
+    });
+
     describe('Trial', function() {
         var user, arena, trial, trial2;
         beforeEach(function(done) {

@@ -93,6 +93,10 @@ var userSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Group',
         childPath: "members"
+    },
+    quests: {
+        type: [ObjectId],
+        ref: 'UserQuest'
     }
 });
 
@@ -125,6 +129,14 @@ userSchema.pre('save', true, function(next, done) {
     });
 });
 
+/**
+ * the sum of both exp and rp
+ * @return {Number} 
+ */
+userSchema.virtuals.points = function () {
+  return this.exp+this.rp;  
+};
+
 userSchema.methods.toJSON = function() {
     var obj = this.toObject();
     delete obj.__v;
@@ -145,6 +157,15 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
     });
 };
 
+/**
+ * award a user with amount of points based on the type of points
+ * after awarding an event is published indicating that this user was awarded
+ * 
+ * @param  {Stting} type  type of the award (can be 'exp' or 'rp')
+ * @param  {Numberf} value the amount awarded
+ * @param  {Mixed} obj   object that the award originated from
+ * @event  'user.awarded' published the user awarded the type of award and its value
+ */
 userSchema.methods.award = function(type, value, obj) {
     var update = {
         $inc: {}
@@ -159,6 +180,11 @@ userSchema.methods.award = function(type, value, obj) {
 
 var User = mongoose.model('User', userSchema);
 
+/**
+ * Event listner for when a trial is complete
+ * @param  {Trial} trial trial that was just complete for the first time
+ * @return {[type]}       [description]
+ */
 observer.on('trial.award', function(trial) {
     // console.log('user award hook caought in user', trial.user);
     User.findById(trial.user, function(err, user) {

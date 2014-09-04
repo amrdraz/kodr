@@ -112,7 +112,7 @@ TrialSchema.post('save', function(doc) {
             // util.log('completed for frst time award user exp '+doc.exp);
             observer.emit('trial.award', doc);
         }
-        // observer.emit('trial.complete', doc);
+        observer.emit('trial.complete', doc);
     }
 });
 

@@ -18,7 +18,7 @@ var Mixed = mongoose.Schema.Mixed;
 var Activity = new mongoose.Schema({
     action: {
         type: String,
-        'enum': ['created','started', 'passed', 'tried', 'gained', 'posted']
+        'enum': ['created', 'updated','started', 'passed', 'tried', 'gained', 'posted', 'completed', 'awarded']
     },
     exp: {
         type:Number,

@@ -1,21 +1,28 @@
 var mongoose = require('mongoose');
+var Promise = require('bluebird');
+var UserQuest = require('./userQuest');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 
 /**
- * Achievement Schema.
+ * Quest Schema.
  * An achievement is a means of indicating progress
  * It reuires a certain expreiance level to be achieved one or several arenas
  *
  * @type {mongoose.Schema}
  */
 
-var AchievementSchema = new mongoose.Schema({
+var QuestSchema = new mongoose.Schema({
     name: {
         type: String,
     },
     description: {
         type: String,
+    },
+    rp: {
+        type: Number,
+        default: 0,
+        min: 0
     },
     requirements: {
         type: [Mixed],
@@ -23,11 +30,15 @@ var AchievementSchema = new mongoose.Schema({
     author: {
         type: ObjectId,
         ref: 'User'
-    }
+    },
+    users: [{
+        type: ObjectId,
+        ref: 'UserQuest'
+    }]
 });
 
 
-function isActive (value, condition, activation) {
+function isActive(value, condition, activation) {
     var res = false;
     switch (condition) {
         case '>=':
@@ -44,26 +55,24 @@ function isActive (value, condition, activation) {
     return res;
 };
 
-AchievementSchema.methods.check = function (user) {
+QuestSchema.methods.check = function(user) {
     return this.requirements.every(function(r) {
         // console.log(user.get(r.property), r.property, r.condition, r.activation);
         return isActive(user.get(r.property), r.condition, r.activation);
     });
 };
 
-AchievementSchema.statics.new = function (name, property, condition, activation) {
-    var requirements = [];
-    var met = false;
+QuestSchema.methods.assign = function(user) {
+    return Quest.assign(user, this)
+};
 
-    if (property instanceof Array) {
-        requirements = JSON.parse(JSON.stringify(property));
-    } else {
-        requirements.push({
-            property: property,
-            condition: condition,
-            activation: activation
-        });
-    }
-}
-
-module.exports = mongoose.model('Achievement', AchievementSchema);
+QuestSchema.statics.assign = function(user, quest) {
+    return Promise.fulfilled().then(function() {
+        return UserQuest.create({
+            user: user.id,
+            quest: quest.id,
+            requirements: quest.requirements
+        })
+    });
+};
+var Quest = module.exports = mongoose.model('Quest', QuestSchema);
