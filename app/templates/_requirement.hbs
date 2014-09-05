@@ -1,0 +1,26 @@
+Complete 
+{{#unless req.isAny1 }}
+    {{#if req.isChallenge}}
+     {{#link-to 'challenge.try' req.id2 }}
+       {{req.model1}}
+      {{/link-to}}
+    {{else}}
+      {{#link-to 'arenaTrial' req.id1 }}
+        {{req.model1}}
+      {{/link-to}}
+    {{/if}}
+{{else}}
+    {{#if req.times }}
+        <strong>{{req.times}}</strong>
+    {{/if}}
+    {{#if req.id2}}
+        Challange(s) in
+        {{#link-to 'arenaTrial' req.id2 }}
+          {{req.model2}}
+        {{/link-to}}
+        {{else}}
+        {{#link-to 'arenas' }}
+          {{req.model1}}
+        {{/link-to}}
+    {{/if}}
+{{/unless}}

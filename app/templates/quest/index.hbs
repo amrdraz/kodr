@@ -1,0 +1,24 @@
+<section class="row">
+    <div class="col-md-12 text-center">
+        {{#if session.isTeacher }}
+            {{#link-to 'quest.edit' model class="btn pull-right" }}Edit{{/link-to}}
+            {{#link-to 'quest.assign' model class="btn pull-right" }}Assign{{/link-to}}
+        {{/if}}
+        <h2 class="">{{model.name}}</h2>
+        <p>{{model.description}}</p>
+    </div>
+</section>
+<hr>
+<h4>Requirements</h4>
+<ul class="list-group">    
+{{#each req in requirements}}
+      <li class="list-group-item">
+         {{partial '_requirement' }}
+      </li>
+    {{else}}
+      Does not have any requirements
+    {{/each}}
+</ul>
+
+<hr>
+{{render '_groupMembersList' model.users }}

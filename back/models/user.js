@@ -131,11 +131,11 @@ userSchema.pre('save', true, function(next, done) {
 
 /**
  * the sum of both exp and rp
- * @return {Number} 
+ * @return {Number}
  */
-userSchema.virtuals.points = function () {
-  return this.exp+this.rp;  
-};
+userSchema.virtual('points').get(function() {
+    return this.exp + this.rp;
+});
 
 userSchema.methods.toJSON = function() {
     var obj = this.toObject();
@@ -160,7 +160,7 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
 /**
  * award a user with amount of points based on the type of points
  * after awarding an event is published indicating that this user was awarded
- * 
+ *
  * @param  {Stting} type  type of the award (can be 'exp' or 'rp')
  * @param  {Numberf} value the amount awarded
  * @param  {Mixed} obj   object that the award originated from

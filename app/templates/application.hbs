@@ -28,12 +28,20 @@
             </a>
           {{/link-to}}
 
-          {{#if session.isAuthenticated}}
-          {{#link-to 'groups' tagName="li" href=false }}
+          {{#if session.isTeacher }}
+            {{#link-to 'groups' tagName="li" href=false }}
             <a {{bind-attr href="view.href"}} class="btn">
               Groups
             </a>
-          {{/link-to}}
+            {{/link-to}}
+            {{#link-to 'quests' tagName="li" href=false }}
+            <a {{bind-attr href="view.href"}} class="btn">
+              Quests
+            </a>
+            {{/link-to}}
+          {{/if}}
+
+          {{#if session.isAuthenticated}}
           {{#link-to 'profile' tagName="li" href=false }}
             <a {{bind-attr href="view.href"}} class="btn">
               Profile

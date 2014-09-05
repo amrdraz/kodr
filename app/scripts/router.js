@@ -8,7 +8,16 @@ module.exports = function(App) {
         this.route('index', {
             path: '/'
         });
-         this.resource('group', {path:'group/:group_id'},function () {
+        this.resource('quest', {path:'quest/:quest_id'},function () {
+            this.route('edit');
+            this.route('assign');
+        });
+        this.resource('quests', {
+            path: '/quests'
+        }, function () {
+            this.route('create');
+        });
+        this.resource('group', {path:'group/:group_id'},function () {
             this.route('edit');
         });
         this.resource('groups', {

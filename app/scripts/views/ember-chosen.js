@@ -17,7 +17,7 @@ App.ChosenSelectView = Em.Select.extend({
   watch: function() {
     Em.run.sync();
     Em.run.scheduleOnce('afterRender', this, function() {
-      if (this.get('state') === 'inDOM') {
+      if (this.get('_state') === 'inDOM') {
         this.$().trigger('chosen:updated');
       }
     });

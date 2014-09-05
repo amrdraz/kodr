@@ -146,7 +146,7 @@ App.SandboxView = require('./views/sandbox');
 App.MarkedMathView = require('./views/markedMath');
 App.ToggleView = require('./views/toggle');
 App.ProfileIconView = require('./views/profile-icon');
-require('./views/ember-chosen');
+App.ChosenSelectView = require('./views/ember-chosen');
 
 // Route views
 App.ApplicationView = require('./views/application');
@@ -165,6 +165,11 @@ App.GroupEditController = require('./controllers/group/edit');
 App.GroupsIndexController = require('./controllers/groups/index');
 App.GroupsCreateController = require('./controllers/group/edit');
 
+App.QuestController = require('./controllers/quest');
+App.QuestEditController = require('./controllers/quest/edit');
+App.QuestsIndexController = require('./controllers/quests/index');
+App.QuestsCreateController = require('./controllers/quest/edit');
+
 App.ChallengeController = require('./controllers/challenge');
 App.ChallengeTryController = require('./controllers/trial');
 App.ChallengeEditController = require('./controllers/challenge/edit');
@@ -182,6 +187,9 @@ App.TrialController = require('./controllers/trial');
 // Models
 App.User = require('./models/user');
 App.Group = require('./models/group');
+App.Quest = require('./models/quest');
+App.Requirement = require('./models/requirement');
+App.UserQuest = require('./models/userQuest');
 App.Arena = require('./models/arena');
 App.ArenaTrial = require('./models/arenaTrial');
 App.Challenge = require('./models/challenge');
@@ -199,6 +207,13 @@ App.GroupEditRoute = require('./routes/group/edit');
 
 App.GroupsRoute = require('./routes/groups');
 App.GroupsCreateRoute = require('./routes/groups/create');
+
+App.QuestRoute = require('./routes/quest');
+App.QuestIndexRoute = require('./routes/quest/index');
+App.QuestEditRoute = require('./routes/quest/edit');
+
+App.QuestsRoute = require('./routes/quests');
+App.QuestsCreateRoute = require('./routes/quests/create');
 
 App.ChallengeRoute = require('./routes/challenge');
 App.ChallengeIndexRoute = require('./routes/challenge/index');
