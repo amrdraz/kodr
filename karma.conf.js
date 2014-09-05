@@ -10,7 +10,7 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['qunit'],
+    frameworks: ['mocha','chai'],
     // client: {
     //     mocha: {
     //         ui:'bdd',
@@ -24,7 +24,7 @@ module.exports = function(config) {
             "app/lib/socket.io-client/socket.io.js",
             "app/lib/ember/ember.js",
             "app/lib/ember-data/ember-data.js",
-            "app/lib/ember-sockets/dist/ember-sockets.js",
+            // "app/lib/ember-sockets/dist/ember-sockets.js",
             "app/lib/ember-simple-auth/simple-auth.js",
             "app/lib/ember-simple-auth/simple-auth-oauth2.js",
             "app/lib/ember-validations-bower/ember-validations.js",
@@ -32,7 +32,7 @@ module.exports = function(config) {
             "app/lib/codemirror/lib/codemirror.js",
             // "app/lib/mocha/mocha.js",
             // "app/lib/chai/chai.js",
-            // "app/lib/ember-mocha-adapter/adapter.js",
+            "app/lib/ember-mocha-adapter/adapter.js",
             "app/lib/ember-qunit/dist/globals/main.js",
             "app/lib/MathJax/MathJax.js?config=TeX-AMS_HTML-full",
             "app/lib/jq-console/lib/jqconsole.js",
@@ -83,7 +83,7 @@ module.exports = function(config) {
     autoWatch: false,
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
 
     proxies:  {
     '/': 'http://localhost:3000/'
@@ -92,6 +92,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: true
   });
 };

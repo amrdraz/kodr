@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';
 
 window.ENV = window.ENV || {};
 // configure an authorizer to be used
@@ -44,8 +44,11 @@ Ember.Application.initializer({
 //     Ember.SimpleAuth.setup(container, application, {routeAfterLogin:'profile'});
 //   }
 // });
-
-
+try {
+    var emberSockets = EmberSockets; //cause I removed EmberSocket during testing
+} catch(e) {
+    var emberSockets = Em.Object;
+}
 var App = window.App = Ember.Application.create({
     // @if DEBUG
     LOG_ACTIVE_GENERATION: true,
@@ -56,7 +59,7 @@ var App = window.App = Ember.Application.create({
     // @endif
     // used to monotor current path
     currentPath: '',
-    Socket: EmberSockets.extend({
+    Socket: emberSockets.extend({
         // host: 'localhost',
         // port: 9000,
         // secure:true,

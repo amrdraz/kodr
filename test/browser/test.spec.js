@@ -1,34 +1,32 @@
-App.setupForTesting();
-App.injectTestHelpers();
+/* globals describe,before,beforeEach,after,afterEach,$,it,visit,fillIn,loginUser,andThen*/
+// App.setupForTesting();
+// App.injectTestHelpers();
 
-// describe('Test', function() {
-//     beforeEach(function() {
-//         App.reset();
-//     });
-
-//     it('should work', function() {
-//         visit('/arenas');
-//         // andThen(function() {
-//         //     var rows = find("ul.list-group li");
-//         //     rows.should.exist;
-//         // });
-//     });
-// });
-
-module('integration tests', {
-    setup: function() {
-        Ember.run(function() {
-            App.reset();
-            // App.Challenge.challenges = [];
+describe('Test', function() {
+    before(function(done) {
+        $.get('/seed_db', function(res) {
+            done();
         });
-    },
-    // teardown: function() {
-    //     $.mockjaxClear();
-    // }
-});
+    });
+    after(function() {
+        App.reset();
+    });
 
-test('one should equal one', function() {
-    // stubEndpointForHttpRequest('/api/arenas', {arena:[]});
-    visit("/arenas");
-    equal(1, 1, 'error: one did not equal one');
+    it('should login as teacher', function() {
+        loginUser('teacher', 'teacher123');
+        andThen(function () {
+            App.__container__.lookup('session:custom').get('user').should.exist;
+        });
+    });
+
+    describe('Quest', function () {
+        it('should list quests under /quests', function () {
+            loginUser('teacher', 'teacher123');
+            visit('/quests');
+            andThen(function() {
+                find("ul.list-group li").length.should.equal(1);
+            });
+        });
+    });
+
 });
