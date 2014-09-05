@@ -105,16 +105,6 @@ module.exports = function(req, res, next) {
     }).spread(function(ch) {
         return [
             Quest.create({
-                name: "start of a journey",
-                description: "you got 1 exp points",
-                requirements: [{
-                    property: 'exp',
-                    condition: '>=',
-                    activation: 1
-                }],
-                author: teacher.id
-            }),
-            Quest.create({
                 name: 'lab 1',
                 rp: 10,
                 requirements: [{

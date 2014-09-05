@@ -8,6 +8,7 @@ var Quest = require('../../back/models/quest');
 var UserQuest = require('../../back/models/userQuest');
 var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
+var Arena = require('../../back/models/arena');
 var User = require('../../back/models/user');
 var observer = require('../../back/mediator');
 
@@ -63,15 +64,21 @@ describe('Quest', function() {
                 return [
                     User.create(teacher),
                     User.create(student),
-                    User.create(student2)
+                    User.create(student2),
+                    Challenge.create({exp:20}),
                 ];
-            }).spread(function(t, st, st2) {
+            }).spread(function(t, st, st2,ch) {
                 student = st;
                 student2 = st2;
+                challenge = ch;
                 var at = Quest.create({
-                    name:"start of a journey",
+                    name: "start of a journey",
                     description: "you got 10 exp points",
-                    requirements: [{property:'exp', condition:'>=', activation:10}],
+                    requirements: [{
+                        model1: 'Challenge',
+                        model2: 'Arena',
+                        times: 1,
+                    }],
                     author: teacher.id
                 });
                 return [at];
@@ -93,31 +100,39 @@ describe('Quest', function() {
 
         it('should check requirments and fail', function(done) {
             quest.requirements.length.should.equal(1);
-            quest.check(student).should.be.false;
-            done();
+            quest.check(student).then(function (value) {
+                value.should.be.false;
+                done();
+            });
         });
 
         it('should check requirments and pass', function(done) {
             quest.requirements.length.should.equal(1);
-            student.exp = 10;
-            quest.check(student).should.be.true;
-            done();
+            Trial.create({challenge:challenge.id,user:student.id, complete:true},function (err, model) {
+                if (err) return done(err);
+                quest.check(student).then(function (value) {
+                    value.should.be.true;
+                    done();
+                });
+            });
         });
 
         it('should assign user to quest', function(done) {
             student.quests.length.should.equal(0);
-            quest.assign(student).then(function (userquest) {
+            quest.assignOrUpdate(student).then(function(userquest) {
                 userquest.user.should.eql(student._id);
-                return User.findOne({_id:student.id}).exec();
-            }).then(function (user) {
+                return User.findOne({
+                    _id: student.id
+                }).exec();
+            }).then(function(user) {
                 user.quests.length.should.equal(1);
             }).finally(done);
         });
 
 
-        
+
     });
-//*
+    //*
 
     describe("API", function() {
         var url = setup.url;
@@ -152,9 +167,13 @@ describe('Quest', function() {
         var accessToken;
         var quest = {
             quest: {
-                name:'lab 1',
-                rp:10,
-                requirements:[{object:{type:'Challenge', id:20},property:'complete', condition:'==', activation:true}]
+                name: 'lab 1',
+                rp: 10,
+                requirements: [{
+                    model1: 'Challenge',
+                    model2: 'Arena',
+                    times: 1,
+                }]
             }
         };
 

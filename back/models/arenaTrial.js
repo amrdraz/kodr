@@ -95,6 +95,7 @@ ArenaTrialSchema.statics.findOrCreate = function(arenaTrial) {
         var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
             return Trial.findOrCreate({
                 arenaTrial: model._id,
+                arena:model.arena,
                 user: model.user,
                 challenge: challenge._id,
                 code: challenge.setup
