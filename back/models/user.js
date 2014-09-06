@@ -94,10 +94,10 @@ var userSchema = new mongoose.Schema({
         ref: 'Group',
         childPath: "members"
     },
-    quests: {
-        type: [ObjectId],
+    userQuests: [{
+        type: ObjectId,
         ref: 'UserQuest'
-    }
+    }]
 });
 
 
@@ -105,29 +105,6 @@ userSchema.plugin(relationship, {
     relationshipPathName: ['groups', 'group']
 });
 
-/**
- * User Schema pre-save hooks.
- * It is used for hashing and salting user's password and token.
- */
-
-userSchema.pre('save', true, function(next, done) {
-    next();
-    var user = this;
-
-    if (!user.isModified('password')) return done(null, user);
-
-    var hashContent = user.username + user.password + Date.now() + Math.random();
-    user.token = crypto.createHash('sha1').update(hashContent).digest('hex');
-
-    bcrypt.genSalt(5, function(err, salt) {
-        if (err) return done(err);
-        bcrypt.hash(user.password, salt, function(err, hash) {
-            if (err) return done(err);
-            user.password = hash;
-            done(null, user);
-        });
-    });
-});
 
 /**
  * the sum of both exp and rp
@@ -137,8 +114,13 @@ userSchema.virtual('points').get(function() {
     return this.exp + this.rp;
 });
 
+// userSchema.methods.quests = function() {
+//     // UserQuest.find({_id:$in[this.userQuests]}).exec()
+// };
+
 userSchema.methods.toJSON = function() {
     var obj = this.toObject();
+    obj.id = obj._id;
     delete obj.__v;
     delete obj.password;
     delete obj.token;
@@ -177,6 +159,31 @@ userSchema.methods.award = function(type, value, obj) {
         observer.emit('user.awarded', user, type, value);
     });
 };
+
+
+/**
+ * User Schema pre-save hooks.
+ * It is used for hashing and salting user's password and token.
+ */
+
+userSchema.pre('save', true, function(next, done) {
+    next();
+    var user = this;
+
+    if (!user.isModified('password')) return done(null, user);
+
+    var hashContent = user.username + user.password + Date.now() + Math.random();
+    user.token = crypto.createHash('sha1').update(hashContent).digest('hex');
+
+    bcrypt.genSalt(5, function(err, salt) {
+        if (err) return done(err);
+        bcrypt.hash(user.password, salt, function(err, hash) {
+            if (err) return done(err);
+            user.password = hash;
+            done(null, user);
+        });
+    });
+});
 
 var User = mongoose.model('User', userSchema);
 

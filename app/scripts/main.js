@@ -170,6 +170,7 @@ App.GroupsCreateController = require('./controllers/group/edit');
 
 App.QuestController = require('./controllers/quest');
 App.QuestEditController = require('./controllers/quest/edit');
+App.QuestAssignController = require('./controllers/quest/assign');
 App.QuestsIndexController = require('./controllers/quests/index');
 App.QuestsCreateController = require('./controllers/quest/edit');
 

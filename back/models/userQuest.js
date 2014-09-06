@@ -17,19 +17,19 @@ var UserQuestSchema = new mongoose.Schema({
     },
     quest: {
         type: ObjectId,
-        ref: 'UserQuest',
-        childPath: "users"
+        ref: 'Quest',
+        childPath: "userQuests"
     },
     user: {
         type: ObjectId,
         ref: 'User',
-        childPath: "quests"
+        childPath: "userQuests"
     }
 });
 
 
 UserQuestSchema.plugin(relationship, {
-    relationshipPathName: ['user']
+    relationshipPathName: ['user', 'quest']
 });
 
 function isActive (value, condition, activation) {
@@ -54,6 +54,13 @@ UserQuestSchema.methods.check = function (user) {
         // console.log(user.get(r.property), r.property, r.condition, r.activation);
         return isActive(user.get(r.property), r.condition, r.activation);
     });
+};
+
+UserQuestSchema.methods.toJSON = function () {
+    var uq = this.toObject();
+    uq.id = uq._id;
+    delete uq.__v;
+    return uq;
 };
 
 module.exports = mongoose.model('UserQuest', UserQuestSchema);

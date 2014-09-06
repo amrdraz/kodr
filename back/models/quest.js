@@ -34,7 +34,7 @@ var QuestSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'User'
     },
-    users: [{
+    userQuests: [{
         type: ObjectId,
         ref: 'UserQuest'
     }]
@@ -60,7 +60,7 @@ function isActive(value, condition, activation) {
 
 // this function is too big and must die
 // it checks if all requirments are set and updates the userQuest of the current progress
-QuestSchema.methods.check = function(user) {
+QuestSchema.methods.check = function(userId) {
     var quest = this;
     return Promise.reduce(quest.requirements, function(met, req) {
         if (req.met >= req.times) return met && true;
@@ -69,7 +69,7 @@ QuestSchema.methods.check = function(user) {
                 if (req.id1) { //specific challenge
                     return Trial.findOne({
                         challenge: req.id1,
-                        user: user.id,
+                        user: userId,
                         complete: true
                     }).exec().then(function(tr) {
                         if (!tr) return false;
@@ -80,12 +80,12 @@ QuestSchema.methods.check = function(user) {
                     if (req.id2) { // specific arena
                         return ArenaTrial.findOne({
                             arena: req.id2,
-                            user: user.id
+                            user: userId
                         }, '_id').exec().then(function(at) {
                             if (!at) return false;
                             return Trial.find({
                                 arenaTrial: at,
-                                user: user.id,
+                                user: userId,
                                 complete: true
                             }).exec().then(function(tr) {
                                 req.met = tr.length;
@@ -95,7 +95,7 @@ QuestSchema.methods.check = function(user) {
                         });
                     } else { // any arena
                         return Trial.find({
-                            user: user.id,
+                            user: userId,
                             complete: true
                         }).exec().then(function(tr) {
                             req.met = tr.length;
@@ -108,7 +108,7 @@ QuestSchema.methods.check = function(user) {
                 if (req.id1) { //specific Arena
                     return ArenaTrial.findOne({
                         arena: req.id1,
-                        user: user.id,
+                        user: userId,
                         complete: true
                     }).exec().then(function(tr) {
                         if (!tr) return false;
@@ -116,7 +116,7 @@ QuestSchema.methods.check = function(user) {
                     });
                 } else { //any arena
                     return ArenaTrial.find({
-                        user: user.id,
+                        user: userId,
                         complete: true
                     }).exec().then(function(tr) {
                         req.met = tr.length;
@@ -127,7 +127,7 @@ QuestSchema.methods.check = function(user) {
             }
         });
     }, true).then(function(value) {
-        return Quest.assignOrUpdate(user, quest).then(function(uq) {
+        return Quest.assignOrUpdate(userId, quest).then(function(uq) {
             // uq.requirements.forEach(function(req) {
             //     console.log('--', req);
             // });
@@ -136,8 +136,8 @@ QuestSchema.methods.check = function(user) {
     });
 };
 
-QuestSchema.methods.assignOrUpdate = function(user) {
-    return Quest.assignOrUpdate(user, this);
+QuestSchema.methods.assignOrUpdate = function(userId) {
+    return Quest.assignOrUpdate(userId, this);
 };
 
 /**
@@ -146,10 +146,10 @@ QuestSchema.methods.assignOrUpdate = function(user) {
  * @param  {[type]} quest [description]
  * @return {[type]}       [description]
  */
-QuestSchema.statics.assignOrUpdate = function(user, quest) {
+QuestSchema.statics.assignOrUpdate = function(userId, quest) {
     return Promise.fulfilled().then(function(argument) {
         return UserQuest.findOne({
-            user: user.id,
+            user: userId,
             quest: quest.id
         }).exec();
     }).then(function(model) {
@@ -163,7 +163,7 @@ QuestSchema.statics.assignOrUpdate = function(user, quest) {
             });
         }
         return UserQuest.create({
-            user: user.id,
+            user: userId,
             quest: quest.id,
             requirements: quest.requirements
         });

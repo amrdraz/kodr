@@ -118,18 +118,19 @@ describe('Quest', function() {
         });
 
         it('should assign user to quest', function(done) {
-            student.quests.length.should.equal(0);
+            student.userQuests.length.should.equal(0);
             quest.assignOrUpdate(student).then(function(userquest) {
                 userquest.user.should.eql(student._id);
-                return User.findOne({
+                return [Quest.findOne({
+                    _id: quest.id
+                }).exec(),User.findOne({
                     _id: student.id
-                }).exec();
-            }).then(function(user) {
-                user.quests.length.should.equal(1);
+                }).exec()];
+            }).spread(function(quest,user) {
+                user.userQuests.length.should.equal(1);
+                quest.userQuests.length.should.equal(1);
             }).finally(done);
         });
-
-
 
     });
     //*
@@ -246,7 +247,7 @@ describe('Quest', function() {
             it("should return a quest by id without its users if student", function(done) {
                 request(api)
                     .get("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('Authorization', 'Bearer ' + student.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -264,7 +265,8 @@ describe('Quest', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.quest._id.should.exist;
-                        // res.body.users.length.should.equal(0);
+                        res.body.users.length.should.equal(0);
+                        res.body.userQuests.length.should.equal(0);
                         done();
                     });
             });
@@ -285,6 +287,18 @@ describe('Quest', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.quest.length.should.equal(1);
+                        done();
+                    });
+            });
+
+            it("should return a list of all users that can be assigned to a quest", function(done) {
+                request(api)
+                    .get("/quests/"+quest.id+"/unassignedUsersOptions")
+                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.length.should.equal(2); //2 students I created
                         done();
                     });
             });
@@ -334,6 +348,23 @@ describe('Quest', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.quest.name.should.equal(update.quest.name);
+                        done();
+                    });
+            });
+
+            it("should assign student a quest if teacher", function(done) {
+                var update = {
+                    users: [student.id],
+                    groups:[]
+                };
+                request(api)
+                    .put("/quests/" + quest.id+ "/assign")
+                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .send(update)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.userQuest.length.should.equal(1);
                         done();
                     });
             });

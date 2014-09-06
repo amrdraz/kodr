@@ -1,11 +1,12 @@
 module.exports = DS.Model.extend({
     requirements: DS.attr(),
+    met:DS.attr('number'),
     quest: DS.belongsTo('Quest', {
         async: true,
-        inverse: 'users'
+        inverse: 'userQuests'
     }),
     user: DS.belongsTo('User', {
         async: true,
-        inverse: 'quests'
+        inverse: 'userQuests'
     })
 });

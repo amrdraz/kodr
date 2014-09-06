@@ -21,6 +21,8 @@ module.exports = function(app, passport) {
     require('./routes/group')(app, passport);
     // quest routes
     require('./routes/quest')(app, passport);
+    // userQuest routes
+    require('./routes/userQuest')(app, passport);
 
     if(process.env.NODE_ENV!=='production') {
         app.get('/seed_db', require('./seed_db'));
