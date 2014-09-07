@@ -1,5 +1,22 @@
+App.QuestRequirementTransform = App.QuestRequirementTransform || DS.Transform.extend({
+  deserialize: function(serialized) {
+    return serialized.map(function  (req) {
+        return App.Requirement.create(req);
+    });
+  },
+  serialize: function(deserialized) {
+    console.log('serializing', deserialized);
+    return deserialized.map(function (req) {
+        return req.serialize();
+    });
+  }
+});
+
 module.exports = DS.Model.extend({
-    requirements: DS.attr(),
+    name: DS.attr('string'),
+    description: DS.attr('string'),
+    rp: DS.attr('number'),
+    requirements: DS.attr('questRequirement'),
     met:DS.attr('number'),
     quest: DS.belongsTo('Quest', {
         async: true,

@@ -78,28 +78,31 @@ module.exports = function(req, res, next) {
                 arena: a.id,
                 author: teacher._id,
                 name: 'Define x',
+                description: 'Define a new `var` __x__ with value equal to 3',
                 exp: 1,
                 solution: 'var x = 3;',
                 setup: '',
-                tests: 'describe(function () {it("should define x", function () {expect(x).toBeDefined();});it("should define x", function () {expect(x).toEqual(3);});});'
+                tests: 'describe("test", function () {it("should define x", function () {expect(x).toBeDefined();});it("should define x", function () {expect(x).toEqual(3);});});'
             }),
             Challenge.create({
                 arena: a.id,
                 author: teacher._id,
                 name: 'Define y',
+                description: 'Define a new `var` __y__ with value equal to 3',
                 exp: 1,
                 solution: 'var y = 3;',
                 setup: '',
-                tests: 'describe(function () {it("should define y", function () {expect(y).toBeDefined();});it("should define y", function () {expect(y).toEqual(3);});});'
+                tests: 'describe("test",function () {it("should define y", function () {expect(y).toBeDefined();});it("should define y", function () {expect(y).toEqual(3);});});'
             }),
             Challenge.create({
                 arena: a.id,
                 author: teacher._id,
                 name: 'Define z',
+                description: 'Define a new `var` __z__ with value equal to 3',
                 exp: 1,
                 solution: 'var z = 3;',
                 setup: '',
-                tests: 'describe(function () {it("should define z", function () {expect(z).toBeDefined();});it("should define z", function () {expect(z).toEqual(3);});});'
+                tests: 'describe("test",function () {it("should define z", function () {expect(z).toBeDefined();});it("should define z", function () {expect(z).toEqual(3);});});'
             }),
         ];
     }).spread(function(ch) {
@@ -122,7 +125,9 @@ module.exports = function(req, res, next) {
                 author: teacher.id
             })
         ];
-    }).then(function function_name(argument) {
+    }).spread(function(q) {
+        return q.assignOrUpdate(student.id);
+    }).then(function(q) {
         res.send('All Seeded');
     }).catch(function(err) {
         console.log(err);

@@ -15,13 +15,13 @@ module.exports = function(app, passport) {
 
     app.get('/api/userQuests/:id', access.requireRole(), function(req, res, next) {
         Promise.fulfilled().then(function() {
-            return UserQuest.find({
-                    userQuest: req.params.id
-                }).populate('user userQuest').exec();
+            return UserQuest.findOne({
+                    _id: req.params.id
+                }).exec();
         }).then(function(q) {
             if (!q) return res.send(404, "Not Found");
             res.json({
-                userQuests: q
+                userQuest: q
             });
         }).catch(next);
     });

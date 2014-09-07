@@ -1,4 +1,6 @@
+var Promise = require('bluebird');
 var User = require('../models/user');
+var UserQuest = require('../models/userQuest');
 var access = require('./access');
 
 module.exports = function(app, passport) {
@@ -10,9 +12,16 @@ module.exports = function(app, passport) {
      */
     
     app.get('/profile', access.requireRole(), function(req, res) {
-        res.json(
-            req.user
+        Promise.fulfilled().then(function () {
+            return [UserQuest.find({user:req.user.id}).exec()];
+        }).spread(function (uqs) {
+            console.log(uqs);
+             res.send({
+                user:req.user,
+                userQuests:uqs
+             }
         );
+        });
     });
 
     app.post('/profile', access.requireRole(), function(req, res) {

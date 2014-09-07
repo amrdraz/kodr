@@ -2,7 +2,7 @@ var ProfileRoute = Ember.Route.extend(SimpleAuth.AuthenticatedRouteMixin);
 
 ProfileRoute.reopen({
     model: function () {
-        return Em.$.get('profile');
+        return this.get('session.user');
     }
 });
 

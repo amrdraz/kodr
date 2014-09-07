@@ -11,14 +11,14 @@
     <li class="list-group-item text-right"><span class="pull-left"><strong>Rank</strong></span> 1</li>
     <li class="list-group-item text-right"><span class="pull-left"><strong>Clan</strong></span> Avengers</li>
 </ul>
-
+{{!-- 
 <ul class="list-group">
     <li class="list-group-item text-muted">Activities</li>
     <li class="list-group-item">Something Happend</li>
     <li class="list-group-item">Something Happend</li>
     <li class="list-group-item">Something Happend</li>
     <li class="list-group-item">Something Happend</li>
-</ul> 
+</ul>  --}}
 </section>
 <section class="col-md-8">
     <ul class="nav nav-tabs" role="tablist">
@@ -30,11 +30,26 @@
 
     <!-- Tab panes -->
     <div class="tab-content">
-      <div class="tab-pane active" id="home">
+      <div class="tab-pane" id="home">
       </div>
       <div class="tab-pane" id="progress">...</div>
-      <div class="tab-pane" id="quests">...</div>
-      <div class="tab-pane" id="achievements">...</div>
+      {{#if session.isStudent }}
+        <div class="tab-pane active" id="quests">
+          {{#each quest in model.userQuests}}
+            {{quest.name}}
+            <ul class="list-group">    
+            {{#each req in quest.requirements}}
+                  <li class="list-group-item">
+                     {{partial '_requirement' }}
+                  </li>
+                {{else}}
+                  Does not have any requirements
+                {{/each}}
+            </ul>
+          {{/each}}
+        </div>
+        <div class="tab-pane" id="achievements">...</div>
+      {{/if}}
       <div class="tab-pane" id="settings">...</div>
     </div>
 </section>

@@ -27,6 +27,10 @@ var QuestSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
+    isPublished:{
+        type:Boolean,
+        default:false
+    },
     requirements: [{
         type: Mixed,
     }],
@@ -39,24 +43,6 @@ var QuestSchema = new mongoose.Schema({
         ref: 'UserQuest'
     }]
 });
-
-
-function isActive(value, condition, activation) {
-    var res = false;
-    switch (condition) {
-        case '>=':
-            res = (value >= activation);
-            break;
-        case '<=':
-            res = (value <= activation);
-            break;
-        case '==':
-            res = (value === activation);
-            break;
-    }
-
-    return res;
-}
 
 // this function is too big and must die
 // it checks if all requirments are set and updates the userQuest of the current progress
@@ -127,7 +113,7 @@ QuestSchema.methods.check = function(userId) {
             }
         });
     }, true).then(function(value) {
-        return Quest.assignOrUpdate(userId, quest).then(function(uq) {
+        return Quest.assign(userId, quest).then(function(uq) {
             // uq.requirements.forEach(function(req) {
             //     console.log('--', req);
             // });
@@ -136,37 +122,26 @@ QuestSchema.methods.check = function(userId) {
     });
 };
 
-QuestSchema.methods.assignOrUpdate = function(userId) {
-    return Quest.assignOrUpdate(userId, this);
+QuestSchema.methods.assign = function(userId) {
+    return Quest.assign(userId, this);
 };
 
 /**
  * Assign quest to user or updates requirements if already assigned
- * @param  {[type]} user  [description]
- * @param  {[type]} quest [description]
- * @return {[type]}       [description]
+ * @param  {ObjectId} userId  [description]
+ * @param  {Quest} quest [description]
+ * @return {UserQuest}       [description]
  */
-QuestSchema.statics.assignOrUpdate = function(userId, quest) {
-    return Promise.fulfilled().then(function(argument) {
-        return UserQuest.findOne({
-            user: userId,
-            quest: quest.id
-        }).exec();
-    }).then(function(model) {
-        if (model) {
-            model.requirements = quest.requirements;
-            return new Promise(function(resolve, reject) {
-                model.save(function(err, model) {
-                    if (err) return reject(err);
-                    resolve(model);
-                });
-            });
-        }
+QuestSchema.statics.assign = function(userId, quest) {
+    if(!quest.isPublished) return Promise.reject('You can not assign an Un-Published quest');
+    return Promise.fulfilled().then(function() {
         return UserQuest.create({
-            user: userId,
+            name:quest.name,
+            description:quest.description,
+            rp:quest.rp,
             quest: quest.id,
-            requirements: quest.requirements
-        });
+            user: userId
+        }).setRequirements(quest.requirments);
     });
 };
 var Quest = module.exports = mongoose.model('Quest', QuestSchema);

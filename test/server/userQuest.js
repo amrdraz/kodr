@@ -5,6 +5,7 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var setup = require('./setup');
 var Quest = require('../../back/models/quest');
+var Requirement = require('../../back/models/requirement');
 var UserQuest = require('../../back/models/userQuest');
 var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
@@ -18,17 +19,17 @@ var observer = require('../../back/mediator');
  *
  * API
  *
- * GET      quests                  return a list of quests
- * GET      quests/:id              return a quest with it's challenges
- * POST     quests/:id              create a quest given name and description
- * PUT      quests/:id              updates name or description of quest
- * put      quests/user/:id    add a user to the arena
- * DELETE   quests/:id              delete quest by id
- * delete   quests/user/:id    removes a user from this arena
+ * GET      userQuests                  return a list of userQuests
+ * GET      userQuests/:id              return a userQuest with it's challenges
+ * POST     userQuests/:id              create a userQuest given name and description
+ * PUT      userQuests/:id              updates name or description of userQuest
+ * put      userQuests/user/:id    add a user to the arena
+ * DELETE   userQuests/:id              delete userQuest by id
+ * delete   userQuests/user/:id    removes a user from this arena
  *
  */
 
-describe('Quest', function() {
+describe('UserQuest', function() {
     before(function(done) {
         return setup.clearDB(done);
     });
@@ -37,7 +38,7 @@ describe('Quest', function() {
         var student,
             student2,
             teacher,
-            quest, challenge, challenge2;
+            userQuest, challenge, challenge2;
         beforeEach(function(done) {
             student = {
                 username: 'student',
@@ -64,28 +65,21 @@ describe('Quest', function() {
                 return [
                     User.create(teacher),
                     User.create(student),
-                    User.create(student2),
-                    Challenge.create({exp:20}),
+                    User.create(student2)
                 ];
-            }).spread(function(t, st, st2,ch) {
+            }).spread(function(t, st, st2) {
                 student = st;
                 student2 = st2;
-                challenge = ch;
-                var at = Quest.create({
+                var at = UserQuest.create({
                     name: "start of a journey",
                     description: "you got 10 exp points",
-                    requirements: [{
-                        model1: 'Challenge',
-                        model2: 'Arena',
-                        times: 1,
-                    }],
-                    author: teacher.id
+                    user:student.id
                 });
                 return [at];
             }).spread(function(g) {
-                quest = g;
-                expect(quest).to.exist;
-                // console.log(quest);
+                userQuest = g;
+                expect(userQuest).to.exist;
+                // console.log(userQuest);
                 return [User.findOne({
                     _id: teacher.id
                 }).exec(), User.findOne({
@@ -98,40 +92,105 @@ describe('Quest', function() {
         });
         afterEach(setup.clearDB);
 
-        it('should check requirments and fail', function(done) {
-            quest.requirements.length.should.equal(1);
-            quest.check(student).then(function (value) {
-                value.should.be.false;
-                done();
-            });
-        });
-
-        it('should check requirments and pass', function(done) {
-            quest.requirements.length.should.equal(1);
-            Trial.create({challenge:challenge.id,user:student.id, complete:true},function (err, model) {
-                if (err) return done(err);
-                quest.check(student).then(function (value) {
-                    value.should.be.true;
-                    done();
-                });
-            });
-        });
-
-        it('should assign user to quest', function(done) {
-            student.userQuests.length.should.equal(0);
-            quest.assignOrUpdate(student.id).then(function(userquest) {
-                userquest.user.should.eql(student._id);
-                return [Quest.findOne({
-                    _id: quest.id
-                }).exec(),User.findOne({
-                    _id: student.id
-                }).exec()];
-            }).spread(function(quest,user) {
-                user.userQuests.length.should.equal(1);
-                quest.userQuests.length.should.equal(1);
+        it('should set requirments', function(done) {
+            userQuest.requirements.length.should.equal(0);
+            var ch = new Challenge();
+            var arena = new Arena();
+            userQuest.setRequirements([{
+                model1: 'Challenge',
+                id1: ch.id,
+                model2: 'Arena',
+                id2: undefined,
+            }, {
+                model1: 'Challenge',
+                id1: undefined,
+                times: 2,
+                model2: 'Arena',
+                id2: arena.id,
+            }]).then(function(uq) {
+                uq.requirements.length.should.equal(2);
             }).finally(done);
         });
 
+        it('should not set same requirments again', function(done) {
+            userQuest.requirements.length.should.equal(0);
+            var ch = new Challenge();
+            var arena = new Arena();
+            var reqs = [{
+                model1: 'Challenge',
+                id1: ch.id,
+                model2: 'Arena',
+                id2: undefined,
+            }, {
+                model1: 'Challenge',
+                id1: undefined,
+                times: 2,
+                model2: 'Arena',
+                id2: arena.id,
+            }];
+            userQuest.setRequirements(reqs).then(function(uq) {
+                return uq.setRequirements(reqs);
+            }).then(function(uq) {
+                uq.requirements.length.should.equal(2);
+            }).finally(done);
+        });
+        it('should create new requirments if repeat time is higher adding the already completed number of times', function(done) {
+            userQuest.requirements.length.should.equal(0);
+            var ch = new Challenge();
+            new Requirement({
+                model1: 'Challenge',
+                id1: ch.id,
+                model2: 'Arena',
+                id2: undefined,
+                times: 2,
+                completed: 1,
+                user:userQuest.user,
+                userQuests: [userQuest.id]
+            }).save(function(err, req) {
+                if (err) return done(err);
+                userQuest.setRequirements([{
+                    model1: 'Challenge',
+                    id1: ch.id,
+                    model2: 'Arena',
+                    id2: undefined,
+                    times: 3,
+                }]).then(function(uq) {
+                    uq.requirements.length.should.equal(2);
+                    return Requirement.findOne({times:3}).exec();
+                }).then(function (req) {
+                    req.completed.should.equal(1);
+                }).finally(done);
+            });
+        });
+        it('should create new requirments if repeat time is lower and it should be marked as complete', function(done) {
+            userQuest.requirements.length.should.equal(0);
+            var ch = new Challenge();
+            new Requirement({
+                model1: 'Challenge',
+                id1: ch.id,
+                model2: 'Arena',
+                id2: undefined,
+                times: 3,
+                completed: 2,
+                user:userQuest.user,
+                userQuests: [userQuest.id]
+            }).save(function(err, req) {
+                if (err) return done(err);
+                userQuest.setRequirements([{
+                    model1: 'Challenge',
+                    id1: ch.id,
+                    model2: 'Arena',
+                    id2: undefined,
+                    times: 2,
+                }]).then(function(uq) {
+                    uq.requirements.length.should.equal(2);
+                    return Requirement.findOne({times:2}).exec();
+                }).then(function (req) {
+                    req.completed.should.equal(2);
+                    req.complete.should.be.true;
+                }).finally(done);
+            });
+        });
     });
     //*
 
@@ -166,15 +225,10 @@ describe('Quest', function() {
                 activated: true
             };
         var accessToken;
-        var quest = {
-            quest: {
+        var userQuest = {
+            userQuest: {
                 name: 'lab 1',
-                rp: 10,
-                requirements: [{
-                    model1: 'Challenge',
-                    model2: 'Arena',
-                    times: 1,
-                }]
+                rp: 10
             }
         };
 
@@ -183,9 +237,12 @@ describe('Quest', function() {
                 return [
                     User.create(teacher),
                     User.create(student),
-                    User.create(student2)
+                    User.create(student2),
+                    Quest.create(userQuest.userQuest)
                 ];
-            }).spread(function(t, st, st2) {
+            }).spread(function(t, st, st2, q) {
+                userQuest.userQuest.userQuest = q.id;
+                userQuest.userQuest.user = st.id;
                 // console.log(st,t,a);
                 st.password = student.password;
                 student = st;
@@ -193,6 +250,7 @@ describe('Quest', function() {
                 student2 = st2;
                 t.password = teacher.password;
                 teacher = t;
+
             }).finally(done);
         });
 
@@ -202,33 +260,33 @@ describe('Quest', function() {
 
             it("should not work without accessToken", function(done) {
                 request(api)
-                    .post("/quests")
-                    .send(quest)
+                    .post("/userQuests")
+                    .send(userQuest)
                     .expect(401)
                     .end(done);
             });
 
-            it("should not create a quest if student", function(done) {
+            it("should not create a userQuest if student", function(done) {
                 request(api)
-                    .post("/quests")
+                    .post("/userQuests")
                     .set('Authorization', 'Bearer ' + student.token)
-                    .send(quest)
+                    .send(userQuest)
                     .expect(401)
                     .end(done);
             });
 
-            it("should create a quest if teacher", function(done) {
+            it("should create a userQuest if teacher", function(done) {
                 request(api)
-                    .post("/quests")
+                    .post("/userQuests")
                     .set('Authorization', 'Bearer ' + teacher.token)
-                    .send(quest)
+                    .send(userQuest)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        expect(res.body.quest._id).to.exist;
-                        expect(res.body.quest.name).to.exist;
-                        quest.id = res.body.quest._id;
-                        quest.quest = quest;
+                        expect(res.body.userQuest._id).to.exist;
+                        expect(res.body.userQuest.name).to.exist;
+                        userQuest.id = res.body.userQuest._id;
+                        userQuest.userQuest = userQuest;
                         done();
                     });
             });
@@ -236,69 +294,42 @@ describe('Quest', function() {
 
         describe("GET", function() {
 
-            it("should get quest not work without accessToken", function(done) {
+            it("should get userQuest not work without accessToken", function(done) {
                 request(api)
-                    .get("/quests/" + quest.id)
+                    .get("/userQuests/" + userQuest.id)
                     .send()
                     .expect(401)
                     .end(done);
             });
 
-            it("should return a quest by id without its users if student", function(done) {
+            it("should return a userQuest", function(done) {
                 request(api)
-                    .get("/quests/" + quest.id)
+                    .get("/userQuests/" + userQuest.id)
                     .set('Authorization', 'Bearer ' + student.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.quest._id.should.exist;
-                        expect(res.body.users).to.not.exist;
+                        res.body.userQuest._id.should.exist;
                         done();
                     });
             });
 
-            it("should return a quest by id with its users only if teacher", function(done) {
+            it("should get userQuests not work without accessToken", function(done) {
                 request(api)
-                    .get("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.quest._id.should.exist;
-                        res.body.users.length.should.equal(0);
-                        res.body.userQuests.length.should.equal(0);
-                        done();
-                    });
-            });
-
-            it("should get quests not work without accessToken", function(done) {
-                request(api)
-                    .get("/quests/")
+                    .get("/userQuests/")
                     .send()
                     .expect(401)
                     .end(done);
             });
 
-            it("should return a list of all quests on if teacher", function(done) {
+            it("should return a list of all userQuests on if teacher", function(done) {
                 request(api)
-                    .get("/quests")
+                    .get("/userQuests")
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.quest.length.should.equal(1);
-                        done();
-                    });
-            });
-
-            it("should return a list of all users that can be assigned to a quest", function(done) {
-                request(api)
-                    .get("/quests/"+quest.id+"/unassignedUsersOptions")
-                    .set('Authorization', 'Bearer ' + teacher.token)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.length.should.equal(2); //2 students I created
+                        res.body.userQuest.length.should.equal(1);
                         done();
                     });
             });
@@ -309,95 +340,79 @@ describe('Quest', function() {
 
             it("should not work without accessToken", function(done) {
                 var update = {
-                    quest: {
+                    userQuest: {
                         name: "new name"
                     }
                 };
                 request(api)
-                    .put("/quests/" + quest.id)
+                    .put("/userQuests/" + userQuest.id)
                     .send(update)
                     .expect(401)
                     .end(done);
             });
 
-            it("should not update a quest if student", function(done) {
+            it("should not update a userQuest if student", function(done) {
                 var update = {
-                    quest: {
+                    userQuest: {
                         name: "new name"
                     }
                 };
                 request(api)
-                    .put("/quests/" + quest.id)
+                    .put("/userQuests/" + userQuest.id)
                     .set('Authorization', 'Bearer ' + student.token)
                     .send(update)
                     .expect(401)
                     .end(done);
             });
 
-            it("should update a quest if teacher", function(done) {
+            it("should update a userQuest if teacher", function(done) {
                 var update = {
-                    quest: {
+                    userQuest: {
                         name: "new name"
                     }
                 };
                 request(api)
-                    .put("/quests/" + quest.id)
+                    .put("/userQuests/" + userQuest.id)
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.quest.name.should.equal(update.quest.name);
+                        res.body.userQuest.name.should.equal(update.userQuest.name);
                         done();
                     });
             });
 
-            it("should assign student a quest if teacher", function(done) {
-                var update = {
-                    users: [student.id],
-                    groups:[]
-                };
-                request(api)
-                    .put("/quests/" + quest.id+ "/assign")
-                    .set('Authorization', 'Bearer ' + teacher.token)
-                    .send(update)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.userQuests.length.should.equal(1);
-                        done();
-                    });
-            });
         });
 
         describe("DELETE", function() {
 
             it("should not work without accessToken", function(done) {
                 request(api)
-                    .del("/quests/" + quest.id)
+                    .del("/userQuests/" + userQuest.id)
                     .expect(401)
                     .end(done);
             });
 
-            it("should not delete a quest if student", function(done) {
+            it("should not delete a userQuest if student", function(done) {
                 request(api)
-                    .del("/quests/" + quest.id)
+                    .del("/userQuests/" + userQuest.id)
                     .set('Authorization', 'Bearer ' + student.token)
                     .expect(401)
                     .end(done);
             });
 
-            it("should delete a quest if teacher", function(done) {
+            it("should delete a userQuest if teacher", function(done) {
                 request(api)
-                    .del("/quests/" + quest.id)
+                    .del("/userQuests/" + userQuest.id)
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .expect(200)
                     .end(done);
             });
 
-            it("should not delete throw an error if quest already deleted", function(done) {
+            it("should not delete throw an error if userQuest already deleted", function(done) {
                 request(api)
-                    .del("/quests/" + quest.id)
+                    .del("/userQuests/" + userQuest.id)
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .expect(404)
                     .end(done);
