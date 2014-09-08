@@ -48,7 +48,7 @@ module.exports = function(app, passport) {
                 }).exec(),
                 UserQuest.find({
                     quest: req.params.id
-                }).exec()
+                }).populate('requirements').exec()
             ];
         }).spread(function(q, uqs) {
             var arr = [q, uqs];
@@ -154,7 +154,7 @@ module.exports = function(app, passport) {
                 users = _.union(users,_.flatten(groups,'members'));
             }
             return Promise.map(users, function(userId) {
-                return model.assignOrUpdate(userId);
+                return model.assign(userId);
             });
         }).then(function(uqs) {
             var usrs = User.find({
@@ -172,7 +172,10 @@ module.exports = function(app, passport) {
                 userQuests: userquests,
                 users:users
             });
-        }).catch(next);
+        }).catch(function (err) {
+            if(typeof err === 'string') return res.send(401,err);
+            next(err);
+        });
     });
 
     /**

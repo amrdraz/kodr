@@ -23,10 +23,20 @@ module.exports = DS.Model.extend({
         async: true,
         inverse: 'quest'
     }),
+    isPublished:DS.attr('boolean', {defaultValue:false}),
     users: function () {
         return this.get('userQuests').getEach('user');
-    }.property('userQuests.@each.relationshipsLoaded')
+    }.property('userQuests.@each.relationshipsLoaded'),
 
+    canSave: function() {
+        return this.get('isNew') || (!this.get('isSaving') && this.get('isDirty') && !this.get('isPublished'));
+    }.property('isDirty', 'isPublished'),
+    canReset: function() {
+        return !this.get('isSaving') && this.get('isDirty') && !this.get('isNew');
+    }.property('isDirty'),
+    canPublish: function() {
+        return !this.get('canSave')&& !this.get('isPublished');
+    }.property('canSave')
     // usersOptions: function() {
     //     var store = this.store;
     //     var dfd = DS.PromiseArray.create({

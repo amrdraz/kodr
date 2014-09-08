@@ -375,38 +375,7 @@ describe('User', function() {
                     });
             });
         });
-        describe("Profile", function() {
-            it("access should not work without token", function(done) {
-                request(url)
-                    .get("/profile")
-                    .expect(401)
-                    .end(done);
-            });
-
-            it("acess should work with token", function(done) {
-                request(url)
-                    .get("/profile")
-                    .set('Authorization', 'Bearer ' + accessToken)
-                    .expect(200)
-                    .end(done);
-            });
-
-            it("should return User object", function(done) {
-                request(url)
-                    .get("/profile")
-                    .set('Authorization', 'Bearer ' + accessToken)
-                    .expect(200)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.body.username.should.equal(user.username);
-                        res.body.email.should.equal(user.email);
-                        res.body.should.have.property("_id");
-                        user._id = res.body._id;
-                        done();
-                    });
-            });
-        });
-
+        
         describe("Token", function() {
 
             it("should not change after User is saved", function(done) {

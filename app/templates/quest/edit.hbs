@@ -1,7 +1,10 @@
 <section class="quest-controlles row">
   <ul class="nav nav-pills pull-right">
-    <li {{action "save"}} {{bind-attr class="isDirty::disabled :quest-save" }} >
+    <li {{action "save"}} {{bind-attr class="shouldSave::disabled :quest-save" }} >
       <a href="#"><i class="glyphicon glyphicon-save"></i> Save</a>
+    </li>
+    <li {{action "publish"}} {{bind-attr class="canPublish::disabled :quest-publish "}} title="after publishing you can no longer change the vaalue of this quest">
+      <a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a>
     </li>
     <li {{action 'delete' }} class="quest-delete">
       <a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a>

@@ -1,10 +1,12 @@
 var mongoose = require('mongoose');
+var relationship = require("mongoose-relationship");
 var Promise = require('bluebird');
 var _ = require('lodash');
+var Requirement = require('./requirement');
+var ArenaTrial = require('./arenaTrial');
+var Trial = require('./trial');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
-var Requirement = require('./requirement');
-var relationship = require("mongoose-relationship");
 
 /**
  * UserQuest Schema.
@@ -54,9 +56,77 @@ UserQuestSchema.methods.toJSON = function() {
     return uq;
 };
 
-UserQuestSchema.methods.check = function(user) {
-    return this.requirements.every(function(r) {
-        // console.log(user.get(r.property), r.property, r.condition, r.activation);
+
+// this function is too big and must die
+// it checks if all requirments are set and updates the userQuest of the current progress
+UserQuestSchema.methods.check = function(userId) {
+    var quest = this;
+    return Promise.reduce(quest.requirements, function(met, req) {
+        if (req.met >= req.times) return met && true;
+        return Promise.fulfilled().then(function() {
+            if (req.model1 === 'Challenge') {
+                if (req.id1) { //specific challenge
+                    return Trial.findOne({
+                        challenge: req.id1,
+                        user: userId,
+                        complete: true
+                    }).exec().then(function(tr) {
+                        if (!tr) return false;
+                        req.met = 1;
+                        return met && req.met;
+                    });
+                } else { //any challenge
+                    if (req.id2) { // specific arena
+                        return ArenaTrial.findOne({
+                            arena: req.id2,
+                            user: userId
+                        }, '_id').exec().then(function(at) {
+                            if (!at) return false;
+                            return Trial.find({
+                                arenaTrial: at,
+                                user: userId,
+                                complete: true
+                            }).exec().then(function(tr) {
+                                req.met = tr.length;
+                                if (req.met < req.times) return false;
+                                return met && true;
+                            });
+                        });
+                    } else { // any arena
+                        return Trial.find({
+                            user: userId,
+                            complete: true
+                        }).exec().then(function(tr) {
+                            req.met = tr.length;
+                            if (req.met < req.times) return false;
+                            return met && true;
+                        });
+                    }
+                }
+            } else {
+                if (req.id1) { //specific Arena
+                    return ArenaTrial.findOne({
+                        arena: req.id1,
+                        user: userId,
+                        complete: true
+                    }).exec().then(function(tr) {
+                        if (!tr) return false;
+                        return met && true;
+                    });
+                } else { //any arena
+                    return ArenaTrial.find({
+                        user: userId,
+                        complete: true
+                    }).exec().then(function(tr) {
+                        req.met = tr.length;
+                        if (req.met < req.times) return false;
+                        return met && true;
+                    });
+                }
+            }
+        });
+    }, true).then(function(value) {
+
     });
 };
 
@@ -75,6 +145,7 @@ UserQuestSchema.methods.setRequirements = function(requirements) {
     return Promise.map(requirements, function(r) {
         r.times = r.times || 1;
         r.user = userQuest.user;
+        console.log(r);
         var query = {
             model1: r.model1,
             id1: r.id1,
@@ -85,16 +156,31 @@ UserQuestSchema.methods.setRequirements = function(requirements) {
         // console.log(query);
         return Requirement.findOne(query).sort('-times').exec().then(function(req) {
             if (req && req.times === r.times) { //requirment already exist with exaclty the same number of times
-                return Requirement.findOneAndUpdate({
-                    _id: req._id
-                }, {
-                    $addToSet: {
-                        userQuests: userQuest._id //add userQuest is not already there
-                    }
-                }, {
-                    safe: true,
-                    upsert: true
-                }).exec();
+                req.userQuests.push(userQuest._id);
+                var userQuests = _.uniq(req.userQuests, function(id) {
+                    return id.toString();
+                });
+                if (req.userQuests.length!==userQuests.length) {
+                    req.userQuests = req.userQuests;
+                    req.markModified('userQuests');
+                    return new Promise(function (resolve,reject) {
+                        req.save(function(err, model) {
+                            if(err) return reject(err);
+                            resolve(model);
+                        });
+                    });
+                }
+                return req;
+                // return Requirement.findOneAndUpdate({
+                //     _id: req._id
+                // }, {
+                //     $addToSet: {
+                //         userQuests: userQuest._id //add userQuest is not already there
+                //     }
+                // }, {
+                //     safe: true,
+                //     upsert: true
+                // }).exec();
             } else {
                 if (req) { // a similar req already exist but differen repat times
                     r.completed = Math.min(req.completed, r.times);
@@ -105,20 +191,10 @@ UserQuestSchema.methods.setRequirements = function(requirements) {
             }
         });
     }).then(function(reqs) {
-        var ids = _.map(reqs, '_id');
         // console.log(ids);
         return UserQuest.findOneAndUpdate({
             _id: userQuest.id
-        }, {
-            $addToSet: {
-                requirements: {
-                    $each: ids
-                }
-            }
-        }, {
-            safe: true,
-            upsert: true
-        }).exec();
+        }).populate('requirements').exec();
     });
 };
 

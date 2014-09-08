@@ -40,6 +40,10 @@ module.exports = Em.ObjectController.extend({
                     console.log(res);
                     that.store.pushMany('user',res.users);
                     return that.store.pushMany('userQuest',res.userQuests);
+                }, function (err) {
+                    console.log(err);
+                    toastr.error(err);
+                    return false;
                 }).then(function (userQuests) {
                     that.get('model.userQuests').then(function (uqs) {
                         uqs.addObjects(userQuests);
@@ -50,6 +54,7 @@ module.exports = Em.ObjectController.extend({
             } else {
                 toastr.info('You need to pick a user or a group to assign');
             }
+            return false;
         },
         remove: function(uq) {
             var that = this;

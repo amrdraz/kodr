@@ -65,9 +65,11 @@ describe('Quest', function() {
                     User.create(teacher),
                     User.create(student),
                     User.create(student2),
-                    Challenge.create({exp:20}),
+                    Challenge.create({
+                        exp: 20
+                    }),
                 ];
-            }).spread(function(t, st, st2,ch) {
+            }).spread(function(t, st, st2, ch) {
                 student = st;
                 student2 = st2;
                 challenge = ch;
@@ -79,6 +81,7 @@ describe('Quest', function() {
                         model2: 'Arena',
                         times: 1,
                     }],
+                    isPublished: true,
                     author: teacher.id
                 });
                 return [at];
@@ -98,35 +101,16 @@ describe('Quest', function() {
         });
         afterEach(setup.clearDB);
 
-        it('should check requirments and fail', function(done) {
-            quest.requirements.length.should.equal(1);
-            quest.check(student).then(function (value) {
-                value.should.be.false;
-                done();
-            });
-        });
-
-        it('should check requirments and pass', function(done) {
-            quest.requirements.length.should.equal(1);
-            Trial.create({challenge:challenge.id,user:student.id, complete:true},function (err, model) {
-                if (err) return done(err);
-                quest.check(student).then(function (value) {
-                    value.should.be.true;
-                    done();
-                });
-            });
-        });
-
         it('should assign user to quest', function(done) {
             student.userQuests.length.should.equal(0);
-            quest.assignOrUpdate(student.id).then(function(userquest) {
+            quest.assign(student.id).then(function(userquest) {
                 userquest.user.should.eql(student._id);
                 return [Quest.findOne({
                     _id: quest.id
-                }).exec(),User.findOne({
+                }).exec(), User.findOne({
                     _id: student.id
                 }).exec()];
-            }).spread(function(quest,user) {
+            }).spread(function(quest, user) {
                 user.userQuests.length.should.equal(1);
                 quest.userQuests.length.should.equal(1);
             }).finally(done);
@@ -293,7 +277,7 @@ describe('Quest', function() {
 
             it("should return a list of all users that can be assigned to a quest", function(done) {
                 request(api)
-                    .get("/quests/"+quest.id+"/unassignedUsersOptions")
+                    .get("/quests/" + quest.id + "/unassignedUsersOptions")
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -337,7 +321,7 @@ describe('Quest', function() {
             it("should update a quest if teacher", function(done) {
                 var update = {
                     quest: {
-                        name: "new name"
+                        isPublished: true
                     }
                 };
                 request(api)
@@ -347,7 +331,7 @@ describe('Quest', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.quest.name.should.equal(update.quest.name);
+                        res.body.quest.isPublished.should.be.true;
                         done();
                     });
             });
@@ -355,10 +339,10 @@ describe('Quest', function() {
             it("should assign student a quest if teacher", function(done) {
                 var update = {
                     users: [student.id],
-                    groups:[]
+                    groups: []
                 };
                 request(api)
-                    .put("/quests/" + quest.id+ "/assign")
+                    .put("/quests/" + quest.id + "/assign")
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {

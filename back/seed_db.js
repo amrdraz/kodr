@@ -122,11 +122,22 @@ module.exports = function(req, res, next) {
                     model2: 'Arena',
                     id2: arena.id,
                 }],
-                author: teacher.id
+                author: teacher.id,
+                isPublished:true,
+            }),
+            Quest.create({
+                name: 'extra',
+                rp: 5,
+                requirements: [{
+                    model1: 'Arena',
+                    id1: arena.id,
+                    times: 1
+                }],
+                author: teacher.id,
             })
         ];
     }).spread(function(q) {
-        return q.assignOrUpdate(student.id);
+        return q.assign(student.id);
     }).then(function(q) {
         res.send('All Seeded');
     }).catch(function(err) {
