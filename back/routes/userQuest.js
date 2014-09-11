@@ -17,7 +17,7 @@ module.exports = function(app, passport) {
         Promise.fulfilled().then(function() {
             return UserQuest.findOne({
                     _id: req.params.id
-                }).exec();
+                }).populate('requirements').exec();
         }).then(function(q) {
             if (!q) return res.send(404, "Not Found");
             res.json({

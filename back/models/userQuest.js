@@ -145,7 +145,7 @@ UserQuestSchema.methods.setRequirements = function(requirements) {
     return Promise.map(requirements, function(r) {
         r.times = r.times || 1;
         r.user = userQuest.user;
-        console.log(r);
+        // console.log(r);
         var query = {
             model1: r.model1,
             id1: r.id1,
@@ -156,12 +156,13 @@ UserQuestSchema.methods.setRequirements = function(requirements) {
         // console.log(query);
         return Requirement.findOne(query).sort('-times').exec().then(function(req) {
             if (req && req.times === r.times) { //requirment already exist with exaclty the same number of times
+                var length = req.userQuests.length;
                 req.userQuests.push(userQuest._id);
                 var userQuests = _.uniq(req.userQuests, function(id) {
                     return id.toString();
                 });
-                if (req.userQuests.length!==userQuests.length) {
-                    req.userQuests = req.userQuests;
+                if (length!==userQuests.length) {
+                    req.userQuests = userQuests;
                     req.markModified('userQuests');
                     return new Promise(function (resolve,reject) {
                         req.save(function(err, model) {
@@ -192,7 +193,7 @@ UserQuestSchema.methods.setRequirements = function(requirements) {
         });
     }).then(function(reqs) {
         // console.log(ids);
-        return UserQuest.findOneAndUpdate({
+        return UserQuest.findOne({
             _id: userQuest.id
         }).populate('requirements').exec();
     });

@@ -62,7 +62,7 @@ module.exports = Em.ObjectController.extend({
                 uq.get('user.userQuests'),
                 this.get('model.userQuests')
             ]).then(function(arr) {
-                arr[0].removeObject(uq);
+                arr[0] && arr[0].removeObject(uq);
                 arr[1].removeObject(uq);
                 uq.destroyRecord();
             });

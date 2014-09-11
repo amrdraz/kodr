@@ -137,7 +137,7 @@ module.exports = function(req, res, next) {
             })
         ];
     }).spread(function(q) {
-        return q.assign(student.id);
+        return q;
     }).then(function(q) {
         res.send('All Seeded');
     }).catch(function(err) {
