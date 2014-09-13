@@ -21,6 +21,11 @@ var Challenge = new mongoose.Schema({
         type: String,
         'default': 'New Challenge'
     },
+    type: {
+        type: String,
+        'default': 'javascript',
+        enum:['javascript', 'java', 'python']
+    },
     setup: {
         type: String,
         'default': '// Starting Code leave blank if you want Student to start from scrach\n'

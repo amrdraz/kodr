@@ -5,6 +5,7 @@ var _ = require('lodash');
 var Requirement = require('./requirement');
 var ArenaTrial = require('./arenaTrial');
 var Trial = require('./trial');
+var observer = require('../mediator');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 
@@ -32,6 +33,13 @@ var UserQuestSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Requirement'
     }],
+    startTime: {
+        type:Date,
+        default:Date.now
+    },
+    completeTime: {
+        type:Date
+    },
     quest: {
         type: ObjectId,
         ref: 'Quest',

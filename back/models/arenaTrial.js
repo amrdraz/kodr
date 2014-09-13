@@ -95,7 +95,7 @@ ArenaTrialSchema.statics.findOrCreate = function(arenaTrial) {
         var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
             return Trial.findOrCreate({
                 arenaTrial: model._id,
-                arena:model.arena,
+                arena: model.arena,
                 user: model.user,
                 challenge: challenge._id,
                 code: challenge.setup
@@ -117,24 +117,29 @@ var timeout;
 observer.on('trial.award', function(trial) {
     if (trial.arenaTrial)
         queue = queue.then(function(model) {
-            return ArenaTrial.findOne({
+            return ArenaTrial.findOneAndUpdate({
                 _id: trial.arenaTrial
+            }, {
+                $inc: {
+                    completed: 1,
+                    exp: trial.exp
+                }
             }).exec().then(function(arenaTrial) {
-                arenaTrial.completed += 1;
                 if (arenaTrial.trials.length === arenaTrial.completed) {
                     arenaTrial.complete = true;
-                }
-                arenaTrial.exp += trial.exp;
-                return new Promise(function(resolve, reject) {
-                    arenaTrial.save(function(err, model) {
-                        if (err) return reject(err);
-                        if (model.complete) {
-                            observer.emit('arenaTrial.complete', model);
-                        }
-                        observer.emit('arenaTrial.trial.awarded', model);
-                        resolve(model);
+                    return new Promise(function(resolve, reject) {
+                        arenaTrial.save(function(err, model) {
+                            if (err) return reject(err);
+                            if (model.complete) {
+                                observer.emit('arenaTrial.complete', model);
+                            }
+                            observer.emit('arenaTrial.trial.awarded', model);
+                            resolve(model);
+                        });
                     });
-                });
+                }
+                observer.emit('arenaTrial.trial.awarded', model);
+                return arenaTrial;
             });
         });
 });
