@@ -17,36 +17,44 @@
   </ul>
 </section>
 <section class="challenge-settings row">
-  <h3 class="editable col-lg-12">
-    {{view Em.TextField value=model.name class=":challenge-name"}}
-  </h3>
-  <div class="challenge-dificulty col-lg-12">
-    {{view Ember.Select
-      class=":challenge-exp-select"
-      content=model.expOptions
-      optionValuePath="content.points"
-      optionLabelPath="content.rank"
-      value=model.exp
-    }}
-    <span class="label label-primary challenge-exp">Estimated Rank awards: {{model.exp}} Exp</span>
+<form role="form">
+  <div class="form-group">
+    <div class="col-lg-6">
+      <label for="name" class="control-label">Challenge name</label>
+      {{input id="name" value=model.name class="challenge-name form-control"}}
+    </div>
   </div>
-  <div>
-  {{!-- {{model.arena.name}}
-    {{chosen
-      class=":challenge-arena"
-      content=arenas
-      optionValuePath="content"
-      optionLabelPath="content.name"
-      
-      selection=model.arena
-      prompt="Select an arena"
-    }} --}}
+  <div class="form-group">
+    <div class=" col-md-6">
+      <label for="language" class="control-label">Language</label>
+      {{chosen
+          class=":challenge-language-select"
+          content=challengeLanguages
+          value=model.language
+      }}
+    </div>
   </div>
+  <div class="form-group">
+    <div class="col-md-6">
+      <label for="ecp" class="control-label">Difficulty</label>
+      {{chosen
+          class=":challenge-exp-select"
+          content=model.expOptions
+          optionValuePath="content.points"
+          optionLabelPath="content.rank"
+          value=model.exp
+      }}
+      <span class="label label-primary challenge-exp">Estimated difficulty awards: {{model.exp}} Exp</span>
+    </div>
+  </div>
+</form>
 </section>
+<hr>
 <section class="challenge-content row">
   
   <div class="col-lg-6">
-      <a id="run" {{action "runInConsole"}} class="btn btn-default pull-right challenge-run"><i class="glyphicon glyphicon-play"></i> Run in Console</a>
+    <a id="run" {{action "run"}} class="btn btn-default pull-right challenge-run"><i class="glyphicon glyphicon-play"></i> Run in Console</a>
+      
       <ul class="nav nav-tabs">
         <li class="active"><a href="#solution" data-toggle="tab">Solution</a></li>
         <li><a href="#setup" data-toggle="tab">Setup</a></li>

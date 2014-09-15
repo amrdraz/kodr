@@ -35,6 +35,9 @@ var ArenaTrialSchema = new mongoose.Schema({
         type: Boolean,
         'default': false
     },
+    completeTime: {
+        type: Date
+    },
     completed: {
         type: Number,
         'default': 0
@@ -124,9 +127,10 @@ observer.on('trial.award', function(trial) {
                     completed: 1,
                     exp: trial.exp
                 }
-            }).exec().then(function(arenaTrial) {
+            }, {unset:true}).exec().then(function(arenaTrial) {
                 if (arenaTrial.trials.length === arenaTrial.completed) {
                     arenaTrial.complete = true;
+                    arenaTrial.completeTime = Date.now();
                     return new Promise(function(resolve, reject) {
                         arenaTrial.save(function(err, model) {
                             if (err) return reject(err);
@@ -138,7 +142,7 @@ observer.on('trial.award', function(trial) {
                         });
                     });
                 }
-                observer.emit('arenaTrial.trial.awarded', model);
+                observer.emit('arenaTrial.trial.awarded', arenaTrial);
                 return arenaTrial;
             });
         });

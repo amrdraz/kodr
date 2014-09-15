@@ -37,6 +37,10 @@ var UserQuestSchema = new mongoose.Schema({
         type:Date,
         default:Date.now
     },
+    complete:{
+        type:Boolean,
+        default:false
+    },
     completeTime: {
         type:Date
     },
@@ -208,3 +212,16 @@ UserQuestSchema.methods.setRequirements = function(requirements) {
 };
 
 var UserQuest = module.exports = mongoose.model('UserQuest', UserQuestSchema);
+
+observer.on('requirement.complete',function (req) {
+    UserQuest.findOne({_id:{$in:req.userQuests},complete:false}).populate('requirements').exec().then(function (uq) {
+        if(_.every(uq.requirements,'complete')) {
+            uq.complete = true;
+            uq.completeTime = Date.now();
+            uq.save(function (err, model) {
+                if(err) throw err;
+                observer.emit('quest.complete',model);
+            });
+        }
+    });
+});

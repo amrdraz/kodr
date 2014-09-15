@@ -43,6 +43,21 @@ module.exports = function(app, passport) {
     });
 
     /**
+     * post code.
+     *
+     * @returns {object} person
+     */
+
+    app.post('/api/challenges/run', function(req, res, next) {
+        Challenge.run(req.body.code,req.body.language).spread(function (sterr,stout) {
+            res.send({
+                sterr:sterr,
+                stout:stout
+            });
+        });
+    });
+
+    /**
      * Create new challenges.
      *
      * @param range

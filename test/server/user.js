@@ -328,6 +328,7 @@ describe('User', function() {
 
                     res.body.should.have.property("access_token");
                     res.body.should.have.property("user_id");
+                    user.id = res.body.user_id;
                     accessToken = res.body.access_token;
                     done();
                 });
@@ -379,35 +380,20 @@ describe('User', function() {
         describe("Token", function() {
 
             it("should not change after User is saved", function(done) {
+                var newname = 'draz';
                 request(url)
                     .post("/profile")
                     .set('Authorization', 'Bearer ' + accessToken)
                     .send({
-                        username: 'draz'
+                        username: newname
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
-                        res.status.should.equal(200);
-                        request(url)
-                            .get("/profile")
-                            .set('Authorization', 'Bearer ' + accessToken)
-                            .end(function(err, res) {
-                                if (err) return done(err);
-                                res.status.should.equal(200);
-                                res.body.username.should.not.equal(user.username);
-                                user.username = res.body.username;
-                                user.oldPassword = res.body.password;
-
-                                request(url)
-                                    .post("/token")
-                                    .send(user)
-                                    .end(function(err, res) {
-                                        if (err) return done(err);
-                                        res.status.should.equal(200);
-                                        res.body.access_token.should.equal(accessToken);
-                                        done();
-                                    });
-                            });
+                        res.status.should.equal(200);                        
+                        user.username = res.body.user.username;
+                        res.body.user.username.should.equal(newname);
+                        res.body.access_token.should.equal(accessToken);
+                        done();
                     });
 
             });
@@ -422,20 +408,8 @@ describe('User', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-
-                        request(url)
-                            .post("/token")
-                            .send({
-                                username: 'draz',
-                                password: 'amramree12'
-                            })
-                            .expect(200)
-                            .end(function(err, res) {
-                                if (err) return done(err);
-                                res.body.access_token.should.not.equal(accessToken);
-                                accessToken = res.body.access_token;
-                                done();
-                            });
+                        res.body.access_token.should.not.equal(accessToken);
+                        done();
                     });
             });
         });

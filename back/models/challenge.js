@@ -1,8 +1,10 @@
 var mongoose = require('mongoose');
+var Promise = require('bluebird');
 var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
 var relationship = require("mongoose-relationship");
 var observer = require('../mediator');
+var javaRunner = require('../java-runner');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
@@ -16,15 +18,15 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * @type {mongoose.Schema}
  */
 
-var Challenge = new mongoose.Schema({
+var ChallengeSchema = new mongoose.Schema({
     name: {
         type: String,
         'default': 'New Challenge'
     },
-    type: {
+    language: {
         type: String,
         'default': 'javascript',
-        enum:['javascript', 'java', 'python']
+        enum: ['javascript', 'java', 'python']
     },
     setup: {
         type: String,
@@ -38,54 +40,88 @@ var Challenge = new mongoose.Schema({
         type: String,
         'default': '// Code that will run after the student\'s code, but not for testing h\n'
     },
-    solution:  {
+    solution: {
         type: String,
         'default': '// Challenge Solution goes here\n'
     },
-    tests:  {
+    tests: {
         type: String,
         'default': '// Challenge Tests go here\n'
     },
-    description:  {
+    description: {
         type: String,
         'default': 'A new Challenge'
     },
     // the current state of a cahllenge
-    status:  {
+    status: {
         type: String,
-        'default': 'unPublished',        
-        'enum': ['unPublished','Beta', 'Published']
+        'default': 'unPublished',
+        'enum': ['unPublished', 'Beta', 'Published']
     },
-    isPublished:  {
+    isPublished: {
         type: Boolean,
         'default': false
     },
-    valid:  {
+    valid: {
         type: Boolean,
         'default': false
     },
     exp: {
         type: Number,
-        'default':1,
-        min:1
+        'default': 1,
+        min: 1
     },
     author: {
-        type: ObjectId, ref: 'User', childPath:"challenges"
+        type: ObjectId,
+        ref: 'User',
+        childPath: "challenges"
     },
     arena: {
-        type: ObjectId, ref: 'Arena', childPath:"challenges"
+        type: ObjectId,
+        ref: 'Arena',
+        childPath: "challenges"
     },
     trials: [{
-        type: ObjectId, ref: 'Trial'
+        type: ObjectId,
+        ref: 'Trial'
     }]
-    
+
 });
 
-Challenge.plugin(version, { collection: 'ChallengeVersions', log:true });
-Challenge.plugin(relationship, { relationshipPathName: ['arena', 'author']});
+ChallengeSchema.plugin(version, {
+    collection: 'ChallengeVersions',
+    log: true
+});
+ChallengeSchema.plugin(relationship, {
+    relationshipPathName: ['arena', 'author']
+});
 
-Challenge.post('remove', function (doc) {
+ChallengeSchema.post('remove', function(doc) {
     observer.emit('challenge.removed', doc);
 });
 
-module.exports = mongoose.model('Challenge', Challenge);
+ChallengeSchema.methods.run = function(code) {
+    return Challenge.run(code,this.language);
+};
+
+ChallengeSchema.statics.run = function(code, language) {
+    return new Promise(function(resolve, reject) {
+        switch (language) {
+            case 'javascript':
+                resolve(['no server js','']);
+                break;
+            case 'java':
+                javaRunner.runJavaAsScript(code,function (err,stout,sterr) {
+                    if(err && !sterr) return reject(err);
+                    return resolve([sterr, stout]);
+                });
+                break;
+            case 'python':
+                break;
+            case 'ruby':
+                break;
+        }
+    });
+};
+
+var Challenge = module.exports = mongoose.model('Challenge', ChallengeSchema);

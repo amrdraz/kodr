@@ -115,7 +115,15 @@ describe('Quest', function() {
                 quest.userQuests.length.should.equal(1);
             }).finally(done);
         });
-
+        
+        it('should complete quest', function(done) {
+            observer.once('quest.complete', function(req) {
+                done();
+            });
+            quest.assign(student.id).then(function(userquest) {
+                Trial.create({user:student._id,challenge:challenge._id,complete:true}); 
+            });
+        });
     });
     //*
 

@@ -17,6 +17,25 @@ var User = require('../../back/models/user');
 describe('Challenge', function() {
     before(setup.clearDB);
 
+    var code = 'int a = 40, b = 20; System.out.print("a - b = " + (a - b));';
+    var out = "a - b = 20";
+
+    describe('Code', function() {
+        it('should run java', function(done) {
+            Challenge.run(code,'java').spread(function(sterr, stout) {
+                if (sterr) return done(sterr);
+                stout.should.equal(out);
+                done();
+            }).catch(done);
+        });
+        it('should run java and show error', function(done) {
+            Challenge.run(code+'\n x = 3','java').spread(function(sterr, stout) {
+                sterr.should.exist;
+                // stout.should.equal(out);
+                done();
+            }).catch(done);
+        });
+    });
     describe('Trials', function() {
         var challenge, arenaTrial, trials, user, num = 10;
         beforeEach(function(done) {
@@ -186,6 +205,23 @@ describe('Challenge', function() {
                     });
 
             });
+
+            it("should run code based on language returning stout and sterr", function(done) {
+                request(api)
+                    .post("/challenges/run")
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send({
+                        code: code,
+                        language: 'java'
+                    })
+                    .expect(200)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.stout.should.equal(out);
+                        done();
+                    });
+            });
         });
 
         describe("GET", function() {
@@ -226,7 +262,7 @@ describe('Challenge', function() {
 
             it("should not create a challenge if student", function(done) {
                 request(api)
-                    .put("/challenges/"+challenge.id)
+                    .put("/challenges/" + challenge.id)
                     .set('Authorization', 'Bearer ' + student.token)
                     .send({
                         challenge: {
@@ -268,7 +304,7 @@ describe('Challenge', function() {
 
             it("should not delete a challenge if student", function(done) {
                 request(api)
-                    .del("/challenges/"+challenge.id)
+                    .del("/challenges/" + challenge.id)
                     .set('Authorization', 'Bearer ' + student.token)
                     .send()
                     .expect(401)

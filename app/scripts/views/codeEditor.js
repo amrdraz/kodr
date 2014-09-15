@@ -1,3 +1,11 @@
+function getMIME (lang) {
+    if(lang==='java') return 'text/x-java';
+    if(lang==='c') return 'text/x-csrc';
+    if(lang==='cpp') return 'text/x-c++src';
+    if(lang==='c#') return 'text/x-csharp';
+    return 'text/'+lang;
+}
+
 module.exports = Em.TextArea.extend({
     // classNames: [],
     didInsertElement: function() {
@@ -5,13 +13,14 @@ module.exports = Em.TextArea.extend({
         var debounce = require('../utils/debounce');
         var model = this.get('model');
         var attr = this.get('attr') || 'content';
+        var highlight = this.get('highlight') ;
 // debugger;
         var editor = CodeMirror.fromTextArea(this.$()[0], {
             autofocus: true,
             lineNumbers: true,
             lineWrapping:true,
             mode: {
-                name: (this.get('highlight') || 'javascript'),
+                name: (highlight || getMIME(model.get('language'))),
                 globalVars: true
             },
         });
@@ -22,7 +31,11 @@ module.exports = Em.TextArea.extend({
                 editor.getDoc().setValue(model.get(attr) || '');
             }
         };
+        this.changeMode = function() {
+            editor.setOption("mode", getMIME(model.get('language')));
+        };
         model.addObserver(attr, model, this.updateEditor);
+        !highlight && model.addObserver('language', model, this.changeMode);
 
         editor.on('change', debounce(function (cm) {
             model.set(attr, cm.getValue());
@@ -34,6 +47,7 @@ module.exports = Em.TextArea.extend({
     },
     willDestroyElement: function() {
         this.get('model').removeObserver(this.get('attr'), this.get('model'), this.updateEditor);
+        !this.get('highlight') && this.get('model').removeObserver('language', this.get('model'), this.changeMode);
     }
 
 });

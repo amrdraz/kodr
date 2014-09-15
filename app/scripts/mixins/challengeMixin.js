@@ -1,9 +1,9 @@
 module.exports = Em.Mixin.create(Em.Evented, {
-    evaluates:'code',
+    evaluates: 'code',
     jshint: function(code, cb, options) {
         options = options || {};
         var console = this.get('console') || console;
-        console.Write  = console.Write || console.log;
+        console.Write = console.Write || console.log;
         var sb = options.sandbox || this.get('csandbox') || window;
         JSHINT(code, {
             "asi": true, // supress simicolon warning
@@ -28,15 +28,19 @@ module.exports = Em.Mixin.create(Em.Evented, {
         if (!errors.length) {
             cb && cb.call(this, code, console, sb);
         } else {
-            this.testError({lineNumber:errors[0].line, message:errors[0].reason, rest:errors});
+            this.testError({
+                lineNumber: errors[0].line,
+                message: errors[0].reason,
+                rest: errors
+            });
         }
 
         // debugger;
         return errors;
     },
-    testError: function (error) {
+    testError: function(error) {
         var console = this.get('console') || console;
-        console.Write  = console.Write || console.log;
+        console.Write = console.Write || console.log;
         console.Write('Syntax Error line(' + error.lineNumber + '): ' + error.message + '\n', 'error');
         return false;
     },
@@ -46,7 +50,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
         var failures = report.failures.length;
         var pass = tests === passes;
         var jconsole = this.get('console') || console;
-        jconsole.Write  = jconsole.Write || console.log;
+        jconsole.Write = jconsole.Write || console.log;
         var writeTest = function(test, pass) {
             jconsole.Write(test.fullName + '\n', pass);
         };
@@ -63,11 +67,11 @@ module.exports = Em.Mixin.create(Em.Evented, {
         if (failures) {
             report.failures.forEach(function(test) {
                 writeTest(test, 'error');
-                test.failedExpectations.forEach(function (fail) {
-                    if(fail.message.indexOf('Error: Timeout')) {
-                        jconsole.Write('\t'+fail.message+'\n', 'error');
+                test.failedExpectations.forEach(function(fail) {
+                    if (fail.message.indexOf('Error: Timeout')) {
+                        jconsole.Write('\t' + fail.message + '\n', 'error');
                     } else {
-                        jconsole.Write('\tTimeout this test ran ('+test.durationSec+'s)\n', 'error');
+                        jconsole.Write('\tTimeout this test ran (' + test.durationSec + 's)\n', 'error');
                     }
                 });
                 // console.error(test.failedExpectations[0].stack);
@@ -76,6 +80,16 @@ module.exports = Em.Mixin.create(Em.Evented, {
         jconsole.Write("==============================================\n", pass ? 'result' : 'error');
 
         return report.passed;
+    },
+    runInServer: function(code, language, cb) {
+        Em.$.ajax({
+            url: '/api/challenges/run',
+            type:'POST',
+            data: {
+                code: code,
+                language: language
+            }
+        }).done(cb).fail(cb);
     },
     actions: {
         sandboxLoaded: function(sb) {
@@ -93,7 +107,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
         },
         runInConsole: function() {
             this.trigger('showConsole');
-            this.send('consoleEval', this.get('model.'+this.get('evaluates')));
+            this.send('consoleEval', this.get('model.' + this.get('evaluates')));
         },
         consoleEval: function(command) {
             this.jshint(command, function(code, console, sb) {
@@ -103,7 +117,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
                         console.Write(error.name + ': ' + error.message + '\n', 'error');
                     } else {
                         var run = res !== undefined;
-                        console.Write((run?'==> ' + res:'\n'+code) + '\n', run?'result':'jqconsole-old-prompt');
+                        console.Write((run ? '==> ' + res : '\n' + code) + '\n', run ? 'result' : 'jqconsole-old-prompt');
                     }
                 });
             });

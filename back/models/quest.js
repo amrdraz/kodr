@@ -25,6 +25,9 @@ var QuestSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
+    endDate:{
+       type:Date 
+    },
     isPublished:{
         type:Boolean,
         default:false

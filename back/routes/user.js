@@ -10,26 +10,26 @@ module.exports = function(app, passport) {
      *
      * @returns {object} User
      */
-    
+
     app.get('/profile', access.requireRole(), function(req, res) {
-        Promise.fulfilled().then(function () {
-            return [UserQuest.find({user:req.user.id}).exec()];
-        }).spread(function (uqs) {
-            console.log(uqs);
-             res.send({
-                user:req.user,
-                userQuests:uqs
-             }
-        );
+        Promise.fulfilled().then(function() {
+            return [UserQuest.find({
+                user: req.user.id
+            }).exec()];
+        }).spread(function(uqs) {
+            res.send({
+                user: req.user,
+                userQuests: uqs
+            });
         });
     });
 
     app.post('/profile', access.requireRole(), function(req, res) {
         req.user.set(req.body);
         req.user.save(function(err, user) {
-            if(err) res.send(500);
+            if (err) res.send(500);
             res.json({
-                model:user,
+                user: user,
                 access_token: user.token
             });
         });
@@ -43,7 +43,7 @@ module.exports = function(app, passport) {
      * @returns {object} User
      */
 
-    app.get('/api/users/:id', access.requireRole(),function(req, res, next) {
+    app.get('/api/users/:id', access.requireRole(), function(req, res, next) {
         User.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
@@ -60,8 +60,8 @@ module.exports = function(app, passport) {
      * @returns {object} users
      */
 
-    app.get('/api/users', access.requireRole(['student', 'teacher']),function(req, res, next) {
-        if(req.query.group==="null") {
+    app.get('/api/users', access.requireRole(['student', 'teacher']), function(req, res, next) {
+        if (req.query.group === "null") {
             req.query.group = null;
         }
         User.find(req.query).exec().then(function(model) {
@@ -69,7 +69,7 @@ module.exports = function(app, passport) {
             res.json({
                 user: model
             });
-        },next);
+        }, next);
     });
 
     /**
@@ -85,7 +85,7 @@ module.exports = function(app, passport) {
                 res.json({
                     user: model,
                 });
-            },next);
+            }, next);
     });
 
     /**
@@ -95,9 +95,11 @@ module.exports = function(app, passport) {
      * @returns {object} user
      */
 
-    app.put('/api/users/:id', access.requireRole(['$self','teacher']), function(req, res, next) {
+    app.put('/api/users/:id', access.requireRole(['$self', 'teacher']), function(req, res, next) {
         var user = req.body.user;
-        User.findOne({_id:req.params.id}).exec().then(function(model) {
+        User.findOne({
+            _id: req.params.id
+        }).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             model.set(user);
             model.save(function(err, model) {
@@ -119,7 +121,7 @@ module.exports = function(app, passport) {
     app.del('/api/users/:id', access.requireRole(['teacher']), function(req, res, next) {
         User.findById(req.params.id, function(err, model) {
             if (err) return next(err);
-            if(!model) return res.send(404);
+            if (!model) return res.send(404);
             model.remove(function(err, model) {
                 if (err) return next(err);
                 res.send(200);

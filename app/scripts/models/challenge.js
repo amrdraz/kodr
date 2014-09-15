@@ -17,6 +17,7 @@ var ChallengeModel = module.exports = DS.Model.extend({
     // callbacks: attr('string', {defaultValue:"// callbacks for structure variables if any\n{}"}),
     preCode: attr('string'),
     postCode: attr('string'),
+    language: attr('string'),
     description: attr('string', {
         defaultValue: "A new Challenge"
     }),
@@ -59,6 +60,10 @@ var ChallengeModel = module.exports = DS.Model.extend({
         rank: "hard",
         points: 32
     }],
+
+    isJava: function () {
+        return this.get('language')==='java';
+    }.property('language'),
 
     // relationshipChanged: false,
     canSave: function() {

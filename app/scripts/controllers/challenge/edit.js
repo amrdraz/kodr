@@ -6,6 +6,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
     breadCrumb: 'edit',
     breadCrumbPath: 'arena.edit',
     evaluates: 'solution',
+    challengeLanguages:['javascript','java'],
     // queryParams: ['arena'],
     // originalArena: null,
     init: function() {
@@ -103,7 +104,19 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
     },
     actions: {
         run: debounce(function() {
-            this.evaluate();
+            var controller = this;
+            var model = controller.get('model');
+            if(model.get('isJava')) {
+                controller.trigger('showConsole');
+                controller.get('console').Write('Compiling...\n');
+                controller.runInServer(model.get('solution'), model.get('language'),function (res) {
+                    controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
+                    controller.get('console').Write(res.stout);
+                    res.sterr && controller.get('console').Write(res.sterr,'error');
+                });
+            } else {
+                this.send('runInConsole');
+            }
         }),
         validate: function() {
             this.evaluate();

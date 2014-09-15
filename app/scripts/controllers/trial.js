@@ -58,18 +58,26 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             var model = this.get('model');
             var challenge = this.get('model.challenge');
             var controller = this;
-            var sb = controller.get('sandbox');
-            var Runner = require('../runners/runner');
-            var iframeTemplate = require('../demo/iframe');
-            controller.jshint(model.get('code'), function(code, jconsole, sb) {
-                sb.load(iframeTemplate, function() {
-                    sb.evaljs(Runner.test(code, challenge.get('tests')));
+            if(challenge.get('type')==='javascript') {
+                var sb = controller.get('sandbox');
+                var Runner = require('../runners/runner');
+                var iframeTemplate = require('../demo/iframe');
+                controller.jshint(model.get('code'), function(code, jconsole, sb) {
+                    sb.load(iframeTemplate, function() {
+                        sb.evaljs(Runner.test(code, challenge.get('tests')));
+                    });
+                }, {
+                    sandbox: sb,
+                    run: true
                 });
-            }, {
-                sandbox: sb,
-                run: true
-            });
-
+            } else {
+                controller.runServer(model.get('code'), challenge.get('type'), function (res) {
+                    controller.get('console').Write(res.stout);
+                    if(res.sterr) {
+                        controller.get('console').Write(res.sterr, 'error');
+                    }
+                });
+            }
         })
     }
 });

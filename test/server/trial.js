@@ -139,7 +139,7 @@ describe('Trial', function() {
         };
         var trial = {
             trial: {
-                code: challenge.setup,
+                code: challenge.solution,
                 complete: false,
                 tests: {},
                 challenge: null,
@@ -263,6 +263,34 @@ describe('Trial', function() {
                     .end(done);
                 });
             });
+
+            // it("should run trial code", function(done) {
+            //     Trial.create({
+            //         user:student._id,
+            //         challenge:challenge.id,
+            //     }).then(function(tr){
+            //         request(api)
+            //         .put("/trials/" + tr.id+"/run")
+            //         .set('Authorization', 'Bearer ' + student.token)
+            //         .send(trial)
+            //         .expect(200)
+            //         .end(done);
+            //     });
+            // });
+
+            // it("should submit trial code", function(done) {
+            //     Trial.create({
+            //         user:student._id,
+            //         challenge:challenge.id,
+            //     }).then(function(tr){
+            //         request(api)
+            //         .put("/trials/" + tr.id+"/submit")
+            //         .set('Authorization', 'Bearer ' + student.token)
+            //         .send(trial)
+            //         .expect(200)
+            //         .end(done);
+            //     });
+            // });
 
             it("should update a trial if teacher regardless of ownership", function(done) {
                 request(api)
