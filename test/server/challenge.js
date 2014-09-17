@@ -17,7 +17,19 @@ var User = require('../../back/models/user');
 describe('Challenge', function() {
     before(setup.clearDB);
 
-    var code = 'int a = 40, b = 20; System.out.print("a - b = " + (a - b));';
+    var code = 'char c =\'a\'; int a = 40, b = 20; System.out.print("a - b = " + (a - b));';
+    var testchallenge = {
+        language:'java',
+        tests: '\
+  if ($userOut.toString().equals("a - b = 20")) {\
+    Test.pass("you did it!");\
+  } else {\
+   Test.fail("it\'s "+$userOut.toString()+" to equal "+"a - b = 20"); \
+  }',
+        postCode:'//comment won\'t be striped\n char y = \'1\';',
+        preCode:'//comment to be striped',
+        exp:1
+    };
     var out = "a - b = 20";
 
     describe('Code', function() {
@@ -32,6 +44,15 @@ describe('Challenge', function() {
             Challenge.run(code+'\n x = 3','java').spread(function(sterr, stout) {
                 sterr.should.exist;
                 // stout.should.equal(out);
+                done();
+            }).catch(done);
+        });
+
+        it('should test java', function(done) {
+            Challenge.test(code,testchallenge,'java').spread(function(report, stout, sterr) {
+                if(sterr) return done(sterr);
+                console.log(report);
+                expect(report).to.have.property('passed',true);
                 done();
             }).catch(done);
         });
@@ -219,6 +240,22 @@ describe('Challenge', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.stout.should.equal(out);
+                        done();
+                    });
+            });
+            it("should test code", function(done) {
+                request(api)
+                    .post("/challenges/test")
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send({
+                        code:code,
+                        challenge:testchallenge
+                    })
+                    .expect(200)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.report.passed.should.be.true;
                         done();
                     });
             });

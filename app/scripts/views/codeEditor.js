@@ -3,7 +3,7 @@ function getMIME (lang) {
     if(lang==='c') return 'text/x-csrc';
     if(lang==='cpp') return 'text/x-c++src';
     if(lang==='c#') return 'text/x-csharp';
-    return 'text/'+lang;
+    return lang;
 }
 
 module.exports = Em.TextArea.extend({
@@ -13,8 +13,7 @@ module.exports = Em.TextArea.extend({
         var debounce = require('../utils/debounce');
         var model = this.get('model');
         var attr = this.get('attr') || 'content';
-        var highlight = this.get('highlight') ;
-// debugger;
+        var highlight = this.get('highlight') && getMIME(this.get('highlight'));
         var editor = CodeMirror.fromTextArea(this.$()[0], {
             autofocus: true,
             lineNumbers: true,

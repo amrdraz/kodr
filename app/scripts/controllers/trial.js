@@ -54,11 +54,27 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         }
     },
     actions: {
-        run: debounce(function() {
+        run:function () {
             var model = this.get('model');
             var challenge = this.get('model.challenge');
             var controller = this;
-            if(challenge.get('type')==='javascript') {
+            if(challenge.get('isJS')) {
+                controller.send('runInConsole');
+            } else {
+                controller.trigger('showConsole');
+                controller.get('console').Write('Compiling...\n');
+                controller.runInServer(model.get('code'), model.get('challenge.language'),function (res) {
+                    controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
+                    controller.get('console').Write(res.stout);
+                    res.sterr && controller.get('console').Write(res.sterr,'error');
+                });
+            }
+        },
+        test: debounce(function() {
+            var model = this.get('model');
+            var challenge = this.get('model.challenge');
+            var controller = this;
+            if(challenge.get('isJS')) {
                 var sb = controller.get('sandbox');
                 var Runner = require('../runners/runner');
                 var iframeTemplate = require('../demo/iframe');
@@ -71,11 +87,12 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                     run: true
                 });
             } else {
-                controller.runServer(model.get('code'), challenge.get('type'), function (res) {
-                    controller.get('console').Write(res.stout);
-                    if(res.sterr) {
-                        controller.get('console').Write(res.sterr, 'error');
-                    }
+                controller.trigger('showConsole');
+                controller.get('console').Write('Running Tests...\n');
+                controller.testInServer(model.get('code'), challenge,function (res) {
+                    controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
+                    controller.testSuccess(res.report);
+                    res.sterr && controller.get('console').Write(res.sterr,'error');
                 });
             }
         })

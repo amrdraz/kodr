@@ -49,6 +49,11 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
     testSuccess: function(report) {
         var model = this.get('model');
         var result = this._super(report);
+        // console.log(report);
+        if(report.score<model.get('exp')) {
+            this.get('console').Write('Awrded ('+report.score+"/"+model.get('exp')+') - Solution to challeneg should reach maximum score tests','error');
+            result = false;
+        }
 
         model.set('valid', result);
         if (result) {
@@ -119,7 +124,19 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             }
         }),
         validate: function() {
-            this.evaluate();
+            var controller = this;
+            var model = controller.get('model');
+            if(model.get('isJava')) {
+                controller.trigger('showConsole');
+                controller.get('console').Write('Running Tests...\n');
+                controller.testInServer(model.get('solution'), model,function (res) {
+                    controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
+                    controller.testSuccess(res.report);
+                    res.sterr && controller.get('console').Write(res.sterr,'error');
+                });
+            } else {
+                this.send('evaluate');
+            }
         },
         reset: function() {
             this.get('model.canReset') && this.get('model').rollback();

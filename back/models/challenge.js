@@ -34,11 +34,11 @@ var ChallengeSchema = new mongoose.Schema({
     },
     preCode: {
         type: String,
-        'default': '// Code that will run before the student\'s codeh\n'
+        'default': '// Code that will run before the student\'s code\n'
     },
     postCode: {
         type: String,
-        'default': '// Code that will run after the student\'s code, but not for testing h\n'
+        'default': '// Code that will run after the student\'s code, but not for testing\n'
     },
     solution: {
         type: String,
@@ -114,6 +114,31 @@ ChallengeSchema.statics.run = function(code, language) {
                 javaRunner.runJavaAsScript(code,function (err,stout,sterr) {
                     if(err && !sterr) return reject(err);
                     return resolve([sterr, stout]);
+                });
+                break;
+            case 'python':
+                break;
+            case 'ruby':
+                break;
+        }
+    });
+};
+
+
+ChallengeSchema.methods.test = function(code) {
+    return Challenge.test(code,this);
+};
+
+ChallengeSchema.statics.test = function(code, challenge) {
+    return new Promise(function(resolve, reject) {
+        switch (challenge.language) {
+            case 'javascript':
+                resolve(['no server js','']);
+                break;
+            case 'java':
+                javaRunner.testJavaAsScript(code,challenge.tests,challenge,function (err,report,stout,sterr) {
+                    if(err && !sterr) return reject(err);
+                    return resolve([report,stout, sterr]);
                 });
                 break;
             case 'python':

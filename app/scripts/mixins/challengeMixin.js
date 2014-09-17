@@ -48,11 +48,11 @@ module.exports = Em.Mixin.create(Em.Evented, {
         var tests = report.tests.length;
         var passes = report.passes.length;
         var failures = report.failures.length;
-        var pass = tests === passes;
+        var pass = report.passed;
         var jconsole = this.get('console') || console;
         jconsole.Write = jconsole.Write || console.log;
         var writeTest = function(test, pass) {
-            jconsole.Write(test.fullName + '\n', pass);
+            jconsole.Write((test.fullName||test.message) + '\n', pass);
         };
         console.log(report);
         jconsole.Write("========= Running Submission " + (pass ? 'Passed' : 'Failed') + " ==========\n", pass ? 'result' : 'error');
@@ -67,7 +67,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
         if (failures) {
             report.failures.forEach(function(test) {
                 writeTest(test, 'error');
-                test.failedExpectations.forEach(function(fail) {
+                test.failedExpectations && test.failedExpectations.forEach(function(fail) {
                     if (fail.message.indexOf('Error: Timeout')) {
                         jconsole.Write('\t' + fail.message + '\n', 'error');
                     } else {
@@ -77,7 +77,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
                 // console.error(test.failedExpectations[0].stack);
             });
         }
-        jconsole.Write("==============================================\n", pass ? 'result' : 'error');
+        if (passes||failures) jconsole.Write("==============================================\n", pass ? 'result' : 'error');
 
         return report.passed;
     },
@@ -89,7 +89,21 @@ module.exports = Em.Mixin.create(Em.Evented, {
                 code: code,
                 language: language
             }
-        }).done(cb).fail(cb);
+        }).done(cb).fail(function (err) {
+            toastr.error(err.statusText);
+        });
+    },
+    testInServer: function(code, challenge, cb) {
+        Em.$.ajax({
+            url: '/api/challenges/test',
+            type:'POST',
+            data: {
+                code: code,
+                challenge: challenge.getProperties(['preCode','language','tests','postCode', 'exp'])
+            }
+        }).done(cb).fail(function (err) {
+            toastr.error(err.responseText);
+        });
     },
     actions: {
         sandboxLoaded: function(sb) {

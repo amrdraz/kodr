@@ -1,4 +1,5 @@
 var cp = require('child_process');
+var _ = require('lodash');
 // var Docker = require('dockerode');
 // var Streams = require('memory-streams');
 // var docker = new Docker({socketPath: '/var/run/docker.sock'});
@@ -6,11 +7,13 @@ var cp = require('child_process');
 var fs = require('fs');
 
 // run java inside main method using the java built in dynamic compiler
-var run = exports.run = function (simple_program,cb) {
+var run = exports.run = function(simple_program, cb) {
     var name = 'Main';
-    var cmd = 'java -cp '+__dirname+' -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner \'' + simple_program + '\'';
+    var cmd = 'java -cp ' + __dirname + ' -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner \'' + simple_program + '\'';
     console.log(cmd);
-    cp.exec(cmd,{timeout: 10000}, cb);
+    cp.exec(cmd, {
+        timeout: 10000
+    }, cb);
 };
 
 
@@ -33,28 +36,30 @@ var run = exports.run = function (simple_program,cb) {
 //     });
 // };
 
-var runCMD = exports.runCMD = function (simple_program, cb) {
-    cp.exec('docker run --rm  java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner \'' + simple_program + '\'',{timeout: 10000}, cb);
+var runCMD = exports.runCMD = function(simple_program, cb) {
+    cp.exec('docker run --rm  java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner \'' + simple_program + '\'', {
+        timeout: 10000
+    }, cb);
 };
 
-var UID = 1;
-// run java inside main method using the java built in dnamic compiler
-function runByJavaFile(program) {
-    var name = 'tempFile' + (UID++);
+// var UID = 1;
+// // run java inside main method using the java built in dnamic compiler
+// function runByJavaFile(program) {
+//     var name = 'tempFile' + (UID++);
 
-    fs.writeFile('./' + name + '.java', 'public class ' + name + ' {' + program + '}', function(err) {
-        if (err) {
-            console.log(err);
-        } else {
-            cp.exec('javac ' + name + '.java && java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 ' + name, function(err, stdout, stderr) {
-                stderr && console.error(stderr);
-                stdout && console.log(stdout);
-                fs.unlinkSync('./'+name+'.java');
-                fs.unlinkSync('./'+name+'.class');
-            });
-        }
-    });
-}
+//     fs.writeFile('./' + name + '.java', 'public class ' + name + ' {' + program + '}', function(err) {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             cp.exec('javac ' + name + '.java && java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 ' + name, function(err, stdout, stderr) {
+//                 stderr && console.error(stderr);
+//                 stdout && console.log(stdout);
+//                 fs.unlinkSync('./'+name+'.java');
+//                 fs.unlinkSync('./'+name+'.class');
+//             });
+//         }
+//     });
+// }
 
 /**
  * Runs a String of java code as if it is inside a method
@@ -68,15 +73,18 @@ function runByJavaFile(program) {
  *                          values space seperated values for the paramaters
  *                          paramaters names,types and values need to match count
  */
-var runJavaAsScript = exports.runJavaAsScript = function (code, options, cb) {
-    if(typeof options==='function') {
+var runJavaAsScript = exports.runJavaAsScript = function(code, options, cb) {
+    if (typeof options === 'function') {
         cb = options;
         options = {};
     } else {
         options = options || {};
     }
 
-    var cmd = ['java -cp '+__dirname+':'+__dirname+'/janino/commons-compiler.jar:'+__dirname+'/janino/janino.jar ScriptRunner'];
+    var cmd = ['java -cp ' + __dirname + ':' + __dirname + '/janino/commons-compiler.jar:' + __dirname + '/janino/janino.jar ScriptRunner'];
+    var pre = (options.preCode || '').replace(/\/\/.*$/gm, '');//.replace(/\r?\n|\r/g, ' ');
+    var post = (options.postCode || '');
+
     // <return-type>                            (default: void)
     options.rt && cmd.push('-rt', options.rt);
     // <comma-separated-parameter-names>        (default: none)
@@ -87,12 +95,61 @@ var runJavaAsScript = exports.runJavaAsScript = function (code, options, cb) {
     options.te && cmd.push('-te', options.te);
     // <comma-separated-default-imports>        (default: none)
     options.di && cmd.push('-di', options.di);
-    // code to run      
-    cmd.push('\'' + code + '\'');
+    // code to run
+    code = pre + code + '\n' + post;
+    // escape " and $ because of terminal
+    code = code.replace(/"/g,'\\"').replace(/\$/g,'\\$');
+    // console.log(code);
+    cmd.push('"' + code + '"');
+
     // value to pass if paramaters are used
     options.values && cmd.push(options.values);
 
-    cp.exec(cmd.join(" "), cb);
+    // console.log(cmd.join(' '));
+    cp.exec(cmd.join(" "),{timeout: 10000},cb);
+};
+
+var testJavaAsScript = exports.testJavaAsScript = function(code, test, options, cb) {
+    if(_.isEmpty(code)) cb(new Error('code can not be undefined'));
+    if(!test) cb(new Error('test can not be undefined'));
+    if(!options.exp) cb(new Error('challange must have exp'));
+    var hash = _.random(0, 200000000);
+    var opt = _.clone(options); 
+    //capture sys streams and set uniq test hash
+    opt.preCode = 'final ByteArrayOutputStream $userOut = new ByteArrayOutputStream();\n' +
+        'final ByteArrayOutputStream $userErr = new ByteArrayOutputStream();\n' +
+        'final PrintStream _$sysOut = System.out;\n' +
+        'final PrintStream _$sysErr = System.err;\n' +
+        'System.setOut(new PrintStream($userOut));\n' +
+        'System.setErr(new PrintStream($userErr));\n' +
+        'Test.setHash("' + hash + '");'+
+        (opt.preCode || '');
+    opt.postCode = (opt.postCode || '') + '\n' +
+        'System.setOut(_$sysOut);' +
+        'System.setErr(_$sysErr);' + '\n' +
+        test;
+    opt.di = (opt.di || '') + (opt.di ? ',' : '') + 'Test,java.io.ByteArrayOutputStream,java.io.PrintStream';
+    runJavaAsScript(code, opt, function(err, stout, sterr) {
+        if (err && !sterr) return cb(err);
+        // console.log(stout);
+        var report = {
+            passed:false,
+            score:0,
+            passes:[],
+            failures:[],
+            tests:[]
+        };
+        var tests = stout.match(new RegExp("<\\[" + hash + "\\]>(.*)<\\[" + hash + "\\]>", "g")) || [];
+        if (!_.isEmpty(tests)) {
+            tests = report.tests = JSON.parse(('[' + tests.join(',') + ']').replace(new RegExp("<\\[" + hash + "\\]>", 'g'), ''));
+            report.passes = _.filter(tests,'pass');
+            report.failures = _.reject(tests,'pass');
+            report.score = _.reduce(tests, function (sum,t) {return sum+t.score;},0);
+            report.score = Math.max(0,Math.min(report.score,options.exp));
+            report.passed = report.passes.length===tests.length;
+        }
+        cb(null, report, stout, sterr);
+    });
 };
 
 /**
@@ -100,12 +157,12 @@ var runJavaAsScript = exports.runJavaAsScript = function (code, options, cb) {
  * @param  {String} code java code to run
  * @param  {String} args a string of arguments to pass to the main method seperated by space
  */
-var runJavaAsClassBody = exports.runJavaAsClassBody = function (code, args, cb) {
-    var cmd = ['java -cp '+__dirname+':'+__dirname+'/janino/commons-compiler.jar:'+__dirname+'/janino/janino.jar org.codehaus.commons.compiler.samples.ClassBodyDemo'];
+var runJavaAsClassBody = exports.runJavaAsClassBody = function(code, args, cb) {
+    var cmd = ['java -cp ' + __dirname + ':' + __dirname + '/janino/commons-compiler.jar:' + __dirname + '/janino/janino.jar org.codehaus.commons.compiler.samples.ClassBodyDemo'];
     // code to run      
     cmd.push('\'public static void main (String [] args) {\n' + code + '\'\n}');
     // args to pass to main of class
-    if(args) {
+    if (args) {
         cmd.push(args);
         cb = args;
     }
@@ -116,18 +173,22 @@ var runJavaAsClassBody = exports.runJavaAsClassBody = function (code, args, cb) 
 // var i = 1;
 // var time = setInterval(function () {
 //     i++;
-    
-//     // runByJavaFile('public static void main (String [] args) { int a = 30, b = 20;System.out.println("a - b = " + (a - b)); }');
-    
-    // run('int a = 33, b = 20; System.out.println("a - b = " + (a - b));',function(err, stdout, stderr) {
-    //     stderr && console.error(stderr);
-    //     stdout && console.log(stdout);
-    // });
 
-    runJavaAsScript('int a = 20, b = 20; Syste.out.println("a - b = " + (a - b));',{},function(err, stdout, stderr) {
-        stderr && console.error(stderr);
-        stdout && console.log(stdout);
-    });
+//     // runByJavaFile('public static void main (String [] args) { int a = 30, b = 20;System.out.println("a - b = " + (a - b)); }');
+
+// run('int a = 33, b = 20; System.out.println("a - b = " + (a - b));',function(err, stdout, stderr) {
+//     stderr && console.error(stderr);
+//     stdout && console.log(stdout);
+// });
+
+// testJavaAsScript('int a = 20, b = 20; x=3; System.out.println("a - b = " + (a - b));', 'if(x==null)Test.fail(); else Test.pass();',{
+//     preCode: '//comment\nInteger x = null;',
+//     exp:40
+// }, function(err, report, stdout, stderr) {
+//     if(err) throw err;
+//     stderr && console.error(stderr);
+//     stdout && console.log(stdout);
+// });
 
 //     // runJavaInMain('int a = 30, b = 20; System.out.println("a - b = " + (a - b));');
 

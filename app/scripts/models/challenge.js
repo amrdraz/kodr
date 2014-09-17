@@ -64,6 +64,9 @@ var ChallengeModel = module.exports = DS.Model.extend({
     isJava: function () {
         return this.get('language')==='java';
     }.property('language'),
+    isJS: function () {
+        return this.get('language')==='javascript';
+    }.property('language'),
 
     // relationshipChanged: false,
     canSave: function() {
