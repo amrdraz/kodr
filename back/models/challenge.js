@@ -111,9 +111,9 @@ ChallengeSchema.statics.run = function(code, language) {
                 resolve(['no server js','']);
                 break;
             case 'java':
-                javaRunner.runJavaAsScript(code,function (err,stout,sterr) {
+                javaRunner.run(code,function (err,stout,sterr) {
                     if(err && !sterr) return reject(err);
-                    return resolve([sterr, stout]);
+                    return resolve([sterr, stout+"\n"]);
                 });
                 break;
             case 'python':
@@ -138,7 +138,7 @@ ChallengeSchema.statics.test = function(code, challenge) {
             case 'java':
                 javaRunner.testJavaAsScript(code,challenge.tests,challenge,function (err,report,stout,sterr) {
                     if(err && !sterr) return reject(err);
-                    return resolve([report,stout, sterr]);
+                    return resolve([report,stout+"\n", sterr]);
                 });
                 break;
             case 'python':

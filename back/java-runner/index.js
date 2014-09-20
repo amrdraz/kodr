@@ -7,17 +7,49 @@ var _ = require('lodash');
 var fs = require('fs');
 
 // run java inside main method using the java built in dynamic compiler
-var run = exports.run = function(simple_program, cb) {
-    var name = 'Main';
-    var cmd = 'java -cp ' + __dirname + ' -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner \'' + simple_program + '\'';
-    console.log(cmd);
-    cp.exec(cmd, {
-        timeout: 10000
-    }, cb);
+var run = exports.run = function(code, options,cb) {
+    
+    if (typeof options === 'function') {
+        cb = options;
+        options = {};
+    } else {
+        options = options || {};
+    }
+
+    var cmd = ["java -cp " + __dirname + " -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner"];
+    var pre = (options.preCode || '').replace(/\/\/.*$/gm, '').replace(/\r?\n|\r/g, ' ');
+    var post = (options.postCode || '');
+    var name = "Main";
+    // <comma-separated-default-imports>        (default: none)
+    var preClass = '';
+    if(options.di) {
+        preClass += _.reduce(options.di.split(','),function (s,i) {
+            return s+'import '+i+';';
+        },'');
+    }
+    // code to run
+    code = pre + '\n' + code + '\n' + post;
+    // escape " and $ because of terminal
+    code = code.replace(/"/g,'\\"').replace(/\$/g,'\\$');
+
+    var program ="";
+    program+=preClass;
+    program+="public class "+name+" {";
+    program+="  public static void main(String args[]) {try {\n";
+    program+="    "+code;
+    program+='  } catch (Exception e) {System.err.println(\\"Exception Line \\"+(e.getStackTrace()[0].getLineNumber()-2)+\\" \\"+e);}}'+
+             "}";
+        
+    // console.log(code);
+    cmd.push("\"" + name + "\"");
+    cmd.push("\"" + program + "\"");
+
+    // console.log(cmd.join(" "));
+    cp.exec(cmd.join(" "),{timeout: 10000,cwd:__dirname},cb);
 };
 
 
-// exports.run = function (simple_program,cb)
+// exports.run = function (code,cb)
 // {
 //     var stderr = new Streams.WritableStream(),
 //         stdout = new Streams.WritableStream();
@@ -37,9 +69,7 @@ var run = exports.run = function(simple_program, cb) {
 // };
 
 var runCMD = exports.runCMD = function(simple_program, cb) {
-    cp.exec('docker run --rm  java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner \'' + simple_program + '\'', {
-        timeout: 10000
-    }, cb);
+    cp.exec('docker run --rm draz/java-runner:0.3 java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner "Main" "' + simple_program + '"' , {timeout: 10000,cwd:__dirname}, cb);
 };
 
 // var UID = 1;
@@ -128,8 +158,9 @@ var testJavaAsScript = exports.testJavaAsScript = function(code, test, options, 
         'System.setOut(_$sysOut);' +
         'System.setErr(_$sysErr);' + '\n' +
         test;
-    opt.di = (opt.di || '') + (opt.di ? ',' : '') + 'Test,java.io.ByteArrayOutputStream,java.io.PrintStream';
-    runJavaAsScript(code, opt, function(err, stout, sterr) {
+    opt.di = (opt.di || '') + (opt.di ? ',' : '') + 'java.io.ByteArrayOutputStream,java.io.PrintStream';
+    
+    run(code, opt, function(err, stout, sterr) {
         if (err && !sterr) return cb(err);
         // console.log(stout);
         var report = {
@@ -175,20 +206,6 @@ var runJavaAsClassBody = exports.runJavaAsClassBody = function(code, args, cb) {
 //     i++;
 
 //     // runByJavaFile('public static void main (String [] args) { int a = 30, b = 20;System.out.println("a - b = " + (a - b)); }');
-
-// run('int a = 33, b = 20; System.out.println("a - b = " + (a - b));',function(err, stdout, stderr) {
-//     stderr && console.error(stderr);
-//     stdout && console.log(stdout);
-// });
-
-// testJavaAsScript('int a = 20, b = 20; x=3; System.out.println("a - b = " + (a - b));', 'if(x==null)Test.fail(); else Test.pass();',{
-//     preCode: '//comment\nInteger x = null;',
-//     exp:40
-// }, function(err, report, stdout, stderr) {
-//     if(err) throw err;
-//     stderr && console.error(stderr);
-//     stdout && console.log(stdout);
-// });
 
 //     // runJavaInMain('int a = 30, b = 20; System.out.println("a - b = " + (a - b));');
 

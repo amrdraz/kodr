@@ -13,5 +13,9 @@ module.exports = DS.Model.extend({
     groups: DS.hasMany('group',{async: true, inverse: 'founder'}),
     group: DS.belongsTo('group',{async: true, inverse: 'members'}),
 
-    userQuests: DS.hasMany('userQuest', {async:true,inverse:'user'})
+    userQuests: DS.hasMany('userQuest', {async:true,inverse:'user'}),
+
+    isStudent:function () {
+        return this.get('role')==='student';
+    }.property('role')
 });

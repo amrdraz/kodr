@@ -1,5 +1,5 @@
 
-public class Test {
+public class KodrTest {
     private static boolean hashSet=false;
     private static String hash="TestOut";
 
