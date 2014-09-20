@@ -51,7 +51,7 @@ describe('Challenge', function() {
         it('should test java', function(done) {
             Challenge.test(code,testchallenge,'java').spread(function(report, stout, sterr) {
                 if(sterr) return done(sterr);
-                console.log(report);
+                // console.log(stout);
                 expect(report).to.have.property('passed',true);
                 done();
             }).catch(done);

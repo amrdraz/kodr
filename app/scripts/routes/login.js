@@ -10,7 +10,11 @@ module.exports = App.LoginRoute = Em.Route.extend({
     });
   },
   // renderTemplate: function() {},
-  // beforeModel: function() {},
+  beforeModel: function() {
+    if(this.get('session.isAuthenticated')) {
+      this.transitionTo('profile');
+    }
+  },
   // afterModel: function() {},
   
   model: function() {

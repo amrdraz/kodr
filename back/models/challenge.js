@@ -111,7 +111,7 @@ ChallengeSchema.statics.run = function(code, language) {
                 resolve(['no server js','']);
                 break;
             case 'java':
-                javaRunner.runJavaAsScript(code,function (err,stout,sterr) {
+                javaRunner.run(code,function (err,stout,sterr) {
                     if(err && !sterr) return reject(err);
                     return resolve([sterr, stout]);
                 });

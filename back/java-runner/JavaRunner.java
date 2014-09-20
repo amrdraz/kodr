@@ -1,24 +1,10 @@
-// import java.io.IOException;
-// import java.io.PrintWriter;
-// import java.io.StringWriter;
-// import java.net.URI;
-// import java.util.Arrays;
-
-// import javax.tools.Diagnostic;
-// import javax.tools.DiagnosticCollector;
-// import javax.tools.JavaCompiler;
-// import javax.tools.JavaFileObject;
-// import javax.tools.SimpleJavaFileObject;
-// import javax.tools.ToolProvider;
-// import javax.tools.JavaCompiler.CompilationTask;
-// import javax.tools.JavaFileObject.Kind;
-
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 import java.lang.reflect.InvocationTargetException;
  
 import javax.tools.Diagnostic;
@@ -30,71 +16,22 @@ import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-// compiles source in memory
-// public class JavaRunner {
-//   public static void main(String args[]) throws IOException {
-//     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-//     DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-
-//     String code = "public class Main {\n"+
-//     "  public static void main(String args[]) {\n";
-//     if(args.length>0)
-//       code+=args[0];
-//     code+="  }"+
-//     "}";
-//     SimpleJavaFileObject file = new JavaSourceFromString("Main", code);
-
-//     Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(file);
-//     CompilationTask task = compiler.getTask(null, null, diagnostics, null, null, compilationUnits);
-    
-//     boolean success = task.call();
-//     for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
-//       // System.out.println(diagnostic.getCode());
-//       // System.out.println(diagnostic.getKind());
-//       // System.out.println(diagnostic.getPosition());
-//       // System.out.println(diagnostic.getStartPosition());
-//       // System.out.println(diagnostic.getEndPosition());
-//       // System.out.println(diagnostic.getSource());
-//       System.out.println(diagnostic.getMessage(null));
-
-//     }
-
-//     if (success) {
-//       try {
-//         Class.forName("Main").getDeclaredMethod("main", new Class[] { String[].class }).invoke(null, new Object[] { null });
-//       } catch (ClassNotFoundException e) {
-//         System.err.println("Class not found: " + e);
-//       } catch (NoSuchMethodException e) {
-//         System.err.println("No such method: " + e);
-//       } catch (IllegalAccessException e) {
-//         System.err.println("Illegal access: " + e);
-//       } catch (InvocationTargetException e) {
-//         System.err.println("Invocation target: " + e);
-//       }
-//     }
-//   }
-// }
-
  
 /**
  * A test class to test dynamic compilation API.
+ * args[0] is the name of the calss
+ * args[1] is the code to run
  *
  */
 public class JavaRunner {
     final Logger logger = Logger.getLogger(JavaRunner.class.getName()) ;
   
     public static void main(String args[]){
-        String name = "Main";
-        String code = "public class "+name+" {\n"+
-        "  public static void main(String args[]) {\n";
-        if(args.length>0)
-          code+=args[0];
-        code+="  }"+
-        "}";
+        String name = args[0];
         /*Creating dynamic java source code file object*/
-        SimpleJavaFileObject fileObject = new DynamicJavaSourceCodeObject (name, code) ;
+        SimpleJavaFileObject fileObject = new DynamicJavaSourceCodeObject (name, args[1]) ;
         JavaFileObject javaFileObjects[] = new JavaFileObject[]{fileObject} ;
- 
+
         /*Instantiating the java compiler*/
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
  
@@ -112,14 +49,15 @@ public class JavaRunner {
  
         /*Prepare any compilation options to be used during compilation*/
         //In this example, we are asking the compiler to place the output files under bin folder.
-        String[] compileOptions = new String[]{} ;
-        Iterable<String> compilationOptionss = Arrays.asList(compileOptions);
+        List<String> compileOptions = new ArrayList<String>();
+        compileOptions.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path")));
+        // Iterable<String> compilationOptionss = Arrays.asList(compileOptions);
  
         /*Create a diagnostic controller, which holds the compilation problems*/
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
  
         /*Create a compilation task from compiler by passing in the required input objects prepared above*/
-        CompilationTask compilerTask = compiler.getTask(null, stdFileManager, diagnostics, compilationOptionss, null, compilationUnits) ;
+        CompilationTask compilerTask = compiler.getTask(null, stdFileManager, diagnostics, compileOptions, null, compilationUnits) ;
  
         //Perform the compilation by calling the call method on compilerTask object.
         boolean status = compilerTask.call();
