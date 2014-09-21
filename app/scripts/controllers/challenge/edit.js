@@ -115,12 +115,13 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                 controller.trigger('showConsole');
                 controller.get('console').Write('Compiling...\n');
                 controller.runInServer(model.get('solution'), model.get('language'),function (res) {
-                    console.log(res.sterr);
                     controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
                     if(res.sterr){
                         controller.get('console').Write(res.sterr,'error');
+                        controller.trigger('lintCode', 'solution',controller.parseSterr(res.sterr));
                     } else {
                         controller.get('console').Write(res.stout);
+                        controller.trigger('lintCode', 'solution',[]);
                     }
                 });
             } else {
@@ -137,8 +138,10 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                     controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
                     if(res.sterr){
                         controller.get('console').Write(res.sterr,'error');
+                        controller.trigger('lintCode', 'solution',controller.parseSterr(res.sterr));
                     } else {
                         controller.testSuccess(res.report);
+                        controller.trigger('lintCode', 'solution',[]);
                     }
                 });
             } else {

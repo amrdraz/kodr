@@ -155,6 +155,7 @@ App.ChosenSelectView = require('./views/ember-chosen');
 App.ApplicationView = require('./views/application');
 App.ChallengeEditView = require('./views/challengeEditView');
 App.ChallengeTryView = require('./views/challengeEditView');
+App.TrialView = require('./views/challengeEditView');
 App.ArenaTrialTrialView = require('./views/challengeEditView');
 
 // Controllers

@@ -37,7 +37,7 @@ var run = exports.run = function(code, options,cb) {
     program+="public class "+name+" {";
     program+="  public static void main(String args[]) {try {\n";
     program+="    "+code;
-    program+='  } catch (Exception e) {System.err.println(\\"Exception Line \\"+(e.getStackTrace()[0].getLineNumber()-2)+\\" \\"+e);}}'+
+    program+='  } catch (Exception e) {System.err.print(\\"Exception line \\"+(e.getStackTrace()[0].getLineNumber())+\\" \\"+e);}}'+
              "}";
         
     // console.log(code);

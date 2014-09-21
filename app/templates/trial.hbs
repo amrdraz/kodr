@@ -17,9 +17,10 @@
       <div class="tab-pane  fade in active" id="code">
         {{view 'App.CodeEditorView'
           name="codeEditor"
-          id="editor"
+          id="codeEditor"
           class="col-lg-12"
           model=model
+          lint=true
           highlight=model.challenge.language
           attr='code' }}
       </div>

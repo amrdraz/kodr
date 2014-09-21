@@ -65,8 +65,13 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                 controller.get('console').Write('Compiling...\n');
                 controller.runInServer(model.get('code'), model.get('challenge.language'),function (res) {
                     controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
-                    controller.get('console').Write(res.stout);
-                    res.sterr && controller.get('console').Write(res.sterr,'error');
+                    if(res.sterr){
+                        controller.get('console').Write(res.sterr,'error');
+                        controller.trigger('lintCode', 'code',controller.parseSterr(res.sterr));
+                    } else {
+                        controller.get('console').Write(res.stout);
+                        controller.trigger('lintCode', 'code',[]);
+                    }
                 });
             }
         },
@@ -91,8 +96,13 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                 controller.get('console').Write('Running Tests...\n');
                 controller.testInServer(model.get('code'), challenge,function (res) {
                     controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
-                    controller.testSuccess(res.report);
-                    res.sterr && controller.get('console').Write(res.sterr,'error');
+                    if(res.sterr){
+                        controller.get('console').Write(res.sterr,'error');
+                        controller.trigger('lintCode', 'code',controller.parseSterr(res.sterr));
+                    } else {
+                        controller.testSuccess(res.report);
+                        controller.trigger('lintCode', 'code',[]);
+                    }
                 });
             }
         })

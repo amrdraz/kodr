@@ -81,6 +81,33 @@ module.exports = Em.Mixin.create(Em.Evented, {
 
         return report.passed;
     },
+    parseSterr : function (sterr) {
+        var i,column_no_start,column_no_stop,errs,fragment,lines = sterr.split('\n'),found = [];
+
+        for (i = 0;i<lines.length;) {
+            if(~lines[i].indexOf('Error')) {
+                errs = lines[i++].match(/Error.* line (\d*).* error: (.*)/);
+                fragment = lines[i++]+"\n";
+                column_no_start = lines[i++].length-2;
+                column_no_stop = column_no_start+1;
+            } else {
+                errs = lines[i++].match(/Exception.* line (\d*) (.*)/);
+                column_no_start = 0;
+                column_no_stop = 200;
+                fragment = '';
+            }
+            found.push({
+                line_no:(+errs[1])-2,
+                column_no_start: column_no_start,
+                column_no_stop: column_no_stop,
+                message:errs[2],
+                fragment:fragment,
+                severity: "error"
+            });
+        }
+        console.log(found);
+        return found;
+    },
     runInServer: function(code, language, cb) {
         Em.$.ajax({
             url: '/api/challenges/run',
