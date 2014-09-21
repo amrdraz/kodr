@@ -62,6 +62,14 @@ module.exports = Em.TextArea.extend({
         }
 
         var editor = CodeMirror.fromTextArea(this.$()[0], config);
+            },
+            gutters: ["CodeMirror-lint-markers"],
+            lint: {
+                "getAnnotations": CodeMirror.remoteValidator,
+                "async": true,
+                "check_cb": this.check_syntax.bind(this)
+            }
+        });
 
         editor.getDoc().setValue(model.get(attr) || '');
         this.updateEditor = function() {

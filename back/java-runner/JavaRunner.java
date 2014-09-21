@@ -16,7 +16,6 @@ import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
- 
 /**
  * A test class to test dynamic compilation API.
  * args[0] is the name of the calss

@@ -2,7 +2,7 @@
 public class Test {
     private static boolean hashSet=false;
     private static String hash="TestOut";
-
+    
     public static void setHash(String h) {
         if(!hashSet) {
             hash = h;
