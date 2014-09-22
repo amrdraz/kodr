@@ -41,7 +41,7 @@ module.exports = function(req, res, next) {
                 activated: true
             }), User.create({
                 username: 'admin',
-                email: 'admin@place.com',
+                email: 'amr.m.draz@gmail.com',
                 password: 'admin12345',
                 role: 'admin',
                 activated: true
@@ -69,12 +69,13 @@ module.exports = function(req, res, next) {
             Challenge.create({
                 arena: a.id,
                 author: teacher._id,
+                language:'java',
                 name: 'Define x',
-                description: 'Define a new `var` __x__ with value equal to 3',
+                description: 'Define a new `int` __x__ with value equal to 3',
                 exp: 1,
-                solution: 'var x = 3;',
+                solution: 'int x = 3;',
                 setup: '',
-                tests: 'describe("test", function () {it("should define x", function () {expect(x).toBeDefined();});it("should define x", function () {expect(x).toEqual(3);});});'
+                tests: 'try {\n if(x===3) \n Test.pass(1); \n else \n Test.fail("x should wual 3");\n} catch (Exception e) {\n Test.fail("x was not deifnied");\n}'
             }),
             Challenge.create({
                 arena: a.id,

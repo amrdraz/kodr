@@ -62,9 +62,8 @@ module.exports = function(app, passport) {
             User.findOne({_id:token.user}).exec().then(function (user) {
                 user.activated = true;
                 user.save();
-                var confirmURL = req.headers.host + '/confirmAccount/' + req.params.token;
-                res.render('mail/welcome.html', {
-                    confirmURL: confirmURL,
+                // var confirmURL = req.headers.host + '/confirmAccount/' + req.params.token;
+                res.render('confirm.html', {
                     user:user
                 });
             }, next);
