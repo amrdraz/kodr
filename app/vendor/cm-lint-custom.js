@@ -66,7 +66,7 @@
     if (options instanceof Function) return {getAnnotations: options};
     if (!options || options === true) options = {};
     if (!options.getAnnotations) options.getAnnotations = cm.getHelper(CodeMirror.Pos(0, 0), "lint");
-    if (!options.getAnnotations) throw new Error("Required option 'getAnnotations' missing (lint addon)");
+    // if (!options.getAnnotations) throw new Error("Required option 'getAnnotations' missing (lint addon)");
     return options;
   }
 
@@ -116,14 +116,6 @@
     return tip;
   }
 
-  function startLinting(cm) {
-    var state = cm.state.lint, options = state.options;
-    if (options.async)
-      options.getAnnotations(cm, updateLinting, options);
-    else
-      updateLinting(cm, options.getAnnotations(cm.getValue(), options.options));
-  }
-
   function updateLinting(cm, annotationsNotSorted) {
     clearMarks(cm);
     var state = cm.state.lint, options = state.options;
@@ -159,12 +151,6 @@
     if (options.onUpdateLinting) options.onUpdateLinting(annotationsNotSorted, annotations, cm);
   }
 
-  function onChange(cm) {
-    var state = cm.state.lint;
-    clearTimeout(state.timeout);
-    state.timeout = setTimeout(function(){startLinting(cm);}, state.options.delay || 500);
-  }
-
   function popupSpanTooltip(ann, e) {
     var target = e.target || e.srcElement;
     showTooltipFor(e, annotationTooltip(ann), target);
@@ -194,7 +180,6 @@
 
     if (old && old != CodeMirror.Init) {
       clearMarks(cm);
-      cm.off("change", onChange);
       CodeMirror.off(cm.getWrapperElement(), "mouseover", cm.state.lint.onMouseOver);
       delete cm.state.lint;
     }
@@ -203,11 +188,9 @@
       var gutters = cm.getOption("gutters"), hasLintGutter = false;
       for (var i = 0; i < gutters.length; ++i) if (gutters[i] == GUTTER_ID) hasLintGutter = true;
       var state = cm.state.lint = new LintState(cm, parseOptions(cm, val), hasLintGutter);
-      cm.on("change", onChange);
       if (state.options.tooltips != false)
         CodeMirror.on(cm.getWrapperElement(), "mouseover", state.onMouseOver);
 
-      startLinting(cm);
     }
   });
 });

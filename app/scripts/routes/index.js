@@ -4,7 +4,6 @@ module.exports = Em.Route.extend({
   // setupController: function(controller, model) {}
   // renderTemplate: function() {},
   beforeModel: function() {
-    debugger;
     if(this.get('session.isAuthenticated')) {
       this.transitionTo('arenas');
     } else {

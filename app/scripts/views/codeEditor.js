@@ -53,11 +53,7 @@ module.exports = Em.TextArea.extend({
         // compileErrors
         if (lint) {
             config.gutters = ["CodeMirror-lint-markers"];
-            config.lint = {
-                "getAnnotations": CodeMirror.remoteValidator,
-                "async": true,
-                "check_cb": this.check_syntax.bind(this)
-            };
+            config.lint = {};
             // this.get('controller').on('spy', this, this.spy);
         }
 
