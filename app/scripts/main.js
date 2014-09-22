@@ -213,6 +213,14 @@ App.GroupEditRoute = require('./routes/group/edit');
 App.GroupsRoute = require('./routes/groups');
 App.GroupsCreateRoute = require('./routes/groups/create');
 
+
+// App.UserRoute = require('./routes/user');
+// App.UserIndexRoute = require('./routes/user/index');
+// App.UserEditRoute = require('./routes/user/edit');
+
+App.UsersRoute = require('./routes/users');
+// App.UsersCreateRoute = require('./routes/users/create');
+
 App.QuestRoute = require('./routes/quest');
 App.QuestIndexRoute = require('./routes/quest/index');
 App.QuestEditRoute = require('./routes/quest/edit');

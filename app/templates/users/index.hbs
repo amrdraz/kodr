@@ -1,0 +1,33 @@
+
+{{#link-to 'users.create' class="btn btn-primary pull-right .create-user" }} <i class="glyphicon glyphicon-plus"></i> Create User{{/link-to}}
+
+<h3>Users</h3>
+
+<ul class="list-group">
+{{#each user in model}}
+        <li class="list-group-item">            
+            <h4 class="list-group-item-heading">
+                <small class="pull-right">
+                {{#if user.isStudent }}
+                    <span class="label label-default">student</span>
+                {{/if}}
+                {{#if user.group }}
+                  <span class="label label-default">{{user.group.name}}</span>
+                {{/if}}
+                {{#link-to 'user.edit' user class="user-edit"}}
+                    <i class="glyphicon glyphicon-pencil"></i> Edit
+                {{/link-to}} 
+                <a href="#remove" {{action "remove" user }} class="user-delete">
+                    <i class="glyphicon glyphicon-trash"></i> Delete
+                </a>
+                </small>
+
+                {{#link-to 'user' user class="user-name"}}
+                    {{user.username}}
+                {{/link-to}}
+            </h4>
+        </li>
+{{else}}
+    <p>No Users</p>
+{{/each}}
+</ul>
