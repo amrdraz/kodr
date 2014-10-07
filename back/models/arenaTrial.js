@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var debounce = require('debounce');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
