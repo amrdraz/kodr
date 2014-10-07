@@ -9,6 +9,8 @@ var setup = require('./setup');
 var Trial = require('../../back/models/trial');
 var User = require('../../back/models/user');
 var Challenge = require('../../back/models/challenge');
+var Arena = require('../../back/models/arena');
+var AreanTrial = require('../../back/models/arenaTrial');
 var observer = require('../../back/mediator');
 
 
@@ -16,6 +18,24 @@ var observer = require('../../back/mediator');
 describe('Trial', function() {
     before(function(done) {
         return setup.clearDB(done);
+    });
+
+    describe('Unit', function () {
+        it('should create a trial with id', function (done) {
+            var arena = new Arena({});
+            var user = new User({});
+            var areanTrial = new AreanTrial({arena:arena.id,user:user.id});
+            var challenge = new Challenge({arena:arena.id});
+            Trial.findOrCreate({
+                    arenaTrial: areanTrial.id,
+                    arena: areanTrial.arena,
+                    user: areanTrial.user,
+                    challenge: challenge.id,
+                    code: challenge.setup
+                }).then(function (trial) {
+                    done();
+                });
+        });
     });
 
     describe('Integration', function() {
@@ -151,12 +171,12 @@ describe('Trial', function() {
         before(function(done) {
             Promise.fulfilled().then(function() {
                 return [
-                    Challenge.create({}),
+                    Arena.create({}),
                     User.create(student),
                     User.create(teacher),
                     User.create(admin)
                 ];
-            }).spread(function(ch, st, t, a) {
+            }).spread(function(a, st, t, a) {
                 // console.log(st,t,a);
                 student._id = st._id;
                 student.token = st.token;
@@ -164,6 +184,8 @@ describe('Trial', function() {
                 admin.token = a.token;
                 teacher._id = t._id;
                 accessToken = teacher.token = t.token;
+                return Challenge.create({arena:a.id});
+            }).then(function (ch) {
                 challenge.id = ch.id;
                 trial.trial.challenge = ch.id;
                 return setup.challengeTest(done);

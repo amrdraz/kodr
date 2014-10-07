@@ -51,7 +51,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         var result = this._super(report);
         // console.log(report);
         if(report.score<model.get('exp')) {
-            this.get('console').Write('Awrded ('+report.score+"/"+model.get('exp')+') - Solution to challeneg should reach maximum score tests','error');
+            this.get('console').Write('Awarded ('+report.score+"/"+model.get('exp')+') - Solution to challenge should reach maximum score tests','error');
             result = false;
         }
 
@@ -145,7 +145,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                     }
                 });
             } else {
-                this.send('evaluate');
+                this.evaluate();
             }
         },
         reset: function() {
@@ -155,7 +155,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             var model = this.get('model');
             if (model.get('canSave')) {
                 if (model.get('isPublished')) {
-                    this.evaluate();
+                    this.send('validate');
                     return false;
                 }
                 this.save();
@@ -183,7 +183,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                         console.log(err.stack);
                     });
                 } else {
-                    this.evaluate();
+                    this.send('validate');
                 }
             }
         },

@@ -8,6 +8,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
 var observer = require('../mediator');
 var Challenge = require('./challenge');
+// var ArenaTrial = require('./arenaTrial');
 
 
 /**
@@ -70,6 +71,11 @@ var TrialSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'ArenaTrial',
         childPath: "trials"
+    },
+    arena: {
+        type: ObjectId,
+        ref: 'Arena',
+        childPath: "trials"
     }
 
 });
@@ -78,12 +84,12 @@ TrialSchema.plugin(version, {
     collection: 'TrialVersions',
     logError: true,
     suppressVersionIncrement: false,
-    ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge'],
+    ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge', 'arena'],
     strategy: 'array'
 });
 
 TrialSchema.plugin(relationship, {
-    relationshipPathName: ['arenaTrial', 'user', 'challenge']
+    relationshipPathName: ['arenaTrial', 'user', 'challenge', 'arena']
 });
 
 TrialSchema.pre('save', true, function(next, done) {
@@ -124,10 +130,12 @@ TrialSchema.statics.findOrCreate = function(trial) {
         }).exec();
     }).then(function(model) {
         if (model) return model;
-        return Trial.create(trial).then(function(model) {
-            return model;
-        });
+        console.log(trial);
+        delete trial.tests;
+        console.log(trial);
+        return Trial.create(trial);
     });
+
 };
 
 
@@ -135,7 +143,7 @@ function computeResult(trial, done) {
 
 }
 
-var Trial = mongoose.model('Trial', TrialSchema);
+var Trial = module.exports = mongoose.model('Trial', TrialSchema);
 
 // removing trial from arena trial so that it wouldn't show up
 // while still retaining the data for the user's histroy (tho maybe that's not a good idea)
@@ -179,6 +187,3 @@ observer.on('challenge.removed', function(challenge) {
         });
 
 });
-
-
-module.exports = Trial;

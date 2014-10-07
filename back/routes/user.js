@@ -24,8 +24,12 @@ module.exports = function(app, passport) {
         });
     });
 
-    app.post('/profile', access.requireRole(), function(req, res) {
-        req.user.set(req.body);
+    app.post('/profile', access.requireRole(['$self', 'admin']), function(req, res) {
+        
+        if (req.body.password !== req.body.passwordConfirmation) {
+            return res.send(400, 'Passwords do not match.');
+        }
+        req.user.set(req.body.user);
         req.user.save(function(err, user) {
             if (err) res.send(500);
             res.json({

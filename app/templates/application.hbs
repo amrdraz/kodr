@@ -13,29 +13,29 @@
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           {{#link-to 'index' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn">
+            <a {{bind-attr href="view.href"}} class="btn" >
               Home
             </a>
           {{/link-to}}
           {{#link-to 'about' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn">
+            <a {{bind-attr href="view.href"}} class="btn" >
               About
             </a>
           {{/link-to}}
-          {{#link-to 'arenas' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn">
+          {{#link-to 'arenas' tagName="li" href=false}}
+            <a {{bind-attr href="view.href"}} class="btn" >
               Arenas
             </a>
           {{/link-to}}
 
           {{#if session.isTeacher }}
             {{#link-to 'groups' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn">
+            <a {{bind-attr href="view.href"}} class="btn" >
               Groups
             </a>
             {{/link-to}}
             {{#link-to 'quests' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn">
+            <a {{bind-attr href="view.href"}} class="btn" >
               Quests
             </a>
             {{/link-to}}
@@ -48,7 +48,7 @@
 
           {{#if session.isAuthenticated}}
           {{#link-to 'profile' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn">
+            <a {{bind-attr href="view.href"}} class="btn" >
               Profile
             </a>
           {{/link-to}}
@@ -69,10 +69,10 @@
                   <li><a href="#" {{action "invalidateSession"}}>Logout</a></li>
                 </ul>
               </div> --}}
-              <li><a href="#" {{action "invalidateSession"}}>Logout</a></li>
+              <li><a href="#" {{action "invalidateSession"}} >Logout</a></li>
             {{else}}
-              <li>{{#link-to "login"}}Sign In{{/link-to}}</li>
-              <li>{{#link-to "signup"}}Create Account{{/link-to}}</li>
+              <li>{{#link-to "login" }}Sign In{{/link-to}}</li>
+              <li>{{#link-to "signup" }}Create Account{{/link-to}}</li>
             {{/if}}
         </ul>
       </div>

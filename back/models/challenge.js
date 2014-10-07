@@ -113,7 +113,7 @@ ChallengeSchema.statics.run = function(code, language) {
             case 'java':
                 javaRunner.run(code,function (err,stout,sterr) {
                     if(err && !sterr) return reject(err);
-                    return resolve([sterr, stout+"\n"]);
+                    return resolve([sterr, stout]);
                 });
                 break;
             case 'python':
@@ -138,7 +138,7 @@ ChallengeSchema.statics.test = function(code, challenge) {
             case 'java':
                 javaRunner.testJavaAsScript(code,challenge.tests,challenge,function (err,report,stout,sterr) {
                     if(err && !sterr) return reject(err);
-                    return resolve([report,stout+"\n", sterr]);
+                    return resolve([report,stout, sterr]);
                 });
                 break;
             case 'python':

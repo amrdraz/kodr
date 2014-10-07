@@ -142,6 +142,9 @@ App.CustomAuthenticator = SimpleAuth.Authenticators.OAuth2.extend({
     }
 });
 
+// Components
+App.HighChartComponent = require('./components/high-chart');
+
 // Views
 App.CodeEditorView = require('./views/codeEditor');
 App.ConsoleView = require('./views/console');
@@ -168,6 +171,12 @@ App.GroupEditController = require('./controllers/group/edit');
 // App.GroupsController = require('./controllers/group');
 App.GroupsIndexController = require('./controllers/groups/index');
 App.GroupsCreateController = require('./controllers/group/edit');
+
+App.UserIndexController = require('./controllers/user/index');
+// App.UserEditController = require('./controllers/user/edit');
+// App.UsersController = require('./controllers/user');
+// App.UsersIndexController = require('./controllers/users/index');
+// App.UsersCreateController = require('./controllers/user/edit');
 
 App.QuestController = require('./controllers/quest');
 App.QuestEditController = require('./controllers/quest/edit');
@@ -227,6 +236,8 @@ App.QuestEditRoute = require('./routes/quest/edit');
 
 App.QuestsRoute = require('./routes/quests');
 App.QuestsCreateRoute = require('./routes/quests/create');
+
+App.ChallengeTrialRoute = require('./routes/challengeTrial');
 
 App.ChallengeRoute = require('./routes/challenge');
 App.ChallengeIndexRoute = require('./routes/challenge/index');

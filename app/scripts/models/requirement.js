@@ -1,5 +1,7 @@
 module.exports = Em.Object.extend({
-    
+    user:null,
+    complete:null,
+    completed:null,
     init: function() {
         this._super();
         this.setProperties({
@@ -17,6 +19,12 @@ module.exports = Em.Object.extend({
     isChallenge: function() {
         return this.get('model1') === 'Challenge';
     }.property('model1'),
+    isMultiple:function () {
+        return this.get('times')>1;
+    }.property('times'),
+    progressInCSS:function () {
+        return "width:"+(this.get('completed')*100/this.get('times'))+"%;";
+    }.property('completed', 'times'),
 
     serialize: function () {
         var obj = this.getProperties(['model1', 'id1', 'model2', 'id2', 'times']);

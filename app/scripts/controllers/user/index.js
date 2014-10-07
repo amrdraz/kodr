@@ -1,0 +1,61 @@
+var UserController = Ember.ObjectController.extend(Ember.Validations.Mixin, {
+    validations:{
+      password: {
+        length:{minimum:10},
+        format:{
+          with:/^.{10,}$/,
+          message: 'must contain at least one alphabel character and one digit'
+        },
+        confirmation:true
+      },
+      passwordConfirmation: {
+        presence:true
+      }
+    },
+    activitySeries: function () {
+      return [{
+                name: 'Quantity',
+                data: [4, 4]
+            }, {
+                name: 'Revenue',
+                data: [10.0, 10.0]
+            }];
+    }.property(),
+    isOwnPage:function () {
+      return this.get('session.user.id')===this.get('model.id');
+    }.property('model.id'),
+    actions: {
+        changePass: function() {
+            var that = this;
+            this.validate().then(function() {
+                if (this.get('session.isAdmin')) {
+                  //TODO
+                } else {
+                  Em.$.ajax({
+                      type: 'POST',
+                      url: '/profile',
+                      context: that,
+                      data: that.getProperties('password', 'passwordConfirmation')
+                  }).done(function(res) {
+                      toastr.success('passwordChanged');
+                      this.get('session').restore({access_token:res.access_token});
+                  }).fail(function(xhr) {
+                      toastr.error(xhr.responseText);
+                  });
+                }
+            }, function() {
+                var errors = that.get('errors');
+                var fullErrors = [];
+                Object.keys(errors).forEach(function(val) {
+                    if (errors[val] instanceof Array)
+                        errors[val].forEach(function(msg) {
+                            fullErrors.push([val, msg].join(" "));
+                        });
+                });
+                that.set('fullErrors', fullErrors);
+            });
+        }
+    }
+});
+
+module.exports = UserController;

@@ -38,6 +38,7 @@ module.exports = function(App) {
                 path: '/try/:trial_id' //used to load trial
             });
         });
+        this.resource('challengeTrial',{path:'/trial/:challenge_id'});
         this.resource('arena', {
             path: '/arenas/:arena_id'
         }, function() {

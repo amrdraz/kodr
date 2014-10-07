@@ -1,12 +1,11 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var debounce = require('debounce');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
 var observer = require('../mediator');
-var Trial = require("./trial");
 var Challenge = require("./challenge");
+var Trial = require("./trial");
 
 /**
  * Arena User Schema.
@@ -83,10 +82,11 @@ ArenaTrialSchema.methods.getArenaChallenges = function() {
 /**
  * Find ir create an ArenaTrial along with it's associated Trials
  * @param  {hash} arenaTrial arena trial to create requires arena and user
- * @return {Promise}         array contianing arenaTrial as first element and trials as second
+ * @param  {boolean} withoutTrials wether to create trials along with this arena trial
+ * @return {Promise} array contianing arenaTrial as first element and trials as second unless withoutTrials is true
  */
-ArenaTrialSchema.statics.findOrCreate = function(arenaTrial) {
-    return Promise.fulfilled().then(function() {
+ArenaTrialSchema.statics.findOrCreate = function(arenaTrial,withoutTrials) {
+    var promise = Promise.fulfilled().then(function() {
         return ArenaTrial.findOne({
             user: arenaTrial.user,
             arena: arenaTrial.arena
@@ -94,26 +94,32 @@ ArenaTrialSchema.statics.findOrCreate = function(arenaTrial) {
             if (model) return Promise.resolve(model);
             return ArenaTrial.create(arenaTrial);
         });
-    }).then(function(model) {
-        var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
-            return Trial.findOrCreate({
-                arenaTrial: model._id,
-                arena: model.arena,
-                user: model.user,
-                challenge: challenge._id,
-                code: challenge.setup
-            });
-        });
-        var at = trials.then(function(mods) {
-            return ArenaTrial.findOne({
-                _id: model._id
-            }).exec();
-        });
-        return [at, trials];
     });
+    console.log(withoutTrials);
+    if(withoutTrials) {
+        return [promise];
+    } else {
+        return promise.then(function(model) {
+            var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
+                return Trial.findOrCreate({
+                    arenaTrial: model._id,
+                    arena: model.arena,
+                    user: model.user,
+                    challenge: challenge._id,
+                    code: challenge.setup
+                });
+            });
+            var at = trials.then(function(mods) {
+                return ArenaTrial.findOne({
+                    _id: model._id
+                }).exec();
+            });
+            return [at, trials];
+        });
+    }
 };
 
-var ArenaTrial = mongoose.model('ArenaTrial', ArenaTrialSchema);
+var ArenaTrial = module.exports = mongoose.model('ArenaTrial', ArenaTrialSchema);
 
 var queue = Promise.fulfilled();
 var timeout;
@@ -147,5 +153,3 @@ observer.on('trial.award', function(trial) {
             });
         });
 });
-
-module.exports = ArenaTrial;

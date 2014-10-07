@@ -7,6 +7,7 @@ module.exports = DS.Model.extend({
     report:DS.attr(),
     challenge: DS.belongsTo('challenge'),
     user: DS.belongsTo('user'),
+    arena: DS.belongsTo('arena'),
     arenaTrial: DS.belongsTo('arenaTrial'),
 
     canSubmit: function () {

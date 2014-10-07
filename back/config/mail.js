@@ -22,7 +22,7 @@ var smtpTransporter = nodemailer.createTransport(smtpTransport({
 }));
 // smtpTransporter.use('compile', htmlToText());
 
-var from = '"Coding Owel" <kodr@abkar.org>';
+var from = '"Coding Owl" <kodr@abkar.org>';
 
 var stubTransport = nodemailer.createTransport(stubTransport());
 

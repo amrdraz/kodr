@@ -1,5 +1,6 @@
 module.exports = DS.Model.extend({
     username: DS.attr('string'),
+    email: DS.attr('string'),
     exp: DS.attr('number'),
     rp: DS.attr('number'),
     role:DS.attr('string'),

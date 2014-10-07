@@ -17,7 +17,10 @@ module.exports = DS.Model.extend({
     description: DS.attr('string'),
     rp: DS.attr('number'),
     requirements: DS.attr('questRequirement'),
-    met:DS.attr('number'),
+    complete:DS.attr('boolean'),
+    hash:function () {
+        return '#'+this.get('id');
+    }.property('id'),
     quest: DS.belongsTo('Quest', {
         async: true,
         inverse: 'userQuests'
