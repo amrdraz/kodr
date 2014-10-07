@@ -30,7 +30,7 @@ describe('Challenge', function() {
         preCode:'//comment to be striped',
         exp:1
     };
-    var out = "a - b = 20";
+    var out = "a - b = 20\n";
 
     describe('Code', function() {
         it('should run java', function(done) {
