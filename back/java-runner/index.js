@@ -1,6 +1,5 @@
 var cp = require('child_process');
 var path = require('path');
-var Parallel = require('paralleljs');
 var _ = require('lodash');
 // var Docker = require('dockerode');
 // var Streams = require('memory-streams');
