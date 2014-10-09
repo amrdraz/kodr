@@ -102,6 +102,9 @@ module.exports = function(app, passport) {
         }, {
             role: 'teacher',
             all: true
+        }, {
+            role: 'admin',
+            all: true
         }, ]
     }), access.requireIn('trials'), function(req, res, next) {
         var trial = req.body.trial;
@@ -134,6 +137,9 @@ module.exports = function(app, passport) {
             in : 'trials'
         }, {
             role: 'teacher',
+            all: true
+        },{
+            role: 'admin',
             all: true
         }, ]
     }), function(req, res, next) {

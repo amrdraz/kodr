@@ -1,11 +1,11 @@
 
-{{#if session.isTeacher}}
+{{#if session.atLeastTeacher}}
   {{#link-to 'arenas.create' class="btn btn-primary pull-right .create-arena" }} <i class="glyphicon glyphicon-plus"></i> Create Arena{{/link-to}}
 {{/if}}
 
 <h3>Arenas</h3>
 
-{{#if session.isTeacher }}
+{{#if session.atLeastTeacher }}
 <ul class="list-group">
 {{#each arena in model}}
         <li class="list-group-item">            

@@ -18,5 +18,11 @@ module.exports = DS.Model.extend({
 
     isStudent:function () {
         return this.get('role')==='student';
+    }.property('role'),
+    isTeacher:function () {
+        return this.get('role')==='teacher';
+    }.property('role'),
+    isAdmin:function () {
+        return this.get('role')==='admin';
     }.property('role')
 });

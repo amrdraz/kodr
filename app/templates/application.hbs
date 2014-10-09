@@ -28,7 +28,7 @@
             </a>
           {{/link-to}}
 
-          {{#if session.isTeacher }}
+          {{#if session.atLeastTeacher }}
             {{#link-to 'groups' tagName="li" href=false }}
             <a {{bind-attr href="view.href"}} class="btn" >
               Groups
@@ -39,11 +39,13 @@
               Quests
             </a>
             {{/link-to}}
-           {{!--  {{#link-to 'users' tagName="li" href=false }}
+          {{/if}}
+          {{#if session.isAdmin}}
+            {{#link-to 'users' tagName="li" href=false }}
             <a {{bind-attr href="view.href"}} class="btn">
               Users
             </a>
-            {{/link-to}} --}}
+            {{/link-to}}
           {{/if}}
 
           {{#if session.isAuthenticated}}

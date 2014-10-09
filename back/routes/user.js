@@ -64,11 +64,16 @@ module.exports = function(app, passport) {
      * @returns {object} users
      */
 
-    app.get('/api/users', access.requireRole(['student', 'teacher']), function(req, res, next) {
-        if (req.query.group === "null") {
-            req.query.group = null;
+    app.get('/api/users', access.requireRole(['student', 'teacher', 'admin']), function(req, res, next) {
+        var query = req.query;
+        if (query.group === "null") {
+            query.group = null;
         }
-        User.find(req.query).exec().then(function(model) {
+        switch (req.user.role) {
+            case 'student': query.role = 'student'; break;
+            case 'teacher': query.role = {$in:['student','teacher']}; break;
+        }
+        User.find().exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({
                 user: model
@@ -83,7 +88,7 @@ module.exports = function(app, passport) {
      * @returns {object} user
      */
 
-    app.post('/api/users', access.requireRole(['teacher']), function(req, res, next) {
+    app.post('/api/users', access.requireRole(['teacher', 'admin']), function(req, res, next) {
         User.create(req.body.user)
             .then(function(model) {
                 res.json({
@@ -99,7 +104,7 @@ module.exports = function(app, passport) {
      * @returns {object} user
      */
 
-    app.put('/api/users/:id', access.requireRole(['$self', 'teacher']), function(req, res, next) {
+    app.put('/api/users/:id', access.requireRole(['$self', 'teacher', 'admin']), function(req, res, next) {
         var user = req.body.user;
         User.findOne({
             _id: req.params.id
@@ -122,7 +127,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/users/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.del('/api/users/:id', access.requireRole(['teacher', 'admin']), function(req, res, next) {
         User.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404);

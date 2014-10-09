@@ -64,7 +64,7 @@ module.exports = function(app, passport) {
      * @returns {object} person
      */
 
-    app.post('/api/arenas', access.requireRole(['teacher']), function(req, res, next) {
+    app.post('/api/arenas', access.requireRole(['teacher','admin']), function(req, res, next) {
         req.body.arena.author = req.user.id;
         Arena.create(req.body.arena, function(err, model) {
             if (err) return next(err);
@@ -82,7 +82,7 @@ module.exports = function(app, passport) {
      * @returns {object} person
      */
 
-    app.put('/api/arenas/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.put('/api/arenas/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         Arena.findByIdAndUpdate(req.params.id, req.body.arena, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
@@ -99,7 +99,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/arenas/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.del('/api/arenas/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         Arena.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404);

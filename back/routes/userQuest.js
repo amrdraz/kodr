@@ -34,7 +34,7 @@ module.exports = function(app, passport) {
      * @returns {object} userQuests
      */
 
-    app.get('/api/userQuests', access.requireRole(['teacher']), function(req, res, next) {
+    app.get('/api/userQuests', access.requireRole(['teacher','admin']), function(req, res, next) {
         UserQuest.find(req.query).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({
@@ -50,7 +50,7 @@ module.exports = function(app, passport) {
      * @returns {object} userQuest
      */
 
-    app.post('/api/userQuests', access.requireRole(['teacher']), function(req, res, next) {
+    app.post('/api/userQuests', access.requireRole(['teacher','admin']), function(req, res, next) {
         UserQuest.create(req.body.userQuest)
             .then(function(model) {
                 res.json({
@@ -67,7 +67,7 @@ module.exports = function(app, passport) {
      * @returns {object} userQuest
      */
 
-    app.put('/api/userQuests/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.put('/api/userQuests/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         var userQuest = req.body.userQuest;
         Promise.fulfilled().then(function() {
             return UserQuest.findOne({
@@ -92,7 +92,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/userQuests/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.del('/api/userQuests/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         UserQuest.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404);

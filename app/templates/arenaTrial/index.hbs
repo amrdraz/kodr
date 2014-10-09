@@ -1,6 +1,6 @@
 <section class="row">
 <div class="col-md-12 text-center">
-{{#if session.isTeacher}}
+{{#if session.atLeastTeacher}}
   {{#link-to 'arena.edit' arena class="btn pull-right" }}Edit{{/link-to}}
 {{/if}}
     <h2 class="">{{arena.name}}</h2>

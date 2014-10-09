@@ -27,6 +27,7 @@ public class JavaRunner {
   
     public static void main(String args[]){
         String name = args[0];
+        // System.out.println(args[1]);
         /*Creating dynamic java source code file object*/
         SimpleJavaFileObject fileObject = new DynamicJavaSourceCodeObject (name, args[1]) ;
         JavaFileObject javaFileObjects[] = new JavaFileObject[]{fileObject} ;

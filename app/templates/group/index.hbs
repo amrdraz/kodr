@@ -1,6 +1,6 @@
 <section class="row">
     <div class="col-md-12 text-center">
-        {{#if session.isTeacher }}
+        {{#if session.atLeastTeacher }}
             {{#link-to 'group.edit' model class="btn pull-right" }}Edit{{/link-to}}
         {{/if}}
         <h2 class="">{{model.name}}</h2>

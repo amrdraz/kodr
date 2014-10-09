@@ -68,31 +68,6 @@ var App = window.App = Ember.Application.create({
     })
 });
 
-App.ApplicationSerializer = DS.RESTSerializer.extend({
-    primaryKey: '_id'
-});
-
-// App.ApplicationAdapter = DS.FixtureAdapter;
-App.ApplicationAdapter = DS.RESTAdapter.extend({
-    namespace: 'api'
-});
-
-App.GroupSerializer = DS.RESTSerializer.extend(DS.EmbeddedRecordsMixin, {
-    primaryKey: '_id',
-    attrs: {
-        // author: {embedded: 'always'},
-        members: {
-            serialize: 'ids'
-        }
-    }
-});
-
-// App.ChallengeAdapter = DS.FixtureAdapter;
-// App.TrialAdapter = DS.FixtureAdapter;
-
-require('./router')(App);
-
-require('./helpers/markdown-helper');
 
 
 // the custom session that handles an authenticated account
@@ -103,11 +78,17 @@ App.CustomSession = SimpleAuth.Session.extend({
             return this.container.lookup('store:main').find('user', userId);
         }
     }.property('user_id'),
+    atLeastTeacher: function () {
+        return this.get('isAdmin') || this.get('isTeacher');
+    }.property('user.role'),
+    isAdmin: function () {
+        return this.get('user.isAdmin');
+    }.property('user.role'),
     isTeacher: function() {
-        return this.get('user.role') === 'teacher';
+        return this.get('user.isTeacher');
     }.property('user.role'),
     isStudent: function() {
-        return this.get('user.role') === 'student';
+        return this.get('user.isStudent');
     }.property('user.role')
 });
 
@@ -142,6 +123,32 @@ App.CustomAuthenticator = SimpleAuth.Authenticators.OAuth2.extend({
     }
 });
 
+App.ApplicationSerializer = DS.RESTSerializer.extend({
+    primaryKey: '_id'
+});
+
+// App.ApplicationAdapter = DS.FixtureAdapter;
+App.ApplicationAdapter = DS.RESTAdapter.extend({
+    namespace: 'api'
+});
+
+App.GroupSerializer = DS.RESTSerializer.extend(DS.EmbeddedRecordsMixin, {
+    primaryKey: '_id',
+    attrs: {
+        // author: {embedded: 'always'},
+        members: {
+            serialize: 'ids'
+        }
+    }
+});
+
+// App.ChallengeAdapter = DS.FixtureAdapter;
+// App.TrialAdapter = DS.FixtureAdapter;
+
+require('./router')(App);
+
+require('./helpers/markdown-helper');
+
 // Components
 App.HighChartComponent = require('./components/high-chart');
 
@@ -173,8 +180,8 @@ App.GroupsIndexController = require('./controllers/groups/index');
 App.GroupsCreateController = require('./controllers/group/edit');
 
 App.UserIndexController = require('./controllers/user/index');
-// App.UserEditController = require('./controllers/user/edit');
-// App.UsersController = require('./controllers/user');
+App.UserEditController = require('./controllers/user/edit');
+App.UsersController = require('./controllers/user');
 // App.UsersIndexController = require('./controllers/users/index');
 // App.UsersCreateController = require('./controllers/user/edit');
 
@@ -228,7 +235,7 @@ App.GroupsCreateRoute = require('./routes/groups/create');
 // App.UserEditRoute = require('./routes/user/edit');
 
 App.UsersRoute = require('./routes/users');
-// App.UsersCreateRoute = require('./routes/users/create');
+App.UsersCreateRoute = require('./routes/users/create');
 
 App.QuestRoute = require('./routes/quest');
 App.QuestIndexRoute = require('./routes/quest/index');

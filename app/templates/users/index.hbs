@@ -1,32 +1,47 @@
 
-{{#link-to 'users.create' class="btn btn-primary pull-right .create-user" }} <i class="glyphicon glyphicon-plus"></i> Create User{{/link-to}}
-
+{{#if session.atLeastTeacher}}
+  {{#link-to 'users.create' class="btn btn-primary pull-right .create-user" }} <i class="glyphicon glyphicon-plus"></i> Create User{{/link-to}}
+{{/if}}
 <h3>Users</h3>
 
 <ul class="list-group">
 {{#each user in model}}
-        <li class="list-group-item">            
-            <h4 class="list-group-item-heading">
-                <small class="pull-right">
+     <li class="list-group-item">            
+        <h4 class="list-group-item-heading">
+            <small class="pull-right">
+            {{#unless session.isStudent }}
                 {{#if user.isStudent }}
                     <span class="label label-default">student</span>
                 {{/if}}
                 {{#if user.group }}
                   <span class="label label-default">{{user.group.name}}</span>
                 {{/if}}
-                {{#link-to 'user.edit' user class="user-edit"}}
-                    <i class="glyphicon glyphicon-pencil"></i> Edit
-                {{/link-to}} 
-                <a href="#remove" {{action "remove" user }} class="user-delete">
-                    <i class="glyphicon glyphicon-trash"></i> Delete
-                </a>
-                </small>
+                {{#if user.isTeacher}}
+                  {{#if session.isAdmin}}
+                    {{#link-to 'user.edit' user class="user-edit"}}
+                        <i class="glyphicon glyphicon-pencil"></i> Edit
+                    {{/link-to}} 
+                    <a href="#remove" {{action "remove" user }} class="user-delete">
+                        <i class="glyphicon glyphicon-trash"></i> Delete
+                    </a>
+                  {{/if}}
+                {{else}}
+                    {{#link-to 'user.edit' user class="user-edit"}}
+                        <i class="glyphicon glyphicon-pencil"></i> Edit
+                    {{/link-to}} 
+                    <a href="#remove" {{action "remove" user }} class="user-delete">
+                        <i class="glyphicon glyphicon-trash"></i> Delete
+                    </a>
+                {{/if}}
+                
+            {{/unless}}
+            </small>
 
-                {{#link-to 'user' user class="user-name"}}
-                    {{user.username}}
-                {{/link-to}}
-            </h4>
-        </li>
+            {{#link-to 'user' user class="user-name"}}
+                {{user.username}}
+            {{/link-to}}
+        </h4>
+    </li>
 {{else}}
     <p>No Users</p>
 {{/each}}

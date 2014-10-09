@@ -86,22 +86,23 @@ module.exports = Em.Mixin.create(Em.Evented, {
 
         for (i = 0;i<lines.length;) {
             if(~lines[i].indexOf('Error')) {
-                errs = lines[i++].match(/Error.* line (\d*).* error: (.*)/);
-                fragment = lines[i++]+"\n";
-                column_no_start = lines[i++].length-2;
-                column_no_stop = column_no_start+1;
+                errs = lines[i++].match(/Error.* line (\d*).*:\d+: (.*)/);
+                if(~lines[i].indexOf('found')) {
+                    i+=2;
+                } else {
+                    fragment = lines[i++]+"\n";
+                    column_no_start = lines[i++].length-2;
+                    column_no_stop = column_no_start+1;
+                }
             } else {
                 errs = lines[i++].match(/Exception.* line (\d*) (.*)/);
-                column_no_start = 0;
-                column_no_stop = 200;
-                fragment = '';
             }
             found.push({
                 line_no:(+errs[1])-2,
-                column_no_start: column_no_start,
-                column_no_stop: column_no_stop,
+                column_no_start: column_no_start || 0,
+                column_no_stop: column_no_stop || 200,
                 message:errs[2],
-                fragment:fragment,
+                fragment:fragment || '',
                 severity: "error"
             });
         }

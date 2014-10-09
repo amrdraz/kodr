@@ -25,7 +25,7 @@ var ChallengeSchema = new mongoose.Schema({
     },
     language: {
         type: String,
-        'default': 'javascript',
+        'default': 'java',
         enum: ['javascript', 'java', 'python']
     },
     setup: {

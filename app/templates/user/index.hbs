@@ -5,7 +5,7 @@
 
  <ul class="list-group">
     <li class="list-group-item text-muted">Profile</li>
-    {{#if session.isTeacher }}
+    {{#if session.atLeastTeacher }}
       <li class="list-group-item text-right"><span class="pull-left"><strong>Email</strong></span> {{model.email}}</li>
     {{/if}}
     <li class="list-group-item text-right"><span class="pull-left"><strong>Experience</strong></span> {{model.exp}}</li>
@@ -26,7 +26,9 @@
 <section class="col-md-8">
     <ul class="nav nav-tabs" role="tablist">
       {{#if model.isStudent }}
+      {{#unless session.isStudent}}
         <li><a href="#progress" role="tab" data-toggle="tab">Progress</a></li>
+      {{/unless}}
         <li><a href="#quests" role="tab" data-toggle="tab">Quests</a></li>
       {{else}}
         <li><a href="#groups" role="tab" data-toggle="tab">Groups</a></li>

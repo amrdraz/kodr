@@ -12,7 +12,7 @@ module.exports = function(app, passport) {
      * @returns {object} Users
      */
 
-    app.get('/api/groups/:id/membersOptions', access.requireRole(['teacher']), function(req, res, next) {
+    app.get('/api/groups/:id/membersOptions', access.requireRole(['teacher','admin']), function(req, res, next) {
         Promise.fulfilled().then(function() {
             return User.find({
                 role: 'student',
@@ -32,7 +32,7 @@ module.exports = function(app, passport) {
      * @returns {object} Group
      */
 
-    app.get('/api/groups/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.get('/api/groups/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         Promise.fulfilled().then(function() {
             return [
                 Group.findOne({
@@ -59,7 +59,7 @@ module.exports = function(app, passport) {
      * @returns {object} groups
      */
 
-    app.get('/api/groups', access.requireRole(['teacher']), function(req, res, next) {
+    app.get('/api/groups', access.requireRole(['teacher','admin']), function(req, res, next) {
         Group.find(req.query).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({
@@ -75,7 +75,7 @@ module.exports = function(app, passport) {
      * @returns {object} group
      */
 
-    app.post('/api/groups', access.requireRole(['teacher']), function(req, res, next) {
+    app.post('/api/groups', access.requireRole(['teacher','admin']), function(req, res, next) {
         req.body.group.founder = req.user._id;
         Group.create(req.body.group)
             .then(function(model) {
@@ -97,7 +97,7 @@ module.exports = function(app, passport) {
      * @returns {object} group
      */
 
-    app.put('/api/groups/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.put('/api/groups/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         var group = req.body.group;
         Group.findOne({
             _id: req.params.id
@@ -124,7 +124,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/groups/:id/members/:uid', access.requireRole(['teacher']), function(req, res, next) {
+    app.del('/api/groups/:id/members/:uid', access.requireRole(['teacher','admin']), function(req, res, next) {
         Promise.fulfilled().then(function() {
             return [Group.findOne({
                 _id: req.params.id
@@ -149,7 +149,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/groups/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.del('/api/groups/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         Group.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404);

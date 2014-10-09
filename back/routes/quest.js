@@ -15,7 +15,7 @@ module.exports = function(app, passport) {
      * @returns {object} Users
      */
 
-    app.get('/api/quests/:id/unassignedUsersOptions', access.requireRole(['teacher']), function(req, res, next) {
+    app.get('/api/quests/:id/unassignedUsersOptions', access.requireRole(['teacher','admin']), function(req, res, next) {
         Promise.fulfilled().then(function() {
             return Quest.findOne({
                 _id: req.params.id
@@ -78,7 +78,7 @@ module.exports = function(app, passport) {
      * @returns {object} quests
      */
 
-    app.get('/api/quests', access.requireRole(['teacher']), function(req, res, next) {
+    app.get('/api/quests', access.requireRole(['teacher','admin']), function(req, res, next) {
         Quest.find(req.query).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({
@@ -94,7 +94,7 @@ module.exports = function(app, passport) {
      * @returns {object} quest
      */
 
-    app.post('/api/quests', access.requireRole(['teacher']), function(req, res, next) {
+    app.post('/api/quests', access.requireRole(['teacher','admin']), function(req, res, next) {
         req.body.quest.founder = req.user._id;
         Quest.create(req.body.quest)
             .then(function(model) {
@@ -112,7 +112,7 @@ module.exports = function(app, passport) {
      * @returns {object} quest
      */
 
-    app.put('/api/quests/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.put('/api/quests/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         var quest = req.body.quest;
         Promise.fulfilled().then(function() {
             return Quest.findOne({
@@ -137,7 +137,7 @@ module.exports = function(app, passport) {
      * @returns {object} quest
      */
 
-    app.put('/api/quests/:id/assign', access.requireRole(['teacher']), function(req, res, next) {
+    app.put('/api/quests/:id/assign', access.requireRole(['teacher','admin']), function(req, res, next) {
         var users = req.body.users || [];
         var groupIds = req.body.groups;
         Promise.fulfilled().then(function() {
@@ -185,7 +185,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/quests/:id/unassign/:uid', access.requireRole(['teacher']), function(req, res, next) {
+    app.del('/api/quests/:id/unassign/:uid', access.requireRole(['teacher','admin']), function(req, res, next) {
         Promise.fulfilled().then(function() {
             return UserQuest.findOne({
                 quest: req.params.id,
@@ -206,7 +206,7 @@ module.exports = function(app, passport) {
      * @returns {status} 200
      */
 
-    app.del('/api/quests/:id', access.requireRole(['teacher']), function(req, res, next) {
+    app.del('/api/quests/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         Quest.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404);

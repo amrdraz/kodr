@@ -79,6 +79,7 @@ module.exports = function(app, passport) {
     app.put('/api/arenaTrials/:id',  access.requireRole({roles:[
         {role:'student', in:'arenasTried'},
         {role:'teacher', all:true},
+        {role:'admin', all:true},
     ]}), function(req, res, next) {
         var arenaTrial = req.body.arenaTrial;
         arenaTrial.time = Date.now();
@@ -106,6 +107,7 @@ module.exports = function(app, passport) {
     app.del('/api/arenaTrials/:id',  access.requireRole({roles:[
         {role:'student', in:'arenasTried'},
         {role:'teacher', all:true},
+        {role:'admin', all:true},
     ]}), function(req, res, next) {
         ArenaTrial.findById(req.params.id, function(err, model) {
             if (err) return next(err);
