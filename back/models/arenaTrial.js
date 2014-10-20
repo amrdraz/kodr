@@ -95,7 +95,6 @@ ArenaTrialSchema.statics.findOrCreate = function(arenaTrial,withoutTrials) {
             return ArenaTrial.create(arenaTrial);
         });
     });
-    console.log(withoutTrials);
     if(withoutTrials) {
         return [promise];
     } else {

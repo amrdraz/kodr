@@ -17,19 +17,63 @@ var observer = require('../../back/mediator');
 describe('User', function() {
     before(setup.clearDB);
 
-    describe('Unit', function () {
+    describe('Unit', function() {
         var user;
-        beforeEach(function  () {
+        beforeEach(function() {
             user = new User({
-                username:'2314',
-                password:'1243j1k2412hj'
-            })
-        })
+                username: '2314',
+                password: '1243j1k2412hj'
+            });
+        });
 
-        it('has points', function () {
+        it('has points', function() {
             user.exp = 20;
             user.rp = 30;
             user.points.should.equal(50);
+        });
+
+    });
+
+
+    describe("Token", function() {
+        var user = {
+            username: "amrd",
+            email: "amr.deraz@guc.edu.eg",
+            password: "drazdraz12",
+            passwordConfirmation: "drazdraz12"
+        };
+        before(function(done) {
+            User.create(user).then(function(usr) {
+                user.model = usr;
+                user.token = usr.token;
+                done();
+            }, done);
+        });
+
+        it("should not change after User is saved", function(done) {
+            var newname = 'drazy';
+            user.model.set({
+                username: newname
+            });
+            user.model.save(function(err, usr) {
+                if (err) return done(err);
+                user.username = usr.username;
+                user.username.should.equal(newname);
+                usr.token.should.equal(user.token);
+                done();
+            });
+        });
+
+        it("should change after User password is changed", function(done) {
+            var newname = 'drazy';
+            user.model.set({
+                password: 'passwordn2'
+            });
+            user.model.save(function(err, usr) {
+                if (err) return done(err);
+                usr.token.should.not.equal(user.token);
+                done();
+            });
         });
     });
 
@@ -122,21 +166,21 @@ describe('User', function() {
         beforeEach(function(done) {
             student = {
                 username: 'student',
-                email: 'student@place.com',
+                email: 'student@student.guc.edu.eg',
                 password: 'student123',
                 role: 'student',
                 activated: true
             };
             student2 = {
                 username: 'student2',
-                email: 'student2@place.com',
+                email: 'student2@student.guc.edu.eg',
                 password: 'student123',
                 role: 'student',
                 activated: true
             };
             teacher = {
                 username: 'teacher',
-                email: 'teach@place.com',
+                email: 'teach@guc.edu.eg',
                 password: 'teacher123',
                 role: 'teacher',
                 activated: true
@@ -223,7 +267,7 @@ describe('User', function() {
         var url = 'http://localhost:3000';
         var user = {
                 username: "amrd",
-                email: "amr.m.draz@gmail.com",
+                email: "amr.deraz@guc.edu.eg",
                 password: "drazdraz12",
                 passwordConfirmation: "drazdraz12"
             },
@@ -266,7 +310,7 @@ describe('User', function() {
                             role: 'student'
                         }).exec(function(err, users) {
                             if (err) return done(err);
-                            users.length.should.equal(2);
+                            users.length.should.equal(1);
                             done();
                         });
                     });
@@ -282,7 +326,7 @@ describe('User', function() {
                             role: 'teacher'
                         }).exec(function(err, users) {
                             if (err) return done(err);
-                            users.length.should.equal(1);
+                            users.length.should.equal(2);
                             done();
                         }, done);
                     });
@@ -293,7 +337,7 @@ describe('User', function() {
                     .post("/signup")
                     .send({
                         username: "drazious",
-                        email: "amr.deraz@guc.edu.eg",
+                        email: "amr.draz@guc.edu.eg",
                         password: "drazdraz12",
                         passwordConfirmation: "drazdraz12"
                     })
@@ -308,31 +352,6 @@ describe('User', function() {
         });
 
         describe("Login", function() {
-
-            it("should login with username", function(done) {
-                request(url)
-                    .post("/token")
-                    .send(user)
-                    .expect(200)
-                    .end(done);
-            });
-
-            it("should return a token and user id", function(done) {
-                request(url)
-                    .post("/token")
-                    .send(user)
-                    .expect(200)
-                // .expect('Content-Type', /json/)
-                .end(function(err, res) {
-                    if (err) return done(err);
-
-                    res.body.should.have.property("access_token");
-                    res.body.should.have.property("user_id");
-                    user.id = res.body.user_id;
-                    accessToken = res.body.access_token;
-                    done();
-                });
-            });
 
             it("should not be able to login as a teacher until activation", function(done) {
                 request(url)
@@ -362,7 +381,7 @@ describe('User', function() {
                     });
             });
 
-            it("should be able to login as a teacher after activation", function(done) {
+            it("should login with username and password", function(done) {
                 request(url)
                     .post("/token")
                     .send({
@@ -375,44 +394,29 @@ describe('User', function() {
                         done();
                     });
             });
-        });
-        
-        describe("Token", function() {
 
-            it("should not change after User is saved", function(done) {
-                var newname = 'draz';
+            it("should return a token and user id", function(done) {
                 request(url)
-                    .post("/profile")
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .post("/token")
                     .send({
-                        username: newname
+                        username: "drazious",
+                        password: "drazdraz12",
                     })
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);                        
-                        user.username = res.body.user.username;
-                        res.body.user.username.should.equal(newname);
-                        res.body.access_token.should.equal(accessToken);
-                        done();
-                    });
+                    .expect(200)
+                // .expect('Content-Type', /json/)
+                .end(function(err, res) {
+                    if (err) return done(err);
 
+                    res.body.should.have.property("access_token");
+                    res.body.should.have.property("user_id");
+                    user.id = res.body.user_id;
+                    accessToken = res.body.access_token;
+                    done();
+                });
             });
 
-            it("should change after User password is changed", function(done) {
-                request(url)
-                    .post("/profile")
-                    .set('Authorization', 'Bearer ' + accessToken)
-                    .send({
-                        password: 'amramree12'
-                    })
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.access_token.should.not.equal(accessToken);
-                        done();
-                    });
-            });
         });
+
     });
     describe('API', function() {
         var url = setup.url;

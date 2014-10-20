@@ -24,13 +24,13 @@ exports.hasToken = function(req, res, next) {
 function fullfilesRole(roles, user, params){
     if(_.isEmpty(roles)) return true;
     if (_.isArray(roles)) {
-        return _.contains(roles, user.role) || ( _.contains(roles,'$self') && user._id.equals(params.id) );
+        return _.contains(roles, user.role) || ( _.contains(roles,'$self') && user._id.toString()===params.id );
     }
     var role = _.find(roles.roles, {role:user.role});
     // console.log(role);
     if(!role) return false;
     if(role.all) return true;
-    return _.find(user[role.in], function(id){ return id.equals(params.id);});
+    return _.find(user[role.in], function(id){ return id.toString()===params.id;});
 }
 
 // requiering a role will also require that a user is logged in
@@ -38,8 +38,7 @@ exports.requireRole = function(roles) {
     return function(req, res, next) {
         if (req.user && _.contains(roles, req.user.role))
             next();
-        else
-        if (!req.get('Authorization')) {
+        else if (!req.get('Authorization')) {
             res.send(401, "Unauthorized");
             return;
         }
@@ -70,7 +69,7 @@ exports.requireRole = function(roles) {
  */
 exports.requireIn = function (attrs) {
     return function(req,res,next) {
-        if(_.find(req.user[attrs], function(id){ return id.equals(req.params.id);})) return next();
+        if(_.find(req.user[attrs], function(id){ return id.toString()===params.id;})) return next();
         res.send(401, "Unauthorized");  
     };
 };

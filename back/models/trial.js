@@ -8,7 +8,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
 var observer = require('../mediator');
 var Challenge = require('./challenge');
-// var ArenaTrial = require('./arenaTrial');
+// var ArenaTrial = require('./arenaTrial'); // used bellow in findOrCreate to avoid circulare reference
 
 
 /**
@@ -59,23 +59,26 @@ var TrialSchema = new mongoose.Schema({
     challenge: {
         type: ObjectId,
         ref: 'Challenge',
-        childPath: "trials"
+        childPath: "trials",
         // required: true
     },
     user: {
         type: ObjectId,
         ref: 'User',
-        childPath: "trials"
+        childPath: "trials",
+        // required: true,
     },
     arenaTrial: {
         type: ObjectId,
         ref: 'ArenaTrial',
-        childPath: "trials"
+        childPath: "trials",
+        // required: true
     },
     arena: {
         type: ObjectId,
         ref: 'Arena',
-        childPath: "trials"
+        childPath: "trials",
+        // required: true
     }
 
 });
@@ -123,19 +126,50 @@ TrialSchema.post('save', function(doc) {
 });
 
 TrialSchema.statics.findOrCreate = function(trial) {
-    return Promise.fulfilled().then(function() {
+    // console.log('trial create',trial);
+    var promise = Promise.fulfilled().then(function() {
         return Trial.findOne({
             user: trial.user,
             challenge: trial.challenge
         }).exec();
     }).then(function(model) {
-        if (model) return model;
-        console.log(trial);
-        delete trial.tests;
-        console.log(trial);
-        return Trial.create(trial);
+        if (model) return model; // foudn model
+
+        if (trial.arena && trial.arenaTrial) {
+                delete trial.tests; // sometimes a tests filed is submited, it is not known whther this has any significance, shoudl probably remove this line
+                return Trial.create(trial);
+        } else {
+            var tpromise = Promise.fulfilled().then(function() {
+                return Challenge.findOne({
+                    _id: trial.challenge
+                }).exec();
+            }).then(function(challenge) {
+                if (!challenge) throw new Error(403);
+                trial.arena = challenge.arena.toString();
+                trial.code = challenge.setup;
+                return challenge;
+            });
+            // console.log("trial.arenaTrial", trial.arenaTrial);
+            if (trial.arenaTrial) {
+                return tpromise.then(function(challenge) {
+                    return Trial.findOrCreate(trial);
+                });
+            } else {
+                return tpromise.then(function(challenge) {
+                    return require("./arenaTrial").findOrCreate({
+                        arena: challenge.arena,
+                        user: trial.user
+                    }, true);
+                }).spread(function(at) {
+                    trial.arenaTrial = at.id;
+                    // console.log("trial findOrCreate",trial);
+                    return Trial.findOrCreate(trial);
+                });
+            }
+        }
     });
 
+    return promise;
 };
 
 

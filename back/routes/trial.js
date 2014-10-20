@@ -54,34 +54,7 @@ module.exports = function(app, passport) {
         var trial = req.body.trial;
         if (!trial.challenge) return res.send(400, 'you must include a challenge id in your data');
         trial.user = trial.user || req.user.id;
-        var promise;
-        if (trial.arena && trial.arenaTrial) {
-            promise = Trial.findOrCreate(trial);
-        } else {
-            promise = Promise.fulfilled().then(function() {
-                return Challenge.findOne({
-                    _id: trial.challenge
-                }).exec();
-            }).then(function(challenge) {
-                if (!challenge) return res.send(403);
-                trial.arena = challenge.arena.toString();
-                trial.code = challenge.setup;
-                return challenge;
-            });
-            if (trial.arenaTrial) {
-                promise.then(function(challenge) {
-                    return Trial.findOrCreate(trial);
-                });
-            } else {
-                promise.then(function(challenge) {
-                    return ArenaTrial.findOrCreate({arena:challenge.arena,user:trial.user}, true);
-                }).spread(function (at) {
-                    trial.arenaTrial = at.id;
-                    return Trial.findOrCreate(trial);
-                });
-            }
-        }
-        promise.then(function(trial) {
+        Trial.findOrCreate(trial).then(function(trial) {
             res.json({
                 trial: trial
             });
@@ -106,7 +79,7 @@ module.exports = function(app, passport) {
             role: 'admin',
             all: true
         }, ]
-    }), access.requireIn('trials'), function(req, res, next) {
+    }), function(req, res, next) {
         var trial = req.body.trial;
         trial.time = Date.now();
         trial.times = (trial.times || 0) + 1;
@@ -138,7 +111,7 @@ module.exports = function(app, passport) {
         }, {
             role: 'teacher',
             all: true
-        },{
+        }, {
             role: 'admin',
             all: true
         }, ]

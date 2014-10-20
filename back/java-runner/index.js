@@ -1,16 +1,119 @@
 var cp = require('child_process');
+var net = require('net');
 var path = require('path');
-var _ = require('lodash');
-// var Docker = require('dockerode');
-// var Streams = require('memory-streams');
-// var docker = new Docker({socketPath: '/var/run/docker.sock'});
-// var docker = new Docker({socketPath: false,host: 'http://192.168.59.103',port:'2375'});
+var querystring = require('querystring');
+var http = require('http');
 var fs = require('fs');
-var running=0;
-var proc;
-var procCount = 0;
-var procMax = Math.min(require('os').cpus().length, 4);
+var _ = require('lodash');
 
+var running = 0; // workaround to reduce event loop blocking when running in terminal
+var runTimeout = 5000;
+var servletReady = false; // flag if server is ready to reseave post requests
+var startingServer = false; // flag if server is ready to reseave post requests
+var defaultPort = 3678; // default port picked it at random
+
+var servletPort;
+var servlet;
+
+
+// get an empty port for the java server
+function getPort(cb) {
+    var port = defaultPort;
+    defaultPort += 1;
+
+    var server = net.createServer();
+    server.listen(port, function(err) {
+        server.once('close', function() {
+            cb(port);
+        });
+        server.close();
+    });
+    server.on('error', function(err) {
+        getPort(cb);
+    });
+}
+
+/**
+ * Starts the servlet on an empty port default is 3678
+ */
+function startServlet(cb) {
+    getPort(function(port) {
+        servletPort = global._servletPort = '' + port;
+
+        servlet = global._servlet = cp.spawn('java', ['-cp', '.:servlet-api-2.5.jar:jetty-all-7.0.2.v20100331.jar', 'RunnerServlet', servletPort], {
+            cwd: __dirname
+        });
+
+        servlet.stdout.on('data', function(data) {
+            console.log('OUT:' + data);
+        });
+        servlet.stderr.on('data', function(data) {
+            console.log("" + data);
+            if (~data.toString().indexOf(servletPort)) {
+                servletReady = true;
+                startingServer = false;
+                cb && cb(port);
+            }
+        });
+        servlet.on('exit', function(code) {
+            console.log('servlet exist with code ' + code);
+            servletReady = false;
+        });
+
+        // make sure to close server after node process ends
+        process.on('exit', function() {
+            servlet.kill();
+        });
+    });
+}
+
+/**
+ * Check if a server server is runing on port 3678 if so no need to start a new server
+ * @param  {number} port port to check against default to defaultPort
+ */
+var checkIfServletIsAlreadyRunning = exports.runServer = function(port, cb) {
+    if (!port) {
+        port = defaultPort;
+    } else if (_.isFunction(port)) {
+        cb = port;
+        port = defaultPort;
+    }
+    http.get("http://localhost:" + port + "/", function(res) {
+        if (res.statusCode === 200) {
+            servletPort = global.servletPort = port;
+            servletReady = true;
+            if (cb) {
+                cb(port);
+            }
+            startingServer = false;
+        } else {
+            console.log(res);
+        }
+    }).on('error', function(e) {
+        if (!startingServer) {
+            if(servletPort) {
+                return cb(+servletPort);
+            }
+            startingServer = true;
+            console.log('No server running starting our own');
+            startServlet(cb);
+        } else {
+            console.log('a server is starting waiting till it does');
+            _.delay(function() {
+                checkIfServletIsAlreadyRunning(cb);
+            }, 1000);
+        }
+    });
+};
+
+// start server
+checkIfServletIsAlreadyRunning(global._servletPort || defaultPort);
+
+/**
+ * Spawn a java process and return callback
+ * @param  {Array}   args  arguments to pass to java proc
+ * @param  {Function} cb   callback to be called with err, stout, sterr
+ */
 function runProc(args, cb) {
     var stoutBuffer = '',
         sterrBuffer = '';
@@ -25,7 +128,6 @@ function runProc(args, cb) {
     });
     proc.on('close', function(code) {
         if (code === null) {
-            console.error(code);
             cb(code);
         } else {
             cb(null, stoutBuffer, sterrBuffer);
@@ -33,7 +135,96 @@ function runProc(args, cb) {
         running--;
     });
 }
-// run java inside main method using the java built in dynamic compiler
+
+/**
+ * Run java program in TerminalRunner
+ * @param  {String}   name    name of class
+ * @param  {String}   program source code of JavaClass with public class [name]
+ * @param  {Function} cb      callback when complete
+ */
+function runCMD(name, program, cb) {
+    var args = ["-cp", ".", "-XX:+TieredCompilation", "-XX:TieredStopAtLevel=1", "TerminalRunner"];
+    args.push(name);
+    args.push(program);
+
+    //delaying request if more then one hit so that the event loop has time to compute
+    if (running < 1) {
+        running++;
+        runProc(args, cb);
+    } else {
+        running++;
+        // console.log(running);
+        _.delay(function() {
+            runProc(args, cb);
+        }, running * 250);
+    }
+}
+
+/**
+ * Run java program in server, which is singnificantly faster
+ * @param  {String}   name    name of class
+ * @param  {String}   program source code of JavaClass with public class [name]
+ * @param  {Function} cb      callback when complete
+ */
+function runInServlet(name, program, cb, timeLimit) {
+    var timer;
+    var post_data = querystring.stringify({
+        'name': name,
+        'code': program,
+        'timeLimit':timeLimit||5000
+    });
+    // An object of options to indicate where to post to
+    var post_options = {
+        host: '127.0.0.1',
+        port: servletPort,
+        path: '',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': post_data.length
+        }
+    };
+
+    var post_req = http.request(post_options, function(res) {
+        res.setEncoding('utf8');
+
+        var responseString = '';
+
+        res.on('data', function(data) {
+            clearTimeout(timer);
+            data = JSON.parse(data);
+            cb(null, data.stout, data.sterr);
+        });
+
+        // res.on('end', function() {
+        //     console.log('::-----end-----::');
+        //     var data = JSON.parse(responseString);
+        //     console.log(responseString);
+        //     console.log('::-----end-----::');
+        //     cb(null, data.stout, data.sterr);
+        // });
+    });
+
+    post_req.on('error', function(e) {
+        cb(e);
+    });
+    timer = setTimeout(function () {
+        cb(new Error("TimeoutException: Your program ran for more than "+runTimeout));
+    },runTimeout);
+    post_req.write(post_data);
+    post_req.end();
+}
+
+/**
+ * run java inside main method using the java built in dynamic compiler
+ * this method will run using TerminalRunenr until Server is runing
+ * @param  {String}   code    Code to run inside main
+ * @param  {Object}   options additional configuration options
+ *                            di classes to import
+ *                            preCode  code to run before given code
+ *                            postCode code to run after given code
+ * @param  {Function} cb      return callback
+ */
 var run = exports.run = function(code, options, cb) {
 
     if (typeof options === 'function') {
@@ -42,21 +233,21 @@ var run = exports.run = function(code, options, cb) {
     } else {
         options = options || {};
     }
-    var args = ["-cp", __dirname, "-XX:+TieredCompilation", "-XX:TieredStopAtLevel=1", "JavaRunner"];
+
     var pre = (options.preCode || '').replace(/\/\/.*$/gm, '').replace(/\r?\n|\r/g, ' ');
     var post = (options.postCode || '');
-    var name = "Main";
-    // <comma-separated-default-imports>        (default: none)
+    var name = ((options.name && classCase(options.name)) || "Main") + (options.debug_number || ''); //+Date.now()+""+_.random(0, 2000000); // workaround if all else fails
+
     var preClass = '';
+    // <comma-separated-default-imports>        (default: none)
     if (options.di) {
         preClass += _.reduce(options.di.split(','), function(s, i) {
             return s + 'import ' + i + ';';
         }, '');
     }
+
     // code to run
     code = pre + '\n' + code + '\n' + post;
-    // escape " and $ because of terminal
-    // code = code.replace(/"/g,'\\"').replace(/\$/g,'\\$');
 
     var program = "";
     program += preClass;
@@ -66,79 +257,90 @@ var run = exports.run = function(code, options, cb) {
     program += '  } catch (Exception e) {System.err.print("Exception line "+(e.getStackTrace()[0].getLineNumber())+" "+e);}}' +
         "}";
 
-    // console.log(code);
-    args.push(name);
-    args.push(program);
-
-    // console.log(cmd.join(" "));
-    // cp.exec('java '+args.join(" "),{timeout: 10000,cwd:__dirname},cb);
-    if(running<1) {
-        running++;
-        runProc(args,cb);
+    // if servlet is not ready run code from TerminalRunner
+    if (servletReady && !options.runInCMD) {
+        runInServlet(name, program, cb, options.timeLimit);
     } else {
-        running++;
-        console.log(running);
-        _.delay(function () {
-           runProc(args,cb);
-        },running*250);
+        runCMD(name, program, cb);
     }
-    // if (!proc) {
-    //     proc = cp.fork(path.join(__dirname,'run-worker.js'));
-    //     proc.on('message', function(data) {
-    //         cb(data.error, data.stout, data.sterr);
-    //     });
-    // }
-    // proc.send({
-    //     args: args,
-    //     cwd:__dirname
-    // });
+};
+
+/**
+ * Test Java code using somple test framework
+ * @param  {String}   code    [description]
+ * @param  {String}   test    [description]
+ * @param  {Object}   options [description]
+ * @param  {Function} cb      [description]
+ */
+var test = exports.test = function(code, test, options, cb) {
+    if (_.isEmpty(code)) cb(new Error('code can not be undefined'));
+    if (!test) cb(new Error('test can not be undefined'));
+    if(options.timeLimit && options.timeLimit<0) cb(new Error("TimeLimit can not be negative")); 
+    if (!options.exp) cb(new Error('challange must have exp'));
+    var hash = _.random(0, 200000000);
+    var opt = _.clone(options);
+    opt.runInCMD = opt.runInCMD || !servletReady;
+    //capture sys streams and set uniq test hash
+    // make sure to acomidate for both threaded and none
+    if(opt.runInCMD) {
+         opt.preCode = 'final ByteArrayOutputStream $userOut = new ByteArrayOutputStream();\n' +
+            'final ByteArrayOutputStream $userErr = new ByteArrayOutputStream();\n' +
+            'final PrintStream _$sysOut = System.out;\n' +
+            'final PrintStream _$sysErr = System.err;\n' +
+            'System.setOut(new PrintStream($userOut));\n' +
+            'System.setErr(new PrintStream($userErr));\n' +
+            'Test.setHash("' + hash + '");' +
+            (opt.preCode || '');
+        opt.postCode = (opt.postCode || '') + '\n' +
+            'System.setOut(_$sysOut);' +
+            'System.setErr(_$sysErr);' + '\n' +
+            test+
+            'Test.resetTest();';
+    } else {
+        opt.preCode = 'final ByteArrayOutputStream $userOut = new ByteArrayOutputStream();\n' +
+            'final ByteArrayOutputStream $userErr = new ByteArrayOutputStream();\n' +
+            'final PrintStream _$sysOut = ((ThreadPrintStream)System.out).getThreadOut();\n' +
+            'final PrintStream _$sysErr = ((ThreadPrintStream)System.out).getThreadOut();\n' +
+            '((ThreadPrintStream)System.out).setThreadOut(new PrintStream($userOut));\n' +
+            '((ThreadPrintStream)System.err).setThreadOut(new PrintStream($userErr));\n' +
+            'Test.setHash("' + hash + '");' +
+            (opt.preCode || '');
+        opt.postCode = (opt.postCode || '') + '\n' +
+            '((ThreadPrintStream)System.out).setThreadOut(new PrintStream(_$sysOut));\n' +
+            '((ThreadPrintStream)System.err).setThreadOut(new PrintStream(_$sysErr));\n' +
+            test+
+            'Test.resetTest();';
+    }
+
+    opt.di = (opt.di || '') + (opt.di ? ',' : '') + 'java.io.ByteArrayOutputStream,java.io.PrintStream';
+
+    run(code, opt, function(err, stout, sterr) {
+        if (err && !sterr) return cb(err);
+        sterr && console.log(sterr);
+
+        var report = {
+            passed: false,
+            score: 0,
+            passes: [],
+            failures: [],
+            tests: []
+        };
+        var tests = stout.match(new RegExp("<\\[" + hash + "\\]>(.*)<\\[" + hash + "\\]>", "g")) || [];
+        if (!_.isEmpty(tests)) {
+            tests = report.tests = JSON.parse(('[' + tests.join(',') + ']').replace(new RegExp("<\\[" + hash + "\\]>", 'g'), ''));
+            report.passes = _.filter(tests, 'pass');
+            report.failures = _.reject(tests, 'pass');
+            report.score = _.reduce(tests, function(sum, t) {
+                return sum + t.score;
+            }, 0);
+            report.score = Math.max(0, Math.min(report.score, options.exp));
+            report.passed = report.passes.length === tests.length;
+        }
+        cb(null, report, stout, sterr);
+    });
 };
 
 
-// exports.run = function (code,cb)
-// {
-//     var stderr = new Streams.WritableStream(),
-//         stdout = new Streams.WritableStream();
-//     docker.run('draz/java-runner:0.2', ['java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner \'' + simple_program + '\''], [stdout, stderr], {Tty: false}, function (error, data, container)
-//     {
-//         // make sure the container is removed
-//         if (container)
-//         {
-//             container.remove(function (err, data)
-//             {
-//                 console.log("container removed " + (err || data));
-//             });
-//         }
-
-//         cb(error, stdout.toString(), stderr.toString());
-//     });
-// };
-
-var runCMD = exports.runCMD = function(simple_program, cb) {
-    cp.exec('docker run --rm draz/java-runner:0.3 java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 JavaRunner "Main" "' + simple_program + '"', {
-        timeout: 10000,
-        cwd: __dirname
-    }, cb);
-};
-
-// var UID = 1;
-// // run java inside main method using the java built in dnamic compiler
-// function runByJavaFile(program) {
-//     var name = 'tempFile' + (UID++);
-
-//     fs.writeFile('./' + name + '.java', 'public class ' + name + ' {' + program + '}', function(err) {
-//         if (err) {
-//             console.log(err);
-//         } else {
-//             cp.exec('javac ' + name + '.java && java -XX:+TieredCompilation -XX:TieredStopAtLevel=1 ' + name, function(err, stdout, stderr) {
-//                 stderr && console.error(stderr);
-//                 stdout && console.log(stdout);
-//                 fs.unlinkSync('./'+name+'.java');
-//                 fs.unlinkSync('./'+name+'.class');
-//             });
-//         }
-//     });
-// }
 
 /**
  * Runs a String of java code as if it is inside a method
@@ -190,51 +392,6 @@ var runJavaAsScript = exports.runJavaAsScript = function(code, options, cb) {
     }, cb);
 };
 
-var testJavaAsScript = exports.testJavaAsScript = function(code, test, options, cb) {
-    if (_.isEmpty(code)) cb(new Error('code can not be undefined'));
-    if (!test) cb(new Error('test can not be undefined'));
-    if (!options.exp) cb(new Error('challange must have exp'));
-    var hash = _.random(0, 200000000);
-    var opt = _.clone(options);
-    //capture sys streams and set uniq test hash
-    opt.preCode = 'final ByteArrayOutputStream $userOut = new ByteArrayOutputStream();\n' +
-        'final ByteArrayOutputStream $userErr = new ByteArrayOutputStream();\n' +
-        'final PrintStream _$sysOut = System.out;\n' +
-        'final PrintStream _$sysErr = System.err;\n' +
-        'System.setOut(new PrintStream($userOut));\n' +
-        'System.setErr(new PrintStream($userErr));\n' +
-        'Test.setHash("' + hash + '");' +
-        (opt.preCode || '');
-    opt.postCode = (opt.postCode || '') + '\n' +
-        'System.setOut(_$sysOut);' +
-        'System.setErr(_$sysErr);' + '\n' +
-        test;
-    opt.di = (opt.di || '') + (opt.di ? ',' : '') + 'java.io.ByteArrayOutputStream,java.io.PrintStream';
-
-    run(code, opt, function(err, stout, sterr) {
-        if (err && !sterr) return cb(err);
-        // console.log(stout);
-        var report = {
-            passed: false,
-            score: 0,
-            passes: [],
-            failures: [],
-            tests: []
-        };
-        var tests = stout.match(new RegExp("<\\[" + hash + "\\]>(.*)<\\[" + hash + "\\]>", "g")) || [];
-        if (!_.isEmpty(tests)) {
-            tests = report.tests = JSON.parse(('[' + tests.join(',') + ']').replace(new RegExp("<\\[" + hash + "\\]>", 'g'), ''));
-            report.passes = _.filter(tests, 'pass');
-            report.failures = _.reject(tests, 'pass');
-            report.score = _.reduce(tests, function(sum, t) {
-                return sum + t.score;
-            }, 0);
-            report.score = Math.max(0, Math.min(report.score, options.exp));
-            report.passed = report.passes.length === tests.length;
-        }
-        cb(null, report, stout, sterr);
-    });
-};
 
 /**
  * Run a Strign of java code as if it is inside the body of a class
@@ -254,33 +411,13 @@ var runJavaAsClassBody = exports.runJavaAsClassBody = function(code, args, cb) {
     cp.exec(cmd.join(" "), cb);
 };
 
-// var i = 1;
-// var time = setInterval(function () {
-//     i++;
-
-//     // runByJavaFile('public static void main (String [] args) { int a = 30, b = 20;System.out.println("a - b = " + (a - b)); }');
-
-//     // runJavaInMain('int a = 30, b = 20; System.out.println("a - b = " + (a - b));');
-
-//     // runJavaAsScript('System.out.println("a - b = " + (a - b));', {pn:'a,b', pt:'double,double', values:'63.0 45.3'});
-
-//     // runJavaAsScript('int a = 30, b = 20;System.out.println("a - b = " + (a - b));');
-
-
-//     if(i===20) {
-//         clearInterval(time);
-//     }
-// }, 500);
-
-
-// runJavaAsClassBody('public static void main (String [] args) { System.out.println("Hello World") ; }');
-
-// runJavaAsClassBody('import java.util.*;\n\
-//  \n\
-// // Field declaration:\n\
-// private static final String hello = "World";\n\
-//  \n\
-// // Method declaration:\n\
-// public static void main(String[] args) {\n\
-//     System.out.println("hello" + args.length);\n\
-// }','alpha beta gama');
+/**
+ * Turn a sting to Java class style camel Case striping - and space chracters
+ * @param  {[type]} input [description]
+ * @return {[type]}       [description]
+ */
+function classCase(input) {
+    return input.toUpperCase().replace(/[\-\s](.)/g, function(match, group1) {
+        return group1.toUpperCase();
+    });
+}

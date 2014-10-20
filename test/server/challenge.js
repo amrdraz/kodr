@@ -30,7 +30,7 @@ describe('Challenge', function() {
         preCode:'//comment to be striped',
         exp:1
     };
-    var out = "a - b = 20\n";
+    var out = "a - b = 20";
 
     describe('Code', function() {
         it('should run java', function(done) {
@@ -255,6 +255,9 @@ describe('Challenge', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
+                        // console.log(res.body.report);
+                        // console.log(res.body.stout);
+                        // console.log(res.body.sterr);
                         res.body.report.passed.should.be.true;
                         done();
                     });

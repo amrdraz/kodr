@@ -75,6 +75,10 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                 });
             }
         },
+        rest:function () {
+            var model = this.get('model');
+            model.set('code', model.get('challenge.setup'));
+        },
         test: debounce(function() {
             var model = this.get('model');
             var challenge = this.get('model.challenge');

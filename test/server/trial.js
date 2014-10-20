@@ -20,21 +20,59 @@ describe('Trial', function() {
         return setup.clearDB(done);
     });
 
-    describe('Unit', function () {
-        it('should create a trial with id', function (done) {
+    after(setup.clearDB);
+
+    describe('Unit', function() {
+        after(setup.clearDB);
+
+        it('should create a trial with id', function(done) {
             var arena = new Arena({});
             var user = new User({});
-            var areanTrial = new AreanTrial({arena:arena.id,user:user.id});
-            var challenge = new Challenge({arena:arena.id});
+            var areanTrial = new AreanTrial({
+                arena: arena.id,
+                user: user.id
+            });
+            var challenge = new Challenge({
+                arena: arena.id
+            });
             Trial.findOrCreate({
-                    arenaTrial: areanTrial.id,
-                    arena: areanTrial.arena,
-                    user: areanTrial.user,
-                    challenge: challenge.id,
-                    code: challenge.setup
-                }).then(function (trial) {
-                    done();
+                arenaTrial: areanTrial.id,
+                arena: areanTrial.arena,
+                user: areanTrial.user,
+                challenge: challenge.id,
+                code: challenge.setup
+            }).then(function(trial) {
+                expect(trial).to.exist;
+                done();
+            });
+        });
+        it('should create a trial with challenge and user id only', function(done) {
+
+            Promise.fulfilled().then(function() {
+                var arena = Arena.create({});
+                var user = User.create({
+                    username: 'stdr',
+                    password: "ssh9hkjkljdd"
                 });
+                var challenge = arena.then(function(arena) {
+                    return Challenge.create({
+                        arena: arena.id
+                    });
+                });
+                return [user, arena, challenge];
+            }).spread(function(user, a, challenge) {
+                challenge.id.should.exist;
+                return Trial.findOrCreate({
+                    user: user.id,
+                    challenge: challenge.id
+                }).then(function(trial) {
+                    // console.log("test trial unit", trial);
+                    expect(trial).to.exist;
+                    expect(trial.arena).to.exist;
+                    expect(trial.arenaTrial).to.exist;
+                    done();
+                }).catch(done);
+            }).catch(done);
         });
     });
 
@@ -62,8 +100,8 @@ describe('Trial', function() {
                     challenge: ch._id,
                     user: user._id
                 });
-            }).then(function (tr) {
-                trial = tr; 
+            }).then(function(tr) {
+                trial = tr;
             }).finally(done);
 
         });
@@ -176,23 +214,26 @@ describe('Trial', function() {
                     User.create(teacher),
                     User.create(admin)
                 ];
-            }).spread(function(a, st, t, a) {
+            }).spread(function(ar, st, t, ad) {
                 // console.log(st,t,a);
                 student._id = st._id;
                 student.token = st.token;
-                admin._id = a._id;
-                admin.token = a.token;
+                admin._id = ad._id;
+                admin.token = ad.token;
                 teacher._id = t._id;
                 accessToken = teacher.token = t.token;
-                return Challenge.create({arena:a.id});
-            }).then(function (ch) {
+                return Challenge.create({
+                    arena: ar.id
+                });
+            }).then(function(ch) {
                 challenge.id = ch.id;
                 trial.trial.challenge = ch.id;
-                return setup.challengeTest(done);
+                // return setup.challengeTest(done);
+                done();
             }).catch(done);
         });
 
-        after(setup.clearDB);
+        // after(setup.clearDB);
 
         describe("POST", function() {
 
@@ -212,8 +253,10 @@ describe('Trial', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.trial.times.should.equal(0);
+                        // console.log("trial test",res.body);
+                        expect(res.body.trial).to.exist;
                         trial.id = res.body.trial._id;
+                        // console.log("test post trial id", trial.id);
                         done();
                     });
             });
@@ -222,6 +265,7 @@ describe('Trial', function() {
         describe("GET", function() {
 
             it("should return a trial by id", function(done) {
+
                 request(api)
                     .get("/trials/" + trial.id)
                     .end(function(err, res) {
@@ -233,14 +277,20 @@ describe('Trial', function() {
             });
 
             it("should return a list of all trials", function(done) {
+                // Promise.fulfilled().then(function() {
+                //     return Trial.find().exec();
+                // }).then(function(trials) {
+                //     trials.length.should.equal(2);
+                //     trials[0]._id.toString().shoul.equal(trial.id);
                 request(api)
                     .get("/trials")
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.trial.length.should.equal(3); // 1 + 2 from steup.challegneTest
+                        res.body.trial.length.should.equal(1);
                         done();
                     });
+                // }).catch(done);
             });
 
         });
@@ -270,19 +320,24 @@ describe('Trial', function() {
 
             it("should update own trial if you're a student", function(done) {
                 Trial.create({
-                    user:student._id,
-                    challenge:challenge.id,
-                }).then(function(tr){
+                    user: student._id,
+                    challenge: challenge.id,
+                }).then(function(tr) {
                     request(api)
-                    .put("/trials/" + tr.id)
-                    .set('Authorization', 'Bearer ' + student.token)
-                    .send({
-                        trial: {
-                            complete: true
-                        }
-                    })
-                    .expect(200)
-                    .end(done);
+                        .put("/trials/" + tr.id)
+                        .set('Authorization', 'Bearer ' + student.token)
+                        .send({
+                            trial: {
+                                complete: true
+                            }
+                        })
+                        .end(function(err, res) {
+                            if (err) return done(err);
+                            res.status.should.equal(200);
+                            res.body.trial.complete.should.be.true;
+                            trial.trial.complete = res.body.trial.complete;
+                            done();
+                        });
                 });
             });
 
@@ -320,13 +375,13 @@ describe('Trial', function() {
                     .set('Authorization', 'Bearer ' + accessToken)
                     .send({
                         trial: {
-                            complete: true
+                            complete: false
                         }
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.trial.complete.should.be.true;
+                        res.body.trial.complete.should.be.false;
                         trial.complete = res.body.trial.complete;
                         done();
                     });
@@ -353,15 +408,15 @@ describe('Trial', function() {
 
             it("should delete own trial if you're a student", function(done) {
                 Trial.create({
-                    user:student._id,
-                    challenge:challenge.id,
-                }).then(function(tr){
+                    user: student._id,
+                    challenge: challenge.id,
+                }).then(function(tr) {
                     request(api)
-                    .del("/trials/" + tr.id)
-                    .set('Authorization', 'Bearer ' + student.token)
-                    .send()
-                    .expect(200)
-                    .end(done);
+                        .del("/trials/" + tr.id)
+                        .set('Authorization', 'Bearer ' + student.token)
+                        .send()
+                        .expect(200)
+                        .end(done);
                 });
             });
 

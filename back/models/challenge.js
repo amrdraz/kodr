@@ -30,7 +30,7 @@ var ChallengeSchema = new mongoose.Schema({
     },
     setup: {
         type: String,
-        'default': '// Starting Code leave blank if you want Student to start from scrach\n'
+        'default': '// Starting Code leave blank if you want Student to start from scratch\n'
     },
     preCode: {
         type: String,
@@ -136,7 +136,7 @@ ChallengeSchema.statics.test = function(code, challenge) {
                 resolve(['no server js','']);
                 break;
             case 'java':
-                javaRunner.testJavaAsScript(code,challenge.tests,challenge,function (err,report,stout,sterr) {
+                javaRunner.test(code,challenge.tests,challenge,function (err,report,stout,sterr) {
                     if(err && !sterr) return reject(err);
                     return resolve([report,stout, sterr]);
                 });
