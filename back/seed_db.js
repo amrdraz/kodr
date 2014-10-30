@@ -64,7 +64,9 @@ module.exports = function(req, res, next) {
         return [
             Arena.create({
                 author: t._id,
-                name: 'Variables'
+                name: 'Variables',
+                isPublished:true,
+                description:'Try out some variable exercises'
             }),
             Group.create({
                 founder: t._id,
@@ -78,31 +80,40 @@ module.exports = function(req, res, next) {
                 arena: a.id,
                 author: teacher._id,
                 name: 'Define x',
-                description: 'Define a new `var` __x__ with value equal to 3',
-                exp: 1,
-                solution: 'var x = 3;',
+                language:'java',
+                description: 'Define `int` __x__ with value equal to 3',
+                exp: 10,
+                valid:true,
+                isPublished:false,
+                solution: 'int x = 3;',
                 setup: '',
-                tests: 'describe("test", function () {it("should define x", function () {expect(x).toBeDefined();});it("should define x", function () {expect(x).toEqual(3);});});'
+                tests: 'if(x==3) {\n  Test.pass("You did it you\'re awesome", 10);\n} else {\n  Test.fail("The value of x should not be "+x);\n}'
             }),
             Challenge.create({
                 arena: a.id,
                 author: teacher._id,
-                name: 'Define y',
-                description: 'Define a new `var` __y__ with value equal to 3',
-                exp: 1,
-                solution: 'var y = 3;',
-                setup: '',
-                tests: 'describe("test",function () {it("should define y", function () {expect(y).toBeDefined();});it("should define y", function () {expect(y).toEqual(3);});});'
+                name: 'Say Hello',
+                language:'java',
+                description: 'Print `"Hello"`',
+                exp: 10,
+                valid:true,
+                isPublished:true,
+                solution: 'System.out.print("Hello");',
+                setup: '// System.out.print();',
+                tests: 'Test.expect($userOut.toString(),"Hello", "You did it you\'re awesome!", 10);'
             }),
             Challenge.create({
                 arena: a.id,
                 author: teacher._id,
-                name: 'Define z',
-                description: 'Define a new `var` __z__ with value equal to 3',
-                exp: 1,
-                solution: 'var z = 3;',
-                setup: '',
-                tests: 'describe("test",function () {it("should define z", function () {expect(z).toBeDefined();});it("should define z", function () {expect(z).toEqual(3);});});'
+                name: 'Get the 4th',
+                language:'java',
+                description: 'Print the __4th__ element of the array`',
+                exp: 10,
+                valid:true,
+                isPublished:true,
+                solution: 'int[] x = {12,43,56,344,56};\nSystem.out.print(x[3]);',
+                setup: 'int[] x = {12,43,56,344,56};',
+                tests: 'Test.expect($userOut.toString(),""+x[3], "You did it you\'re awesome!", 10);'
             }),
         ];
     }).spread(function(ch) {

@@ -17,7 +17,7 @@ var ChallengeModel = module.exports = DS.Model.extend({
     // callbacks: attr('string', {defaultValue:"// callbacks for structure variables if any\n{}"}),
     preCode: attr('string'),
     postCode: attr('string'),
-    language: attr('string'),
+    language: attr('string', {defaultValue:'java'}),
     description: attr('string', {
         defaultValue: "A new Challenge"
     }),
@@ -40,25 +40,25 @@ var ChallengeModel = module.exports = DS.Model.extend({
         inverse: 'challenges'
     }),
 
-    exp: attr('number', {defaultValue:1}),
+    exp: attr('number', {defaultValue:10}),
     expOptions: [{
         rank: "direct",
-        points: 1
+        points: 10
     }, {
         rank: "simple",
-        points: 2
+        points: 20
     }, {
         rank: "easy",
-        points: 4
+        points: 40
     }, {
         rank: "medium",
-        points: 8
+        points: 80
     }, {
         rank: "challenging",
-        points: 16
+        points: 160
     }, {
         rank: "hard",
-        points: 32
+        points: 320
     }],
 
     isJava: function () {

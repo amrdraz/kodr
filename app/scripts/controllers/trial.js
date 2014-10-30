@@ -69,7 +69,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
                         controller.get('console').Write(res.sterr,'error');
                         controller.trigger('lintCode', 'code',controller.parseSterr(res.sterr));
                     } else {
-                        controller.get('console').Write(res.stout);
+                        controller.get('console').Write(res.stout+ '\n');
                         controller.trigger('lintCode', 'code',[]);
                     }
                 });
