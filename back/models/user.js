@@ -97,6 +97,10 @@ var userSchema = new mongoose.Schema({
     userQuests: [{
         type: ObjectId,
         ref: 'UserQuest'
+    }],
+    activities:[{
+        type: ObjectId,
+        ref:'Activity'
     }]
 });
 

@@ -4,7 +4,7 @@ var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
 var relationship = require("mongoose-relationship");
 var observer = require('../mediator');
-var javaRunner = require('../java-runner');
+var javaRunner = require('java-code-runner');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
