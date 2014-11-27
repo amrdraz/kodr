@@ -19,14 +19,14 @@ describe('Test', function() {
         });
     });
 
-    describe('Quest', function () {
-        it('should list quests under /quests', function () {
-            loginUser('teacher', 'teacher123');
-            visit('/quests');
-            andThen(function() {
-                find("ul.list-group li").length.should.equal(1);
-            });
-        });
-    });
+    // describe('Quest', function () {
+    //     it('should list quests under /quests', function () {
+    //         loginUser('teacher', 'teacher123');
+    //         visit('/quests');
+    //         andThen(function() {
+    //             find("ul.list-group li").length.should.equal(1);
+    //         });
+    //     });
+    // });
 
 });

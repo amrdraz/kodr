@@ -1,6 +1,7 @@
 module.exports = function(App) {
     App.Router.map(function() {
         this.route('login');
+        this.route('forgotpass');
         this.route('logout');
         this.route('signup');
         this.route('about');

@@ -1,94 +1,59 @@
-<section class="quest-controlles row">
+<section class="user-controlles row">
   <ul class="nav nav-pills pull-right">
-    <li {{action "save"}} {{bind-attr class="shouldSave::disabled :quest-save" }} >
+    <li {{action "save"}} {{bind-attr class="isDirty::disabled :user-save" }} >
       <a href="#"><i class="glyphicon glyphicon-save"></i> Save</a>
     </li>
-    <li {{action "publish"}} {{bind-attr class="canPublish::disabled :quest-publish "}} title="after publishing you can no longer change the vaalue of this quest">
-      <a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a>
+    <li {{action "activate"}} {{bind-attr class="activated:disabled :user-publish "}}>
+      <a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Activate</a>
     </li>
-    <li {{action 'delete' }} class="quest-delete">
+    <li {{action 'delete' }} {{bind-attr class="isAdmin:disabled :user-delete" }}>
       <a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a>
     </li>
   </ul>
 </section>
-<section class="quest-settings row">
+<section class="user-settings row">
 <form role="form">
   <div class="form-group">
     <div class="editable col-lg-12">
-      <label for="name" class="control-label">Quest name</label>
-      {{input id="name" value=model.name class="quest-name form-control"}}
-    </div>
-  </div>
-   <div class="form-group">
-    <div class="editable col-lg-12">
-      <label for="description" class="control-label">Quest description</label>
-      {{textarea id="description" value=model.description class="quest-description form-control"}}
+      <label for="name" class="control-label">User name</label>
+      {{input id="name" value=model.username class="user-username form-control"}}
     </div>
   </div>
   <div class="form-group">
     <div class="editable col-lg-12">
-      <label for="name" class="control-label">Add Quest requirement</label>
-      <button {{action "add"}} class="btn btn-sm btn-default">add Requirement</button>
-        
-      {{#each req in requirements }}
-      <div class="form-control">
-        <button {{action "remove" req }} type="button" class="close"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        Complete 
-        {{view Ember.Select content=modifiers value=req.modifier1 }}
-        {{view Ember.Select content=models value=req.model1 }}
-        {{#unless req.isAny1 }}
-          {{#if req.isChallenge}}
-            {{chosen name="id1"
-                      content=challenges
-                      optionValuePath="content.id"
-                      optionLabelPath="content.name"
-                      value=req.id1
-                      class="requirement-model1 col-md-3"
-                      }}
-          {{else}}
-            {{chosen name="id1"
-                      content=arenas
-                      optionValuePath="content.id"
-                      optionLabelPath="content.name"
-                      value=req.id1
-                      class="requirement-model1 col-md-3"
-                      }}
-          {{/if}}
-        {{else}}
-          {{#if req.isChallenge}}
-            in 
-            {{view Ember.Select content=modifiers value=req.modifier2 }}
-            {{req.model2}}
-            {{#unless req.isAny2 }}
-              {{chosen
-                        name="id2"
-                        content=arenas
-                        optionValuePath="content.id"
-                        optionLabelPath="content.name"
-                        value=req.id2
-                        class="requirement-model2 col-md-3"
-                        }}
-            {{/unless}}
-          {{/if}}
-          times: {{input type='number' value=req.times min=0}}
-        {{/unless}}
-      </div>
-      {{/each}}
+      <label for="description" class="control-label">User email</label>
+      {{input id="description" value=model.email class="user-email form-control"}}
     </div>
   </div>
-</form>
+  {{#unless isAdmin }}
+  <div class="form-group">
+    <div class="editable col-lg-12">
+      <label for="description" class="control-label">User role</label>
+      {{chosen name="id1"
+        content=model.roles
+        value=model.role
+        optionValuePath="content"
+        optionLabelPath="content"
+        class="user-role form-control"
+        }}
+    </div>
+  </div>    
+  {{/unless}}
 </section>
-<section class="quest-requirements">
-<div class="col-md-12">
-  <h4>Requirements</h4>
-  <ul class="item-group">
-    {{#each req in requirements}}
-      <li class="list-group-item">
-         {{partial '_requirement' }}
-      </li>
-    {{else}}
-      Does not have any requirements
-    {{/each}}
-  </ul>
-</div>
+<hr>
+<section class="user-password-reset row">
+  <form role="form-horizontal col-md-6 col-md-offset-1">
+    <fieldset>
+      <legend>Change Password</legend>
+      <div class="form-group">
+          <label for="name" class="control-label">New Password</label>
+          {{input type="password" value=password class="form-control"}}
+      </div>
+      <div class="form-group">
+          <label for="name" class="control-label">New Password Confirmation</label>
+          {{input type="password" value=passwordConfirmation class="form-control"}}
+      </div>
+      <button {{action "changePass"}} class="btn btn-default">Change</button>
+    <fieldset>
+  </form>
 </section>

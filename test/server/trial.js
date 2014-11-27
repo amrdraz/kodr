@@ -11,7 +11,7 @@ var User = require('../../back/models/user');
 var Challenge = require('../../back/models/challenge');
 var Arena = require('../../back/models/arena');
 var AreanTrial = require('../../back/models/arenaTrial');
-var observer = require('../../back/mediator');
+var observer = require('../../back/observer');
 
 
 

@@ -28,8 +28,18 @@ var UserController = Ember.ObjectController.extend(Ember.Validations.Mixin, {
         changePass: function() {
             var that = this;
             this.validate().then(function() {
-                if (this.get('session.isAdmin')) {
-                  //TODO
+                if (that.get('session.isAdmin')) {
+                  Em.$.ajax({
+                      type: 'PUT',
+                      url: '/api/users/'+that.get('model.id'),
+                      context: that,
+                      data: {user:that.get('model').getProperties('password', 'passwordConfirmation')}
+                  }).done(function(res) {
+                      toastr.success('passwordChanged');
+                      that.get('session').restore({access_token:res.access_token});
+                  }).fail(function(xhr) {
+                      toastr.error(xhr.responseText);
+                  });
                 } else {
                   Em.$.ajax({
                       type: 'POST',

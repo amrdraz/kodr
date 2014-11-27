@@ -47,14 +47,7 @@ module.exports = function(passport) {
         // only fire findOne when we have data
         process.nextTick(function() {
 
-            User.findOne({
-                $or: [
-                    {'email': identity},
-                    {'username': identity}
-                ]
-            }, function(err, user) {
-                if (err) return done(err);
-
+            User.findByIdentity(identity).then(function(user) {
                 // check if user with this email already exists
                 if (!user) {
                     return done(null, false, req.flash('loginMessage', 'Invalide username or password'));
@@ -66,6 +59,8 @@ module.exports = function(passport) {
                     return done(null, false, req.flash('loginMessage', 'Invalide username or password'));
                 });
 
+            }, function (err) {
+                done(err);
             });
         });
 

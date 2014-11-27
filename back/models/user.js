@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var observer = require('../mediator');
+var observer = require('../observer');
 var crypto = require('crypto');
 var util = require('util');
 var bcrypt = require('bcrypt');
@@ -109,6 +109,13 @@ userSchema.plugin(relationship, {
     relationshipPathName: ['groups', 'group']
 });
 
+/**
+ * the sum of both exp and rp
+ * @return {Number}
+ */
+userSchema.virtual('isStudent').get(function() {
+    return this.role === 'student';
+});
 
 /**
  * the sum of both exp and rp
@@ -189,19 +196,18 @@ userSchema.pre('save', true, function(next, done) {
     });
 });
 
+userSchema.statics.findByIdentity = function (identity) {
+    return User.findOne({
+                $or: [{
+                    'username': identity
+                }, {
+                    'email': identity,
+                }]
+            }).exec();
+};
+
 var User = mongoose.model('User', userSchema);
 
-/**
- * Event listner for when a trial is complete
- * @param  {Trial} trial trial that was just complete for the first time
- * @return {[type]}       [description]
- */
-observer.on('trial.award', function(trial) {
-    // console.log('user award hook caought in user', trial.user);
-    User.findById(trial.user, function(err, user) {
-        if (err) throw err;
-        user.award('exp', trial.exp, trial);
-    });
-});
-
 module.exports = User;
+
+require('../events/user').model();

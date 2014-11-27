@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
 var relationship = require("mongoose-relationship");
-var observer = require('../mediator');
+var observer = require('../observer');
 var javaRunner = require('java-code-runner');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;

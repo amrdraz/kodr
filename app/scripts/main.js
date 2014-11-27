@@ -172,6 +172,7 @@ App.ArenaTrialTrialView = require('./views/challengeEditView');
 App.ApplicationController = require('./controllers/application');
 App.LoginController = require('./controllers/login');
 App.SignupController = require('./controllers/signup');
+App.ForgotpassController = require('./controllers/forgotpass.js');
 
 App.GroupController = require('./controllers/group');
 App.GroupEditController = require('./controllers/group/edit');

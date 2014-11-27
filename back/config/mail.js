@@ -26,6 +26,23 @@ var from = '"Coding Owl" <kodr@abkar.org>';
 
 var stubTransport = nodemailer.createTransport(stubTransport());
 
+var host = 'localhost:9000';
+if(process.env.NODE_ENV === 'test') {
+    host = 'localhost:3000';
+} else if (process.env.NODE_ENV === 'production') {
+    host = 'abkar.org';
+}
+exports.options = {
+    email:'amr.m.draz@gmail.com'
+};
+
+/**
+ * Sends an email using an html template
+ * @param  {String}   template    name of template found in views/mail
+ * @param  {Object}   context     object to pass to template
+ * @param  {Object}   mailOptions options for mail
+ * @param  {Function} cb          callback after mail is sent
+ */
 exports.renderAndSend = function(template, context, mailOptions, cb) {
 
     emailTemplates(options, function(err, render) {
@@ -47,6 +64,14 @@ exports.renderAndSend = function(template, context, mailOptions, cb) {
     });
 };
 
+/**
+ * sends an email taking 
+ * @param  {Object}   mailOptions options for email
+ *                                -subject email subject
+ *                                -html content of mail in html
+ *                                -from [optional] where email is sent from default is koding owl
+ * @param  {Function} cb          call back retuning error or info about sent email
+ */
 exports.send = function(mailOptions, cb) {
 
     mailOptions = mailOptions || {

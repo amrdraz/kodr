@@ -8,7 +8,7 @@ var Activity = require('../../back/models/activity');
 var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
 var User = require('../../back/models/user');
-var observer = require('../../back/mediator');
+var observer = require('../../back/observer');
 
 
 describe('Activity', function() {

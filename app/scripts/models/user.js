@@ -4,6 +4,7 @@ module.exports = DS.Model.extend({
     exp: DS.attr('number'),
     rp: DS.attr('number'),
     role:DS.attr('string'),
+    activated:DS.attr('boolean'),
 
     challenges: DS.hasMany('challenge', {async: true, inverse: 'author'}),
     arenas: DS.hasMany('arena', {async: true, inverse: 'author'}),
@@ -16,6 +17,8 @@ module.exports = DS.Model.extend({
 
     userQuests: DS.hasMany('userQuest', {async:true,inverse:'user'}),
 
+    roles:['admin','teacher','student'],
+    
     isStudent:function () {
         return this.get('role')==='student';
     }.property('role'),

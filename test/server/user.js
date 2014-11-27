@@ -12,7 +12,7 @@ var ArenaTrial = require('../../back/models/arenaTrial');
 var Trial = require('../../back/models/trial');
 var Challenge = require('../../back/models/challenge');
 var Group = require('../../back/models/group');
-var observer = require('../../back/mediator');
+var observer = require('../../back/observer');
 
 describe('User', function() {
     before(setup.clearDB);
@@ -139,7 +139,7 @@ describe('User', function() {
             trial.complete = true;
             trial2.complete = true;
             var times = 0;
-            observer.on('user.awarded', function(user, type, value) {
+            observer.on('user.awarded', function (user, type, value) {
                 times++;
                 // console.log('assigned user exp ', user.exp, ' after adding ', value);
 
@@ -333,6 +333,12 @@ describe('User', function() {
             });
 
             it("should send and email when a teacher signs up", function(done) {
+               
+               /*observer.once("test.user.signup.response", function (body) {
+                    expect(body.info).to.exist;
+                    activationToken = body.token;
+                    done();
+                });*/
                 request(url)
                     .post("/signup")
                     .send({
@@ -344,7 +350,7 @@ describe('User', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        expect(res.body.info.response).to.exist;
+                        expect(res.body.info).to.exist;
                         activationToken = res.body.token;
                         done();
                     });
@@ -367,9 +373,9 @@ describe('User', function() {
                     });
             });
 
-            it("should activate by accessing link then in email", function(done) {
+            it("should activate by accessing link then send email", function(done) {
                 request(url)
-                    .get("/confirmAccount/" + activationToken)
+                    .get("/verify/" + activationToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -418,6 +424,7 @@ describe('User', function() {
         });
 
     });
+
     describe('API', function() {
         var url = setup.url;
         var api = setup.api;
@@ -432,7 +439,7 @@ describe('User', function() {
                 email: 'student@place.com',
                 password: 'student123',
                 role: 'student',
-                activated: true
+                activated: false
             },
             teacher = {
                 username: 'teacher',
@@ -472,6 +479,8 @@ describe('User', function() {
         after(setup.clearDB);
 
         describe("POST", function() {
+            var passwordToken;
+            var verifyToken;
 
             it("should not work without accessToken", function(done) {
                 request(api)
@@ -481,7 +490,7 @@ describe('User', function() {
                     .end(done);
             });
 
-            it("should not create as a student", function(done) {
+            it("should not create as a student if student", function(done) {
                 request(api)
                     .post("/users")
                     .set('Authorization', 'Bearer ' + student.token)
@@ -493,10 +502,84 @@ describe('User', function() {
                     });
             });
 
+            it("should not send a verification email if not admin", function(done) {
+                request(api)
+                    .post("/users/"+student._id+"/verify")
+                    .send()
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(401);
+                        done();
+                    });
+            });
+
+            it("should send and email when user verification request is sent", function(done) {
+                request(api)
+                    .post("/users/"+student._id+"/verify")
+                    .set('Authorization', 'Bearer ' + admin.token)
+                    .send()
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        expect(res.body.info.response).to.exist;
+                        verifyToken = res.body.token;
+                        done();
+                    });
+            });
+
+            it("should send and email when a password reset request is sent", function(done) {
+                request(api)
+                    .post("/users/forgotpass/")
+                    .send({
+                        identification: "admin"
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        expect(res.body.info.response).to.exist;
+                        passwordToken = res.body.token;
+                        done();
+                    });
+            });
+
+             it("should not reset password if different", function(done) {
+                request(url)
+                    .post("/forgotpass/")
+                    .send({
+                        token: passwordToken,
+                        password: '123233jjw4',
+                        passwordConfirmation:'12323w3j44'
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(400);
+                        done();
+                    });
+            });
+
+            it("should reset password", function(done) {
+                request(url)
+                    .post("/forgotpass/")
+                    .send({
+                        token: passwordToken,
+                        password: '123233jj44',
+                        passwordConfirmation:'123233jj44'
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        User.findById(admin._id,function (err, user) {
+                            if(err) return done(err);
+                            admin.token = user.token;
+                            done();
+                        });
+                    });
+            });
+
             it("should create as a teacher", function(done) {
                 request(api)
                     .post("/users")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('Authorization', 'Bearer ' + admin.token)
                     .send(user)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -551,7 +634,7 @@ describe('User', function() {
                     .set('Authorization', 'Bearer ' + student.token)
                     .send({
                         user: {
-                            password: 'newpass121'
+                            email: 'user@mail.com'
                         }
                     })
                     .then(function(res) {
@@ -566,7 +649,7 @@ describe('User', function() {
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .send({
                         user: {
-                            password: 'newpass121'
+                            email: 'user@mail.com'
                         }
                     })
                     .then(function(res) {
@@ -581,7 +664,7 @@ describe('User', function() {
                     .set('Authorization', 'Bearer ' + student.token)
                     .send({
                         user: {
-                            password: 'newpass121'
+                            email: 'student@email.com'
                         }
                     })
                     .then(function(res) {
@@ -589,6 +672,7 @@ describe('User', function() {
                         done();
                     });
             });
+
         });
 
         describe("DELETE", function() {

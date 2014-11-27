@@ -27,7 +27,7 @@ describe('ExpiringToken', function() {
                 user = model;
                 return ExpiringToken.create({
                     user:user._id,
-                    'for':'newaccount',
+                    'for':ExpiringToken.VERIFICATION,
                     createdAt: new Date()
                 });
             }, done)
@@ -42,14 +42,14 @@ describe('ExpiringToken', function() {
         });
         it('should become used', function (done) {
             expire.used.should.be.false;
-            ExpiringToken.getToken(expire.id).then(function (exp) {
+            ExpiringToken.useToken(expire.id).then(function (exp) {
                 exp.used.should.to.be.true;
                 done();
             }).catch(done);
         });
-        it('should expire after an hour', function (done) {
-            clock.tick(1000*60*60+1); //1h + 1ms
-            ExpiringToken.getToken(expire.id).then(function (exp) {
+        it('should expire after an 24 hours', function (done) {
+            clock.tick(1000*60*60*24+1); //1h + 1ms
+            ExpiringToken.useToken(expire.id).then(function (exp) {
                 expect(exp).to.not.exist;
                 done();
             }).catch(done);
