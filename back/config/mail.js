@@ -22,16 +22,12 @@ var smtpTransporter = nodemailer.createTransport(smtpTransport({
 }));
 // smtpTransporter.use('compile', htmlToText());
 
-var from = '"Coding Owl" <kodr@abkar.org>';
+var from = '"Coding Owl" <od@kodr.in>';
 
 var stubTransport = nodemailer.createTransport(stubTransport());
 
-var host = 'localhost:9000';
-if(process.env.NODE_ENV === 'test') {
-    host = 'localhost:3000';
-} else if (process.env.NODE_ENV === 'production') {
-    host = 'abkar.org';
-}
+exports.host = require('./server')(process.env.NODE_ENV).host;
+
 exports.options = {
     email:'amr.m.draz@gmail.com'
 };
