@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var observer = require('./observer');
 var User = require('./models/user');
 var ExpiringToken = require('./models/expiringToken');
 var access = require('./routes/access');
@@ -24,7 +25,7 @@ module.exports = function(app, passport) {
     // userQuest routes
     require('./routes/userQuest')(app, passport);
 
-    if(process.env.NODE_ENV!=='production') {
+    if (process.env.NODE_ENV !== 'production') {
         app.get('/seed_db', require('./seed_db'));
     }
 
@@ -39,14 +40,13 @@ module.exports = function(app, passport) {
         passport.authenticate('local-login', function(err, user) {
             if (err) return next(err);
             if (user) {
-                if(!user.activated) return res.send(400, 'Please Confirm your email');
+                if (!user.activated) return res.send(400, 'This account is not Verified');
 
                 res.send({
                     access_token: user.token,
                     user_id: user._id
                 });
-            }
-            else res.send(403, 'Incorrect username or password.');
+            } else res.send(403, 'Incorrect username or password.');
         })(req, res, next);
     });
 
@@ -56,19 +56,73 @@ module.exports = function(app, passport) {
         res.send(200);
     });
 
-    // logout
-    app.get('/confirmAccount/:token', function(req, res, next) {
-        ExpiringToken.getToken(req.params.token).then(function(token) {
-            User.findOne({_id:token.user}).exec().then(function (user) {
-                user.activated = true;
-                user.save();
-                // var confirmURL = req.headers.host + '/confirmAccount/' + req.params.token;
-                res.render('confirm.html', {
-                    user:user
-                });
-            }, next);
+    // confirmAccount after recieving verifcation
+    app.get('/verify/:token', function(req, res, next) {
+        ExpiringToken.useToken(req.params.token).then(function(token) {
+            if (token) {
+                User.findOne({
+                    _id: token.user
+                }).exec().then(function(user) {
+                    user.activated = true;
+                    user.save();
+                    res.render('confirm.html', {
+                        user: user
+                    });
+                }, next);
+            } else {
+                res.render("expiredToken.html");
+            }
         }, next);
     });
+
+    // render forgot password page
+    app.get('/forgotpass/:token', function(req, res, next) {
+        ExpiringToken.getToken(req.params.token).then(function(token) {
+            if (token) {
+                res.render('forgotPassword.html', {
+                    token: token.id
+                });
+            } else {
+                res.render("expiredToken.html");
+            }
+        }, next);
+    });
+
+    // reset forgot password page
+    app.post('/forgotpass', function(req, res, next) {
+        ExpiringToken.getToken(req.body.token).then(function(token) {
+            if (token) {
+                return Promise.fulfilled().then(function() {
+                    return User.findOne({
+                        _id: token.user
+                    }).exec();
+                }).then(function(user) {
+                    if (req.body.password !== req.body.passwordConfirmation) {
+                        throw {
+                            http_code: 400,
+                            message: 'Passwords do not match.'
+                        };
+                    }
+                    user.password = req.body.password;
+                    user.save(function(err, user) {
+                        if (err) throw err;
+                        res.render('confirm.html', {
+                            user: user,
+                        });
+                        ExpiringToken.useToken(user);
+                    });
+                });
+            } else {
+                res.render("expiredToken.html");
+            }
+        }).catch(function(err) {
+            if (err.http_code) {
+                return res.send(err.http_code, err.message);
+            }
+            next(err);
+        });
+    });
+
 
     /**
      * POST /signup
@@ -80,88 +134,152 @@ module.exports = function(app, passport) {
      */
 
     app.post('/signup', function(req, res, next) {
-        if (!req.body.username) {
-            return res.send(400, 'Username cannot be blank.');
-        }
-
-        if (!req.body.email) {
-            return res.send(400, 'Email cannot be blank.');
-        }
-
-        if (!req.body.password) {
-            return res.send(400, 'Password cannot be blank.');
-        }
-
-        if (req.body.password !== req.body.passwordConfirmation) {
-            return res.send(400, 'Passwords do not match.');
-        }
-
         Promise.fulfilled()
-            .then(function() {
-                return User.findOne({
+            .then(validateRequestBody(req))
+            .then(findUser(req))
+            .then(createIfNewUser(req))
+            .then(emitAndRespond(req,res))
+            .catch(function(err) {
+                console.log(err.stack);
+                if (err.http_code) {
+                    return res.send(err.http_code, err.message);
+                }
+                res.send(500, err.message);
+            });
+
+        function validateRequestBody(req) {
+            return function() {
+                if (!req.body.username) {
+                    throw {
+                        http_code: 400,
+                        message: 'Username cannot be blank.'
+                    };
+                }
+                if (!req.body.email) {
+                    throw {
+                        http_code: 400,
+                        message: 'Email cannot be blank.'
+                    };
+                }
+                if (!req.body.password) {
+                    throw {
+                        http_code: 400,
+                        message: 'Password cannot be blank.'
+                    };
+                }
+
+                if (req.body.password !== req.body.passwordConfirmation) {
+                    throw {
+                        http_code: 400,
+                        message: 'Passwords do not match.'
+                    };
+                }
+
+                if (!(/^\S+\.\S+@guc\.edu\.eg$/.test(req.body.email) || /^\S+\.\S+@student\.guc\.edu\.eg$/.test(req.body.email))) {
+                    throw {
+                        http_code: 401,
+                        message: 'Invalid Email'
+                    };
+                }
+            };
+        }
+
+        function findUser(req) {
+            return function() {
+                User.findOne({
                     $or: [{
                         'username': req.body.username
                     }, {
                         'email': req.body.email,
                     }]
                 }).exec();
-            })
-            .then(function(user) {
-                if (user) throw new Error(400, 'User already defined');
+            };
+        }
 
-                var email = req.body.email;
-                var role = 'student';
-                var activated = true;
-                if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
-                    role = 'teacher';
-                    //TODO uncomment this in production
-                    activated = false;
-                } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
-                    role = 'student';
+        function createIfNewUser(req) {
+            return function(user) {
+                if (user) {
+                    throw {
+                        http_code: 400,
+                        message: 'User already exists'
+                    };
                 }
+
+                var role = getRoleByEmail(req.body.email);
+
                 var usr = User.create({
                     username: req.body.username,
                     email: req.body.email,
                     password: req.body.password,
                     role: role,
-                    activated:activated
+                    activated: false
                 });
+
                 return usr;
-            })
-            .then(function (user) {
-                var token;
-                if(!user.activated)
-                    token = ExpiringToken.create({
-                        user: user._id,
-                        'for': 'newaccount',
-                    });
-                return [user, token];
-            })
-            .spread(function(user, token) {
-                if (!user.activated) {
-                    var confirmURL = req.headers.host + '/confirmAccount/' + token._id;
-                    // template in views/mail
-                    return mail.renderAndSend('welcome.html', {
-                        confirmURL: confirmURL
-                    }, {
-                        to: user.email,
-                        subject: 'You\'ve just signup for an awesome experience',
-                        stub: process.env.NODE_ENV==='test',
-                    }, function(err, info) {
-                        if (err) throw err;
-                        return res.send({
-                            token: token._id,
-                            info: info
+            };
+        }
+
+
+        function getRoleByEmail(email) {
+            if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
+                return 'teacher';
+            } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
+                return 'student';
+            }
+        }
+
+        function emitAndRespond(req,res) {
+            return function(user) {
+                //*
+                
+                if (!user.isStudent) {
+                    ExpiringToken.toVerify(user).then(function(eToken) {
+                        var confirmURL = req.headers.host + '/confirmAccount/' + eToken._id;
+                        // template in views/mail
+                        return mail.renderAndSend('welcome.html', {
+                            confirmURL: confirmURL
+                        }, {
+                            to: user.email,
+                            subject: 'You\'ve just signup for an awesome experience',
+                            stub: process.env.NODE_ENV === 'test',
+                        }, function(err, info) {
+                            if (err) throw err;
+                            if (process.env.NODE_ENV === 'test') {
+                                return res.send({
+                                    token: eToken._id,
+                                    info: info
+                                });
+                            } else {
+                                res.send(200, "Check your email for verification");
+                            }
                         });
+                    }).catch(function(err) {
+                        throw err;
                     });
+                } else {
+                    mail.send({
+                        to: mail.options.email,
+                        subject: 'A New Student just signed up',
+                        stub: process.env.NODE_ENV === 'test',
+                    }, function(err, info) {
+                        if (process.env.NODE_ENV === 'test') {
+                            return res.send({
+                                info: info
+                            });
+                        } else {
+                            res.send(200, "You registration is complete we will activate your account soon");
+                        }
+                    });
+                }//*/
+                
+                /*if(user.isStudent) {
+                    res.send(200, "You registration is complete we will activate your account soon");
+                } else {
+                    res.send(200, "Check your email for verification");
                 }
-                res.send(200);
-            }).catch(function (err) {
-                console.log(err);
-                if(err.message===400) {
-                    return res.send(400, 'User exists');
-                }
-                res.send(500, err.message);
-            });
+                observer.emit('user.signup', user);*/
+            };
+
+        }
     });
 };

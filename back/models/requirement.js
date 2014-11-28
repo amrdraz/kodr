@@ -6,7 +6,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
 var ArenaTrial = require('./arenaTrial');
 var Trial = require('./trial');
-var observer = require('../mediator');
+var observer = require('../observer');
 
 /**
  * Requirement Schema.

@@ -16,14 +16,16 @@ var Mixed = mongoose.Schema.Mixed;
  * @type {mongoose.Schema}
  */
 
+var FORGOTPASS = 'forgotpass';
+var VERIFICATION = 'verification';
 var ExpiringTokenSchema = new mongoose.Schema({
     'for': {
         type: String,
-        'enum': ['newaccount', 'password']
+        'enum': [VERIFICATION, FORGOTPASS]
     },
     used: {
         type: Boolean,
-        default:false
+        default: false
     },
     createdAt: {
         type: Date,
@@ -36,20 +38,40 @@ var ExpiringTokenSchema = new mongoose.Schema({
     }
 });
 
-ExpiringTokenSchema.statics.getToken = function (id) {
-    return Promise.fulfilled()
-    .then(function () {
+
+ExpiringTokenSchema.statics.getToken = function(id) {
+    return Promise.fulfilled().then(function() {
         var date = new Date();
-        date.setHours(date.getHours()-1);
-        return ExpiringToken.findOne({_id:id, used:false, createdAt:{$gte:date}}).exec().then(function (exec) {
-            if(!exec) return null;
-            exec.used = true;
-            exec.save();
-            return exec;
-        });
+        date.setHours(date.getHours() - 24);
+        return ExpiringToken.findOne({
+            _id: id,
+            used: false,
+            createdAt: {
+                $gte: date
+            }
+        }).exec();
+    });
+};
+
+ExpiringTokenSchema.statics.useToken = function(id) {
+    return ExpiringToken.getToken(id).then(function(exToken) {
+        if (!exToken) return null;
+        exToken.used = true;
+        exToken.save();
+        return exToken;
+    });
+};
+
+
+ExpiringTokenSchema.statics.toVerify = function(user) {
+    return Promise.fulfilled().then(function() {
+        return ExpiringToken.create({user: user._id, 'for': 'verification'});
     });
 };
 
 var ExpiringToken = mongoose.model('ExpiringToken', ExpiringTokenSchema);
+
+ExpiringToken.FORGOTPASS = FORGOTPASS;
+ExpiringToken.VERIFICATION = VERIFICATION;
 
 module.exports = ExpiringToken;

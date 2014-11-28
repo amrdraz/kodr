@@ -5,12 +5,12 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 var request = require('supertest');
 var setup = require('./setup');
-var observer = require('../../back/mediator');
 var Challenge = require('../../back/models/challenge');
 var Arena = require('../../back/models/arena');
 var ArenaTrial = require('../../back/models/arenaTrial');
 var Trial = require('../../back/models/trial');
 var User = require('../../back/models/user');
+var observer = require('../../back/observer');
 
 
 
@@ -110,10 +110,12 @@ describe('Challenge', function() {
                 .finally(done);
         });
         afterEach(setup.clearDB);
-        it('should remove themselves from their arenaTrial after cahllenge is removed', function(done) {
+
+        it('should remove themselves from their arenaTrial after challenge is removed', function(done) {
             trials.length.should.equal(num * 2);
             arenaTrial.trials.length.should.equal(num * 2);
             challenge.trials.length.should.equal(num);
+
             observer.on('test.challenge.trials.removed', function(arenaTrialTrials, challengeTrials) {
                 expect(arenaTrialTrials).to.equal(arenaTrial.trials.length - challengeTrials);
                 done();

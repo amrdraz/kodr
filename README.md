@@ -15,17 +15,9 @@ This project requires nodejs, bower, grunt, mongodb to run
 You can get mongodb via brew if you are a mac user
 
 To run this project clone it locally then run `npm install`
-this shoudl install all dependencies
+this should install all dependencies
 
 to run the project you need to run `mongod --bdpath ./data` in ther terminal (make sure you create the directory first)
 open another terminal tab and run `grunt serve`
 
 >As a side note I use bycript not node-bycrypt for the user hasing which may have a windows bug.
-
-###Immidiate Road Map
-
-- Do User ACL for students and teachers
-- Create Achievement system
-- User management
-- Quests for students
-- Profile Report

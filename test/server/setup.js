@@ -9,7 +9,7 @@ var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
 var Arena = require('../../back/models/arena');
 var ArenaTrial = require('../../back/models/arenaTrial');
-var observer = require('../../back/mediator');
+var observer = require('../../back/observer');
 
 var url = 'http://localhost:3000';
 var api = url+"/api";

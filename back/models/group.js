@@ -6,7 +6,7 @@ var debounce = _.debounce;
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
-var observer = require('../mediator');
+var observer = require('../observer');
 
 /**
  * Arena User Schema.

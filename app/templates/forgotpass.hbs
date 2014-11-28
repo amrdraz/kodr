@@ -1,6 +1,6 @@
 <div class="container">
   <div class="page-header">
-    <h3>Sign in</h3>
+    <h3>Fogot Password</h3>
   </div>
   <div class="col-sm-8 col-sm-offset-2">
 
@@ -25,14 +25,7 @@
         <label for="identification" class="control-label">Username or Email</label>
         {{input type="text" class="form-control" id="identification" value=identification autofocus="autofocus"}}
       </div>
-      <div class="form-group">
-        <label for="password" class="control-label">Password</label>
-        {{input type="password" class="form-control" id="password" value=password}}
-      </div>
-      <button type="submit" class="submit btn btn-primary"><i class="fa fa-unlock-alt"></i> Sign in</button>
-      or {{#link-to 'signup' class="btn"}}Sign Up{{/link-to}}
-      <br>
-      {{#link-to 'forgotpass'}}Did you forget your password?{{/link-to}}
+      <button type="submit" class="submit btn btn-primary">Request Token</button>
     </form>
   </div>
 </div>

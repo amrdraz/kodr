@@ -13,7 +13,7 @@ var Trial = require('../../back/models/trial');
 var Arena = require('../../back/models/arena');
 var ArenaTrial = require('../../back/models/arenaTrial');
 var User = require('../../back/models/user');
-var observer = require('../../back/mediator');
+var observer = require('../../back/observer');
 
 
 describe('UserQuest', function() {
