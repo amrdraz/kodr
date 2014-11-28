@@ -15,9 +15,9 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
         }
       },
       password: {
-        length:{minimum:10},
+        length:{minimum:8},
         format:{
-          with:/^.{10,}$/,
+          with:/^.{8,}$/,
           message: 'must contain at least one alphabel character and one digit'
         },
         confirmation:true

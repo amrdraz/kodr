@@ -430,9 +430,7 @@ describe('User', function() {
         var api = setup.api;
         var user = {
             username: "draz",
-            email: "amr.m.draz@gmail.com",
-            password: "drazdraz12",
-            passwordConfirmation: "drazdraz12"
+            email: "amr.m.draz@gmail.com"
         };
         var student = {
                 username: 'student',
@@ -576,11 +574,11 @@ describe('User', function() {
                     });
             });
 
-            it("should create as a teacher", function(done) {
+            it("should create a user via post if admin", function(done) {
                 request(api)
                     .post("/users")
                     .set('Authorization', 'Bearer ' + admin.token)
-                    .send(user)
+                    .send({user:user})
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);

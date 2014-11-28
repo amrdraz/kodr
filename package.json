@@ -80,6 +80,7 @@
     "passport-local": "~0.1.6",
     "passport-twitter": "~1.0.2",
     "qunitjs": "^1.14.0",
+    "random-password-generator": "0.0.3",
     "requirejs": "^2.1.14",
     "sillyname": "0.0.3",
     "socket.io": "^1.0.6",

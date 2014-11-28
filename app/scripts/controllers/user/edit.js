@@ -1,48 +1,74 @@
-module.exports = Em.ObjectController.extend(Ember.Validations.Mixin,{
+module.exports = Em.ObjectController.extend(Ember.Validations.Mixin, {
     // needs: ['group'],
     breadCrumb: 'user',
     breadCrumbPath: 'user',
-    validations:{
-      password: {
-        length:{minimum:10},
-        format:{
-          with:/^.{10,}$/,
-          message: 'must contain at least one alphabel character and one digit'
+    validations: {
+        password: {
+            length: {
+                minimum: 8
+            },
+            format: {
+                with: /^.{8,}$/,
+                message: 'must contain at least one alphabel character and one digit'
+            },
+            confirmation: true
         },
-        confirmation:true
-      },
-      passwordConfirmation: {
-        presence:true
-      }
+        passwordConfirmation: {
+            presence: true
+        }
     },
-    isCreating: function () {
+    isCreating: function() {
         return App.get('currentPath').split('.').contains('create');
     }.property('App.currentPath'),
+    isCreatingOrNotAdmin:function () {
+      return this.get('isCreating') || !this.get('model.isAdmin');
+    }.property('isCreating','isAdmin'),
     actions: {
-        save:function () {
-            this.get('model').save();
+        save: function() {
+            var that = this;
+            var model = this.get('model');
+            if (this.get('isCreating')) {
+                model.save().then(function(user) {
+                    that.transitionTo('user.edit', user);
+                }, function(xhr) {
+                    console.error(xhr.message);
+                    toastr.error(xhr.message);
+                });
+            } else {
+               return model.save();
+            }
         },
-        activate:function () {
-            
+        activate: function() {
+          var model = this.get('model');
+          model.set('activated',true);
+          model.save();
         },
-        delete:function () {
-            
+        delete: function() {
+            this.get('model').destroyRecord();
+            this.transitionToRoute('users');
         },
         changePass: function() {
             var that = this;
             this.validate().then(function() {
-                  Em.$.ajax({
-                      type: 'PUT',
-                      url: '/api/users/'+that.get('model.id'),
-                      context: that,
-                      data: {user:that.get('model').getProperties('password', 'passwordConfirmation')}
-                  }).done(function(res) {
-                      toastr.success('passwordChanged');
-                      that.get('session').restore({access_token:res.access_token});
-                      that.get('model').setProperties({password:'',passwordConfirmation:''});
-                  }).fail(function(xhr) {
-                      toastr.error(xhr.responseText);
-                  });
+                Em.$.ajax({
+                    type: 'PUT',
+                    url: '/api/users/' + that.get('model.id'),
+                    context: that,
+                    data: {
+                        user: that.get('model').getProperties('password', 'passwordConfirmation')
+                    }
+                }).done(function(res) {
+                    toastr.success('passwordChanged');
+                    that.get('session').restore({
+                        access_token: res.access_token
+                    });
+                    that.get('model').setProperties({
+                        password: '',
+                        passwordConfirmation: ''
+                    });
+                }).fail(function(xhr) {
+                    toastr.error(xhr.responseText);
+                });
             }, function() {
                 var errors = that.get('errors');
                 var fullErrors = [];
@@ -54,6 +80,6 @@ module.exports = Em.ObjectController.extend(Ember.Validations.Mixin,{
                 });
                 that.set('fullErrors', fullErrors);
             });
-        }        
+        }
     }
 });
