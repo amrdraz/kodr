@@ -45,9 +45,14 @@ var userSchema = new mongoose.Schema({
         unique: true,
         trim: true
     },
+    tempPassword: {
+        type: String,
+        match: /^.{8,}$/,
+        trim: true
+    },
     password: {
         type: String,
-        match: /^.{10,}$/,
+        match: /^.{8,}$/,
         trim: true
     },
     activated: {
@@ -134,6 +139,7 @@ userSchema.methods.toJSON = function() {
     obj.id = obj._id;
     delete obj.__v;
     delete obj.password;
+    delete obj.tempPassword;
     delete obj.token;
     return obj;
 };

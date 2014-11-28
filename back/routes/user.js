@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var passGen = require('random-password-generator');
 var User = require('../models/user');
 var UserQuest = require('../models/userQuest');
 var ExpiringToken = require('../models/expiringToken');
@@ -91,19 +92,21 @@ module.exports = function(app, passport) {
     });
 
     /**
-     * Create new users.
+     * Create new users, generating password.
      *
      * @param range
      * @returns {object} user
      */
 
     app.post('/api/users', access.requireRole(['admin']), function(req, res, next) {
-        User.create(req.body.user)
-            .then(function(model) {
-                res.json({
-                    user: model,
-                });
-            }, next);
+        var user = req.body.user;
+        user.password = user.tempPassword = passGen.generate();
+        User.create(user, function(err, model) {
+            if (err) return next(err);
+            res.json({
+                user: model,
+            });
+        });
     });
 
     /**
@@ -114,8 +117,10 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/users/:id/verify', access.requireRole(['admin']), function(req, res, next) {
-        User.findOne({_id:req.params.id}).exec().then(function (user) {
-            ExpiringToken.toVerify(user).then(function(eToken){
+        User.findOne({
+            _id: req.params.id
+        }).exec().then(function(user) {
+            ExpiringToken.toVerify(user).then(function(eToken) {
                 var confirmURL = req.headers.host + '/verify/' + eToken._id;
                 // template in views/mail
                 return mail.renderAndSend('welcome.html', {
@@ -126,7 +131,7 @@ module.exports = function(app, passport) {
                     stub: process.env.NODE_ENV === 'test',
                 }, function(err, info) {
                     if (err) throw err;
-                    if(process.env.NODE_ENV === 'test') {
+                    if (process.env.NODE_ENV === 'test') {
                         return res.send({
                             token: eToken._id,
                             info: info
@@ -135,11 +140,11 @@ module.exports = function(app, passport) {
                         res.send('Email Sent');
                     }
                 });
-            }).catch(function (err) {
+            }).catch(function(err) {
                 next(err);
             });
-        },next);
-        
+        }, next);
+
     });
 
     /**
@@ -175,7 +180,7 @@ module.exports = function(app, passport) {
                     stub: process.env.NODE_ENV === 'test',
                 }, function(err, info) {
                     if (err) throw err;
-                    if(process.env.NODE_ENV === 'test') {
+                    if (process.env.NODE_ENV === 'test') {
                         return res.send({
                             token: eToken._id,
                             info: info
@@ -203,19 +208,27 @@ module.exports = function(app, passport) {
 
     app.put('/api/users/:id', access.requireRole(['$self', 'teacher', 'admin']), function(req, res, next) {
         var user = req.body.user;
-        Promise.fulfilled().then(function () {
-            if(user.password && user.password!==user.passwordConfirmation) {
-                throw {http_code:403, message:"passwords didn't match"};
+        Promise.fulfilled().then(function() {
+            if (user.password && user.password !== user.passwordConfirmation) {
+                throw {
+                    http_code: 403,
+                    message: "passwords didn't match"
+                };
             }
-            return User.findOne({_id: req.params.id}).exec();
+            return User.findOne({
+                _id: req.params.id
+            }).exec();
         }).then(function(model) {
-            if (!model) throw {http_code:404, message:"Not Found"};
+            if (!model) throw {
+                http_code: 404,
+                message: "Not Found"
+            };
             model.set(user);
             model.save(function(err, model) {
                 if (err) return next(err);
                 res.json({
                     user: model,
-                    access_token:user.passwordConfirmation?model.token:undefined
+                    access_token: user.passwordConfirmation ? model.token : undefined
                 });
             });
         }).catch(function(err) {

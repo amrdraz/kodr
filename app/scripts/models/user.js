@@ -17,7 +17,7 @@ module.exports = DS.Model.extend({
 
     userQuests: DS.hasMany('userQuest', {async:true,inverse:'user'}),
 
-    roles:['admin','teacher','student'],
+    roles:['student','teacher','admin'],
     
     isStudent:function () {
         return this.get('role')==='student';

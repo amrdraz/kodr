@@ -3,12 +3,14 @@
     <li {{action "save"}} {{bind-attr class="isDirty::disabled :user-save" }} >
       <a href="#"><i class="glyphicon glyphicon-save"></i> Save</a>
     </li>
+    {{#unless isCreating}}
     <li {{action "activate"}} {{bind-attr class="activated:disabled :user-publish "}}>
       <a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Activate</a>
     </li>
     <li {{action 'delete' }} {{bind-attr class="isAdmin:disabled :user-delete" }}>
       <a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a>
-    </li>
+    </li>      
+    {{/unless}}
   </ul>
 </section>
 <section class="user-settings row">
@@ -25,7 +27,7 @@
       {{input id="description" value=model.email class="user-email form-control"}}
     </div>
   </div>
-  {{#unless isAdmin }}
+  {{#if isCreatingOrNotAdmin }}
   <div class="form-group">
     <div class="editable col-lg-12">
       <label for="description" class="control-label">User role</label>
@@ -38,9 +40,10 @@
         }}
     </div>
   </div>    
-  {{/unless}}
+  {{/if}}
 </section>
-<hr>
+{{#unless isCreating}}
+  <hr>
 <section class="user-password-reset row">
   <form role="form-horizontal col-md-6 col-md-offset-1">
     <fieldset>
@@ -57,3 +60,4 @@
     <fieldset>
   </form>
 </section>
+{{/unless}}

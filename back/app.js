@@ -74,7 +74,11 @@ app.use(passport.session()); // presistent login sessions
 app.use(flash()); // use conect flash to flash message stored in session
 
 app.use(function(err, req, res, next) {
-    console.error(err.stack);
+    if(process.env.NODE_ENV==='test') {
+        console.log(err.stack);
+    } else {
+        console.error(err.stack);        
+    }
     res.send(500, {
         message: 'Internal Server Error'
     });
