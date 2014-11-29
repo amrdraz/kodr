@@ -1,8 +1,8 @@
 module.exports = DS.Model.extend({
     username: DS.attr('string'),
     email: DS.attr('string'),
-    exp: DS.attr('number'),
-    rp: DS.attr('number'),
+    exp: DS.attr('number', {defaultValue:0}),
+    rp: DS.attr('number',{defaultValue:0}),
     role:DS.attr('string'),
     activated:DS.attr('boolean'),
 

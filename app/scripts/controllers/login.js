@@ -10,7 +10,7 @@ var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, E
         password: {
             presence: true,
             length: {
-                minimum: 10
+                minimum: 8
             }
         }
     },

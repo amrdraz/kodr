@@ -67,11 +67,13 @@ var userSchema = new mongoose.Schema({
     },
     exp: {
         type: Number,
-        'default': 0
+        'default': 0,
+        min:0
     }, // experience points
     rp: {
         type: Number,
-        'default': 0
+        'default': 0,
+        min:0
     }, // reputation points
     challenges: {
         type: [ObjectId],
