@@ -29,7 +29,7 @@ module.exports = function(app, passport) {
 
     app.put('/profile', access.requireRole(), function(req, res) {
 
-        if (req.body.password !== req.body.passwordConfirmation) {
+        if (req.body.user.password !== req.body.user.passwordConfirmation) {
             return res.send(400, 'Passwords do not match.');
         }
         req.user.set(req.body.user);
@@ -124,7 +124,8 @@ module.exports = function(app, passport) {
                 var confirmURL = req.headers.host + '/verify/' + eToken._id;
                 // template in views/mail
                 return mail.renderAndSend('welcome.html', {
-                    confirmURL: confirmURL
+                    confirmURL: confirmURL,
+                    password: user.tempPassword || undefined
                 }, {
                     to: user.email,
                     subject: 'You\'ve just joined an awesome experience',
@@ -137,7 +138,7 @@ module.exports = function(app, passport) {
                             info: info
                         });
                     } else {
-                        res.send('Email Sent');
+                        res.send({message:'Verification Email Sent'});
                     }
                 });
             }).catch(function(err) {

@@ -39,9 +39,11 @@ module.exports = Em.ObjectController.extend(Ember.Validations.Mixin, {
             }
         },
         activate: function() {
-          var model = this.get('model');
-          model.set('activated',true);
-          model.save();
+          Em.$.post('api/users/'+this.get('model.id')+'/verify').done(function (res) {
+              toastr.success(res.message);
+          }).fail(function (xhr) {
+              toastr.error(xhr.responseText);
+          });
         },
         delete: function() {
             this.get('model').destroyRecord();
@@ -59,9 +61,7 @@ module.exports = Em.ObjectController.extend(Ember.Validations.Mixin, {
                     }
                 }).done(function(res) {
                     toastr.success('passwordChanged');
-                    that.get('session').restore({
-                        access_token: res.access_token
-                    });
+                    that.set('session.access_token', res.access_token);
                     that.get('model').setProperties({
                         password: '',
                         passwordConfirmation: ''
