@@ -5,7 +5,7 @@ module.exports = App.ConsoleView = Em.View.extend({
         var controller = this.get('controller');
         var that = this;
         var header = 'This is a console for you to test your code!\n' +
-            'You can either type here or run your code to see what happens\n' +
+            'You can either run your code in console to see what happens\n' +
             'When you are ready try submitting your code to see the results\n';
         var iframeTemplate = require('../demo/empty');
         var stuff = require('../../vendor/stuff');

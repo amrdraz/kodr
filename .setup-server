@@ -1,0 +1,14 @@
+
+### forever commands
+
+## start
+#!/bin/sh
+mkdir -p ~/kodr/run
+
+forever start -a -l forever.log -o ~/kodr/run/out.log -e ~/kodr/run/err.log --minUptime=5000 --spinSleepTime=2000 ~/kodr/prod-server.js
+## endstart
+
+## stop
+#!/bin/sh
+forever stop /home/draz/webapps/kodr/prod-server.js
+## endstop
