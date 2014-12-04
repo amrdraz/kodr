@@ -101,7 +101,7 @@ require('./routes')(app, passport);
 require('./events')(io);
 
 if (process.env.NODE_ENV === 'production') {
-    require('./seed_db_prod');
+    require('./seed_db_prod')();
 }
 
 server.listen(app.get('port'), function() {
