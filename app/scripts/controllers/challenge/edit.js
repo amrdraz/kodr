@@ -1,3 +1,4 @@
+var toastr = require('toastr');
 var debounce = require('../../utils/debounce');
 var ChallengeMixin = require('../../mixins/challengeMixin');
 module.exports = Em.ObjectController.extend(ChallengeMixin, {

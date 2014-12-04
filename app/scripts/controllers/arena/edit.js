@@ -1,3 +1,4 @@
+var toastr = require('toastr');
 module.exports = Em.ObjectController.extend({
     breadCrumb:'arena',
     breadCrumbPath:'arena',

@@ -1,4 +1,5 @@
 // 'use strict';
+var toastr = require('toastr');
 
 window.ENV = window.ENV || {};
 // configure an authorizer to be used

@@ -1,3 +1,4 @@
+var toastr = require('toastr');
 module.exports = Em.Mixin.create(Em.Evented, {
     evaluates: 'code',
     jshint: function(code, cb, options) {

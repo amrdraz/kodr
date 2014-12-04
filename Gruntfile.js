@@ -277,6 +277,12 @@ module.exports = function(grunt) {
         },
 
         browserify: {
+            options: {
+                alias:[
+                    "./app/lib/toastr/toastr.js:toastr"
+                ],
+                // external:['jquery']
+            },
             main: {
                 src: '<%= config.app %>/scripts/main.js',
                 dest: '.tmp/scripts/build.js'

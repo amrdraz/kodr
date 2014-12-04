@@ -1,3 +1,4 @@
+var toastr = require('toastr');
 var UserController = Ember.ObjectController.extend(Ember.Validations.Mixin, {
     validations: {
         password: {

@@ -1,3 +1,4 @@
+var toastr = require('toastr');
 module.exports = Ember.Route.extend(SimpleAuth.ApplicationRouteMixin, {
     actions: {
         loading: function(transition, originRoute) {
