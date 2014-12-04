@@ -536,6 +536,7 @@ module.exports = function(grunt) {
 
         // Run some tasks in parallel to speed up build process
         concurrent: {
+            limit:5,
             watch: {
                 tasks: ['nodemon:dev', 'watch'],
                 options: {
