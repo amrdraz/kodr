@@ -29,7 +29,7 @@ var stubTransport = nodemailer.createTransport(stubTransport());
 exports.host = require('./server')(process.env.NODE_ENV).host;
 
 exports.options = {
-    email:'amr.m.draz@gmail.com'
+    email:'od@kodr.in'
 };
 
 /**

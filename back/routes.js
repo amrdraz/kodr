@@ -260,6 +260,7 @@ module.exports = function(app, passport) {
                     mail.send({
                         to: mail.options.email,
                         subject: 'A New Student just signed up',
+                        html: 'User:<br>'+user.toJSON(),
                         stub: process.env.NODE_ENV === 'test',
                     }, function(err, info) {
                         if (process.env.NODE_ENV === 'test') {
@@ -267,17 +268,17 @@ module.exports = function(app, passport) {
                                 info: info
                             });
                         } else {
-                            res.send(200, "You registration is complete we will activate your account soon");
+                            res.send(200, "Your registration is complete we will activate your account soon");
                         }
                     });
-                }//*/
-                
-                /*if(user.isStudent) {
+                }
+                /*
+                if(user.isStudent) {
                     res.send(200, "You registration is complete we will activate your account soon");
                 } else {
                     res.send(200, "Check your email for verification");
-                }
-                observer.emit('user.signup', user);*/
+                } //*/
+                observer.emit('user.signup', user);//*/
             };
 
         }

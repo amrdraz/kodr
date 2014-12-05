@@ -21,7 +21,7 @@ module.exports = function() {
         if(!admin) {
             return User.create({
                 username: 'od.admin',
-                email: 'od@kodr.in',
+                email: mail.options.email,
                 password: pass,
                 role: 'admin',
                 activated: true
