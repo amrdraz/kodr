@@ -111,7 +111,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
                 severity: "error"
             });
         }
-        console.log(found);
+        // console.log(found);
         return found;
     },
     runInServer: function(code, model, cb) {
