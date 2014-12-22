@@ -115,7 +115,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             if(model.get('isJava')) {
                 controller.trigger('showConsole');
                 controller.get('console').Write('Compiling...\n');
-                controller.runInServer(model.get('solution'), model.get('language'),function (res) {
+                controller.runInServer(model.get('solution'), model,function (res) {
                     controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
                     if(res.sterr){
                         controller.get('console').Write(res.sterr,'error');
@@ -193,7 +193,21 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             this.save().then(function(ch) {
                 console.log('unPublished');
             });
-        }
+        },
+        addInput: function() {
+            var controller = this;
+            var model = controller.get('model');
+            if(model.get('isJava')) {
+                var ins = model.get("inputs").pushObject(Em.Object.create({value:""}));
+            }
+        },
+        removeInput: function(inp) {
+            var controller = this;
+            var model = controller.get('model');
+            if(model.get('isJava')) {
+                var ins = model.get("inputs").removeObject(inp);
+            }
+        },
 
     }
 });

@@ -19,7 +19,7 @@
 <section class="challenge-settings row">
 <form role="form">
   <div class="form-group">
-    <div class="col-lg-6">
+    <div class="col-md-6">
       <label for="name" class="control-label">Challenge name</label>
       {{input id="name" value=model.name class="challenge-name form-control"}}
     </div>
@@ -47,6 +47,18 @@
       <span class="label label-primary challenge-exp">Estimated difficulty awards: {{model.exp}} Exp</span>
     </div>
   </div>
+  {{#if isJava }}
+    <div class="form-group">
+    <div class="col-md-6">
+      <label for="inputs" class="control-label">Inputs</label>
+      {{#each inp in model.inputs}}
+            {{input value=inp.value class="challenge-name form-control"}}
+            <button type="button" {{action "removeInput" inp }} class="close"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      {{/each}}
+      <button {{action "addInput" }}class="btn btn-primary">+ Add</button>
+    </div>
+  </div>
+  {{/if}}
 </form>
 </section>
 <hr>
@@ -56,6 +68,7 @@
     <a id="run" {{action "run"}} class="btn btn-default pull-right challenge-run"><i class="glyphicon glyphicon-play"></i> Run in Console</a>
       
       <ul class="nav nav-tabs">
+        <li><a href="#import" data-toggle="tab">Import</a></li>
         <li class="active"><a href="#solution" data-toggle="tab">Solution</a></li>
         <li><a href="#setup" data-toggle="tab">Setup</a></li>
         <li><a href="#tests" data-toggle="tab">Test</a></li>
@@ -105,6 +118,7 @@
             highlight='markdown'
             }}
         </div>
+
         <div class="tab-pane fade" id="descriptionPreview">
           {{view 'App.MarkedMathView' model=model observable='description' }}
         </div>

@@ -81,49 +81,44 @@ describe('User', function() {
         var user, arena, trial, trial2;
         beforeEach(function(done) {
 
-            Promise.fulfilled()
-                .then(function() {
-                    var ar = Arena.create({});
-                    var usr = User.create({
-                        username: 'test',
-                        password: 'testmodel2'
-                    });
-                    return [ar, usr];
-                })
-                .spread(function(ar, usr, t, st, st2) {
-                    arena = ar;
-                    user = usr;
-                    var at = ArenaTrial.create({
-                        arena: arena._id,
-                        user: user._id
-                    });
-                    var ch = Challenge.create({
-                        exp: 4,
-                        arena: arena._id
-                    });
-                    var ch2 = Challenge.create({
-                        exp: 2,
-                        arena: arena._id
-                    });
-                    return [ch, ch2];
-                })
-                .spread(function(ch1, ch2) {
-                    var tr = Trial.create({
-                        challenge: ch1._id,
-                        user: user._id
-                    });
-                    var tr2 = Trial.create({
-                        challenge: ch2._id,
-                        user: user._id
-                    });
-                    return [tr, tr2];
-                })
-                .spread(function(tr, tr2) {
-                    trial = tr;
-                    trial2 = tr2;
-                    done();
-                })
-                .catch(done);
+            Promise.fulfilled().then(function() {
+                var ar = Arena.create({});
+                var usr = User.create({
+                    username: 'test',
+                    password: 'testmodel2'
+                });
+                return [ar, usr];
+            }).spread(function(ar, usr, t, st, st2) {
+                arena = ar;
+                user = usr;
+                var at = ArenaTrial.create({
+                    arena: arena._id,
+                    user: user._id
+                });
+                var ch = Challenge.create({
+                    exp: 4,
+                    arena: arena._id
+                });
+                var ch2 = Challenge.create({
+                    exp: 2,
+                    arena: arena._id
+                });
+                return [ch, ch2];
+            }).spread(function(ch1, ch2) {
+                var tr = Trial.create({
+                    challenge: ch1._id,
+                    user: user._id
+                });
+                var tr2 = Trial.create({
+                    challenge: ch2._id,
+                    user: user._id
+                });
+                return [tr, tr2];
+            }).spread(function(tr, tr2) {
+                trial = tr;
+                trial2 = tr2;
+                done();
+            }).catch(done);
         });
         afterEach(setup.clearDB);
 
@@ -139,7 +134,7 @@ describe('User', function() {
             trial.complete = true;
             trial2.complete = true;
             var times = 0;
-            observer.on('user.awarded', function (user, type, value) {
+            observer.on('user.awarded', function(user, type, value) {
                 times++;
                 // console.log('assigned user exp ', user.exp, ' after adding ', value);
 
@@ -333,12 +328,12 @@ describe('User', function() {
             });
 
             it("should send and email when a teacher signs up", function(done) {
-               
-               /*observer.once("test.user.signup.response", function (body) {
-                    expect(body.info).to.exist;
-                    activationToken = body.token;
-                    done();
-                });*/
+
+                /*observer.once("test.user.signup.response", function (body) {
+                     expect(body.info).to.exist;
+                     activationToken = body.token;
+                     done();
+                 });*/
                 request(url)
                     .post("/signup")
                     .send({
@@ -409,16 +404,16 @@ describe('User', function() {
                         password: "drazdraz12",
                     })
                     .expect(200)
-                // .expect('Content-Type', /json/)
-                .end(function(err, res) {
-                    if (err) return done(err);
+                    // .expect('Content-Type', /json/)
+                    .end(function(err, res) {
+                        if (err) return done(err);
 
-                    res.body.should.have.property("access_token");
-                    res.body.should.have.property("user_id");
-                    user.id = res.body.user_id;
-                    accessToken = res.body.access_token;
-                    done();
-                });
+                        res.body.should.have.property("access_token");
+                        res.body.should.have.property("user_id");
+                        user.id = res.body.user_id;
+                        accessToken = res.body.access_token;
+                        done();
+                    });
             });
 
         });
@@ -502,7 +497,7 @@ describe('User', function() {
 
             it("should not send a verification email if not admin", function(done) {
                 request(api)
-                    .post("/users/"+student._id+"/verify")
+                    .post("/users/" + student._id + "/verify")
                     .send()
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -513,7 +508,7 @@ describe('User', function() {
 
             it("should send and email when user verification request is sent", function(done) {
                 request(api)
-                    .post("/users/"+student._id+"/verify")
+                    .post("/users/" + student._id + "/verify")
                     .set('Authorization', 'Bearer ' + admin.token)
                     .send()
                     .end(function(err, res) {
@@ -540,13 +535,13 @@ describe('User', function() {
                     });
             });
 
-             it("should not reset password if different", function(done) {
+            it("should not reset password if different", function(done) {
                 request(url)
                     .post("/forgotpass/")
                     .send({
                         token: passwordToken,
                         password: '123233jjw4',
-                        passwordConfirmation:'12323w3j44'
+                        passwordConfirmation: '12323w3j44'
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -561,13 +556,13 @@ describe('User', function() {
                     .send({
                         token: passwordToken,
                         password: '123233jj44',
-                        passwordConfirmation:'123233jj44'
+                        passwordConfirmation: '123233jj44'
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        User.findById(admin._id,function (err, user) {
-                            if(err) return done(err);
+                        User.findById(admin._id, function(err, user) {
+                            if (err) return done(err);
                             admin.token = user.token;
                             done();
                         });
@@ -578,7 +573,9 @@ describe('User', function() {
                 request(api)
                     .post("/users")
                     .set('Authorization', 'Bearer ' + admin.token)
-                    .send({user:user})
+                    .send({
+                        user: user
+                    })
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);

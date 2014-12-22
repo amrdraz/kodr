@@ -21,10 +21,11 @@ describe('Challenge', function() {
     var testchallenge = {
         language:'java',
         tests: '\
+        $main(); \
   if ($userOut.toString().equals("a - b = 20")) {\
-    Test.pass("you did it!");\
+    $test.pass("you did it!");\
   } else {\
-   Test.fail("it\'s "+$userOut.toString()+" to equal "+"a - b = 20"); \
+   $test.fail("it\'s "+$userOut.toString()+" to equal "+"a - b = 20"); \
   }',
         postCode:'//comment won\'t be striped\n char y = \'1\';',
         preCode:'//comment to be striped',
@@ -34,14 +35,14 @@ describe('Challenge', function() {
 
     describe('Code', function() {
         it('should run java', function(done) {
-            Challenge.run(code,'java').spread(function(sterr, stout) {
+            Challenge.run(code,testchallenge).spread(function(sterr, stout) {
                 if (sterr) return done(sterr);
                 stout.should.equal(out);
                 done();
             }).catch(done);
         });
         it('should run java and show error', function(done) {
-            Challenge.run(code+'\n x = 3','java').spread(function(sterr, stout) {
+            Challenge.run(code+'\n x = 3',testchallenge).spread(function(sterr, stout) {
                 sterr.should.exist;
                 // stout.should.equal(out);
                 done();
@@ -49,7 +50,7 @@ describe('Challenge', function() {
         });
 
         it('should test java', function(done) {
-            Challenge.test(code,testchallenge,'java').spread(function(report, stout, sterr) {
+            Challenge.test(code,testchallenge,testchallenge).spread(function(report, stout, sterr) {
                 if(sterr) return done(sterr);
                 // console.log(stout);
                 expect(report).to.have.property('passed',true);
@@ -236,6 +237,23 @@ describe('Challenge', function() {
                     .send({
                         code: code,
                         language: 'java'
+                    })
+                    .expect(200)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.stout.should.equal(out);
+                        done();
+                    });
+            });
+            it("should run code with inputs", function(done) {
+                request(api)
+                    .post("/challenges/run")
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .send({
+                        code: code,
+                        language: 'java',
+                        inputs:['int x']
                     })
                     .expect(200)
                     .end(function(err, res) {

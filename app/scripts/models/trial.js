@@ -1,5 +1,6 @@
 module.exports = DS.Model.extend({
     code: DS.attr('string'),
+    input: DS.attr('string'),
     times: DS.attr('number'),
     exp: DS.attr('number'),
     complete: DS.attr('boolean'),

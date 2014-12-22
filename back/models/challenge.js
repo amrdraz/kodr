@@ -28,17 +28,10 @@ var ChallengeSchema = new mongoose.Schema({
         'default': 'java',
         enum: ['javascript', 'java', 'python']
     },
+    inputs:[String],
     setup: {
         type: String,
         'default': '// Starting Code leave blank if you want Student to start from scratch\n'
-    },
-    preCode: {
-        type: String,
-        'default': '// Code that will run before the student\'s code\n'
-    },
-    postCode: {
-        type: String,
-        'default': '// Code that will run after the student\'s code, but not for testing\n'
     },
     solution: {
         type: String,
@@ -101,17 +94,17 @@ ChallengeSchema.post('remove', function(doc) {
 });
 
 ChallengeSchema.methods.run = function(code) {
-    return Challenge.run(code,this.language);
+    return Challenge.run(code,this);
 };
 
-ChallengeSchema.statics.run = function(code, language) {
+ChallengeSchema.statics.run = function(code, options) {
     return new Promise(function(resolve, reject) {
-        switch (language) {
+        switch (options.language) {
             case 'javascript':
                 resolve(['no server js','']);
                 break;
             case 'java':
-                javaRunner.run(code,function (err,stout,sterr) {
+                javaRunner.run(code,options,function (err,stout,sterr) {
                     if(err && !sterr) return reject(err);
                     return resolve([sterr, stout]);
                 });
@@ -133,7 +126,7 @@ ChallengeSchema.statics.test = function(code, challenge) {
     return new Promise(function(resolve, reject) {
         switch (challenge.language) {
             case 'javascript':
-                resolve(['no server js','']);
+                resolve({},['no server js','']);
                 break;
             case 'java':
                 javaRunner.test(code,challenge.tests,challenge,function (err,report,stout,sterr) {

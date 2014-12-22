@@ -70,7 +70,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
                 writeTest(test, 'error');
                 test.failedExpectations && test.failedExpectations.forEach(function(fail) {
                     if (fail.message.indexOf('Error: Timeout')) {
-                        jconsole.Write('\t' + fail.message + '\n', 'error');
+                        jconsole.Write('\t' + fail.message.replace(/\n/g, "\\n") + '\n', 'error');
                     } else {
                         jconsole.Write('\tTimeout this test ran (' + test.durationSec + 's)\n', 'error');
                     }
@@ -83,11 +83,14 @@ module.exports = Em.Mixin.create(Em.Evented, {
         return report.passed;
     },
     parseSterr : function (sterr) {
-        var i,column_no_start,column_no_stop,errs,fragment,lines = sterr.split('\n'),found = [];
+        var i,column_no_start,column_no_stop,errs,msg,line,fragment,lines = sterr.replace(/\^/g, "^\n").split('\n'),found = [];
 
         for (i = 0;i<lines.length;) {
-            if(~lines[i].indexOf('Error')) {
+            if(lines[i]==="") { i++;  continue;}
+            if(~lines[i].indexOf(/^Error/)) {
                 errs = lines[i++].match(/Error.* line (\d*).*:\d+: (.*)/);
+                line = +errs[1];
+                msg = errs[2];
                 if(~lines[i].indexOf('found')) {
                     i+=2;
                 } else {
@@ -95,14 +98,15 @@ module.exports = Em.Mixin.create(Em.Evented, {
                     column_no_start = lines[i++].length-2;
                     column_no_stop = column_no_start+1;
                 }
-            } else {
-                errs = lines[i++].match(/Exception.* line (\d*) (.*)/);
+            } else if(~lines[i].indexOf('RuntimeError')){
+                msg = (lines[i++].match(/RuntimeError: (.*)/))[1];
+                line = +(lines[i++].match(/at.*:(\d)/))[1];
             }
             found.push({
-                line_no:(+errs[1])-2,
+                line_no:(line)-1,
                 column_no_start: column_no_start || 0,
                 column_no_stop: column_no_stop || 200,
-                message:errs[2],
+                message:msg,
                 fragment:fragment || '',
                 severity: "error"
             });
@@ -110,25 +114,28 @@ module.exports = Em.Mixin.create(Em.Evented, {
         console.log(found);
         return found;
     },
-    runInServer: function(code, language, cb) {
+    runInServer: function(code, model, cb) {
         Em.$.ajax({
             url: '/api/challenges/run',
             type:'POST',
             data: {
                 code: code,
-                language: language
+                language: model.get('language'),
+                inputs: model.get('inputs').mapBy("value")
             }
         }).done(cb).fail(function (err) {
             toastr.error(err.statusText);
         });
     },
     testInServer: function(code, challenge, cb) {
+        var data = (challenge.getProperties(['language','tests', 'exp']));
+        data.inputs = challenge.get('inputs').mapBy("value");
         Em.$.ajax({
             url: '/api/challenges/test',
             type:'POST',
             data: {
                 code: code,
-                challenge: challenge.getProperties(['preCode','language','tests','postCode', 'exp'])
+                challenge: data
             }
         }).done(cb).fail(function (err) {
             toastr.error(err.responseText);

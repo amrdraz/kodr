@@ -49,7 +49,7 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/challenges/run', function(req, res, next) {
-        Challenge.run(req.body.code,req.body.language).spread(function (sterr,stout) {
+        Challenge.run(req.body.code,req.body).spread(function (sterr,stout) {
             res.send({
                 sterr:sterr,
                 stout:stout

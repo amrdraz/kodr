@@ -64,7 +64,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             } else {
                 controller.trigger('showConsole');
                 controller.get('console').Write('Compiling...\n');
-                controller.runInServer(model.get('code'), model.get('challenge.language'),function (res) {
+                controller.runInServer(model.get('code'), challenge,function (res) {
                     controller.get('console').Write('Compiled\n',res.sterr?'error':'result');
                     if(res.sterr){
                         controller.get('console').Write(res.sterr,'error');

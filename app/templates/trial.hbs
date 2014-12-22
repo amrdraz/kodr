@@ -15,7 +15,13 @@
       <li class="active"><a href="#code" data-toggle="tab">Code</a></li>
     </ul>
     <div class="tab-content">
-      <div class="tab-pane  fade in active" id="code">
+    {{#if model.challenge.isJava }}
+      <pre>{{#if model.challenge.hasInput}}import java.util.Scanner;
+{{/if}}public class Main {
+  public static void main (String[] args) { {{#each inp in model.challenge.inputs}}
+    {{inp.value}};{{/each}}</pre>
+    {{/if}}
+      <div class="tab-pane fade in active" id="code">
         {{view 'App.CodeEditorView'
           name="codeEditor"
           id="codeEditor"
@@ -25,6 +31,11 @@
           highlight=model.challenge.language
           attr='code' }}
       </div>
+    {{#if model.challenge.isJava }}
+      <pre>
+  }
+}</pre>
+    {{/if}}
     </div>
 </div>
 <div class="col-lg-6">
@@ -41,12 +52,26 @@
     </a>
     <ul class="nav nav-tabs">
       <li class="active"><a href="#console" data-toggle="tab">Console</a></li>
-      <li class=""><a href="#results" data-toggle="tab">Results</a></li>
+      {{#if model.challenge.isJava }}
+        {{#if model.challenge.hasInput}}
+          <li class=""><a href="#input" data-toggle="tab">Test Input</a></li>
+        {{/if}}
+      {{/if}}
     </ul>
     <div class="tab-content">
       <div class="tab-pane fade in active" id="console">
         {{view App.ConsoleView }}
       </div>
+      {{#if model.challenge.hasInput}}
+       <div class="tab-pane fade" id="input">
+        {{view 'App.CodeEditorView'
+          name="inputEditor"
+          id="inputEditor"
+          class="col-lg-12"
+          model=model
+          attr='input' }}
+      </div>
+      {{/if}}
       <div class="tab-pane fade" id="results">
         {{controller.results}}
       </div>

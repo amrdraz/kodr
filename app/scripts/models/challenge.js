@@ -1,22 +1,33 @@
 var attr = DS.attr;
 
+App.JavaInputTransform = App.JavaInputTransform || DS.Transform.extend({
+  deserialize: function(serialized) {
+    return serialized.map(function  (req) {
+        return Object.create({value:req});
+    });
+  },
+  serialize: function(deserialized) {
+    return deserialized.mapBy("value");
+  }
+});
+
 var ChallengeModel = module.exports = DS.Model.extend({
     name: attr('string', {
         defaultValue: "New Challenge"
     }),
+    "import": attr('string'),
+    inputs: attr('javaInput'),
     setup: attr('string', {
-        defaultValue: "// Starting Code leave blank if you want Student to start from scrach\n"
+        defaultValue: "// Starting Code leave blank if you want Student to start from scratch\n"
     }),
     solution: attr('string', {
         defaultValue: "// Challenge Solution goes here\n"
     }),
     tests: attr('string', {
-        defaultValue: require('../demo/basicTest-tests')
+        defaultValue: "// $userOut, $test.expect(), $test.pass(), $test.fail(), $main()"
     }),
     // structure: attr('string', {defaultValue:"// Challenge Code Structure\n"}),
     // callbacks: attr('string', {defaultValue:"// callbacks for structure variables if any\n{}"}),
-    preCode: attr('string'),
-    postCode: attr('string'),
     language: attr('string', {defaultValue:'java'}),
     description: attr('string', {
         defaultValue: "A new Challenge"
@@ -79,27 +90,3 @@ var ChallengeModel = module.exports = DS.Model.extend({
         return !this.get('canSave') && !this.get('isPublished') && this.get('valid');
     }.property('canSave')
 });
-
-ChallengeModel.FIXTURES = [{
-    id: 1,
-    name: 'Basic Test',
-    setup: require('../demo/basicTest-setup'),
-    solution: require('../demo/basicTest-solution'),
-    tests: require('../demo/basicTest-tests'),
-    structure: require('../demo/basicTest-structure'),
-    callbacks: require('../demo/basicTest-callbacks'),
-    description: require('../demo/basicTest-description'),
-    exp: 1,
-    isPublished: true
-}, {
-    id: 2,
-    name: 'Cow Challenge',
-    setup: require('../demo/cow'),
-    solution: require('../demo/cow'),
-    tests: require('../demo/cow-test'),
-    structure: "",
-    callbacks: "",
-    description: "",
-    exp: 4,
-    isPublished: true
-}];
