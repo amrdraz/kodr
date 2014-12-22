@@ -87,7 +87,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
 
         for (i = 0;i<lines.length;) {
             if(lines[i]==="") { i++;  continue;}
-            if(~lines[i].indexOf(/^Error/)) {
+            if((/^Error/).test(lines[i])) {
                 errs = lines[i++].match(/Error.* line (\d*).*:\d+: (.*)/);
                 line = +errs[1];
                 msg = errs[2];
@@ -98,7 +98,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
                     column_no_start = lines[i++].length-2;
                     column_no_stop = column_no_start+1;
                 }
-            } else if(~lines[i].indexOf('RuntimeError')){
+            } else if(/RuntimeError/.test(lines[i])){
                 msg = (lines[i++].match(/RuntimeError: (.*)/))[1];
                 line = +(lines[i++].match(/at.*:(\d)/))[1];
             }
