@@ -16,7 +16,7 @@ var ChallengeModel = module.exports = DS.Model.extend({
         defaultValue: "New Challenge"
     }),
     "import": attr('string'),
-    inputs: attr('javaInput'),
+    inputs: attr('javaInput', {defaultValue:[]}),
     setup: attr('string', {
         defaultValue: "// Starting Code leave blank if you want Student to start from scratch\n"
     }),
