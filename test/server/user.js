@@ -85,7 +85,8 @@ describe('User', function() {
                 var ar = Arena.create({});
                 var usr = User.create({
                     username: 'test',
-                    password: 'testmodel2'
+                    password: 'testmodel2',
+                    uniId: '16-5240'
                 });
                 return [ar, usr];
             }).spread(function(ar, usr, t, st, st2) {
@@ -134,10 +135,8 @@ describe('User', function() {
             trial.complete = true;
             trial2.complete = true;
             var times = 0;
-            observer.on('user.awarded', function(user, type, value) {
+            observer.many('user.awarded', 2,function(user, type, value) {
                 times++;
-                // console.log('assigned user exp ', user.exp, ' after adding ', value);
-
                 if (times === 2) {
                     user.exp.should.equal(trial.exp + trial2.exp);
                     done();
@@ -263,6 +262,8 @@ describe('User', function() {
         var user = {
                 username: "amrd",
                 email: "amr.deraz@guc.edu.eg",
+
+                uniId: '13-56575',
                 password: "drazdraz12",
                 passwordConfirmation: "drazdraz12"
             },
@@ -274,6 +275,7 @@ describe('User', function() {
             },
             student = {
                 username: 'student',
+                uniId: '13-56574',
                 email: 's.s@student.guc.edu.eg',
                 password: 'testmodel12',
                 passwordConfirmation: 'testmodel12'
@@ -291,9 +293,30 @@ describe('User', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
+                        should.exist(res.body.user.username);
+                        should.exist(res.body.user.email);
+                        expect(res.body.user.uniId).to.exist();
                         done();
                     });
             });
+
+            it("should not add a user that's already has the same id", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send({
+                        username: "amrdr",
+                        email: "amr.draz@guc.edu.eg",
+                        uniId: '13-56575',
+                        password: "drazdraz12",
+                        passwordConfirmation: "drazdraz12"
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(400);
+                        done();
+                    });
+            });
+
             it("should assign role student based on email", function(done) {
                 request(url)
                     .post("/signup")
@@ -301,13 +324,8 @@ describe('User', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        User.find({
-                            role: 'student'
-                        }).exec(function(err, users) {
-                            if (err) return done(err);
-                            users.length.should.equal(1);
-                            done();
-                        });
+                        res.body.user.role.should.equal('student');
+                        done();
                     });
             });
             it("should assign role teacher based on email", function(done) {
@@ -317,23 +335,12 @@ describe('User', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        User.find({
-                            role: 'teacher'
-                        }).exec(function(err, users) {
-                            if (err) return done(err);
-                            users.length.should.equal(2);
-                            done();
-                        }, done);
+                        res.body.user.role.should.equal('teacher');
+                        done();
                     });
             });
 
             it("should send and email when a teacher signs up", function(done) {
-
-                /*observer.once("test.user.signup.response", function (body) {
-                     expect(body.info).to.exist;
-                     activationToken = body.token;
-                     done();
-                 });*/
                 request(url)
                     .post("/signup")
                     .send({
@@ -346,7 +353,7 @@ describe('User', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         expect(res.body.info).to.exist;
-                        activationToken = res.body.token;
+                        activationToken = res.body.activation_token;
                         done();
                     });
             });

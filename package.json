@@ -32,6 +32,7 @@
     "cookie-parser": "~1.0.0",
     "dockerode": "^2.0.3",
     "ember-template-compiler": "^1.6.0-beta.5",
+    "eventemitter2": "^0.4.14",
     "express": "~4.0.0",
     "express-session": "~1.0.0",
     "grunt": "~0.4.1",

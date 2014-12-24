@@ -1,4 +1,5 @@
 module.exports = DS.Model.extend({
+    uniId: DS.attr('string'),
     username: DS.attr('string'),
     email: DS.attr('string'),
     exp: DS.attr('number', {defaultValue:0}),

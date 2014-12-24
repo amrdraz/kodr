@@ -5,6 +5,11 @@ var util = require('util');
 var bcrypt = require('bcrypt');
 var relationship = require("mongoose-relationship");
 
+
+var ExpiringToken = require('../models/expiringToken');
+var Challenge = require('../models/challenge');
+var mail = require('../config/mail');
+
 var ObjectId = mongoose.Schema.ObjectId;
 var Mixed = mongoose.Schema.Mixed;
 
@@ -39,6 +44,11 @@ var userSchema = new mongoose.Schema({
         unique: true,
         match: /^\w[\w.-\d]{3,}$/,
         trim: true
+    },
+    uniId: {
+        type: String,
+        unique: true,sparse: true,
+        match: /^\d+\-\d{3,5}$/,
     },
     email: {
         type: String,
@@ -210,12 +220,15 @@ userSchema.statics.findByIdentity = function (identity) {
                     'username': identity
                 }, {
                     'email': identity,
+                }, {
+                    'uniId': identity,
                 }]
             }).exec();
 };
 
 var User = mongoose.model('User', userSchema);
 
+require('../events/user').model(User);
+
 module.exports = User;
 
-require('../events/user').model();

@@ -9,9 +9,8 @@
       <li class="list-group-item text-right"><span class="pull-left"><strong>Email</strong></span> {{model.email}}</li>
     {{/if}}
     <li class="list-group-item text-right"><span class="pull-left"><strong>Experience</strong></span> {{model.exp}}</li>
-    <li class="list-group-item text-right"><span class="pull-left"><strong>Rank</strong></span> 1</li>
     {{#if model.isStudent}}
-      <li class="list-group-item text-right"><span class="pull-left"><strong>Group</strong></span> Avengers</li>
+      <li class="list-group-item text-right"><span class="pull-left"><strong>Group</strong></span> {{model.group.name}}</li>
     {{/if}}
 </ul>
 {{!-- 

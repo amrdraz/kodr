@@ -9,9 +9,16 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
         }
       },
       email: {
+        presence:true,
         format: {
           with: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
           message: 'you need to provide a GUC email'
+        }
+      },
+      uniId: {
+        format: {
+          with:/^\d\d-\d{3,5}$/,
+          message: 'must enter a valid uni id eg. 13-1233'
         }
       },
       password: {
@@ -34,7 +41,7 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
                     type: 'POST',
                     url: '/signup',
                     context: that,
-                    data: that.getProperties('username', 'email', 'password', 'passwordConfirmation')
+                    data: that.getProperties('username', 'email', 'password', 'uniId','passwordConfirmation')
                 }).done(function() {
                     that.transitionToRoute('login');
                 }).fail(function(xhr) {

@@ -155,6 +155,12 @@ module.exports = function(app, passport) {
                         message: 'Username cannot be blank.'
                     };
                 }
+                if (req.body.uniId && !/^\d+\-\d{3,5}$/.test(req.body.uniId)) {
+                    throw {
+                        http_code: 400,
+                        message: 'Invalid Uni ID'
+                    };
+                }
                 if (!req.body.email) {
                     throw {
                         http_code: 400,
@@ -186,11 +192,13 @@ module.exports = function(app, passport) {
 
         function findUser(req) {
             return function() {
-                User.findOne({
+                return User.findOne({
                     $or: [{
                         'username': req.body.username
                     }, {
                         'email': req.body.email,
+                    }, {
+                        'uniId': req.body.uniId,
                     }]
                 }).exec();
             };
@@ -207,15 +215,14 @@ module.exports = function(app, passport) {
 
                 var role = getRoleByEmail(req.body.email);
 
-                var usr = User.create({
+                return User.create({
                     username: req.body.username,
                     email: req.body.email,
+                    uniId: req.body.uniId,
                     password: req.body.password,
                     role: role,
                     activated: false
                 });
-
-                return usr;
             };
         }
 
@@ -229,58 +236,19 @@ module.exports = function(app, passport) {
         }
 
         function emitAndRespond(req,res) {
-            return function(user) {
-                //*
-                
-                if (!user.isStudent) {
-                    ExpiringToken.toVerify(user).then(function(eToken) {
-                        var confirmURL = req.headers.host + '/confirmAccount/' + eToken._id;
-                        // template in views/mail
-                        return mail.renderAndSend('welcome.html', {
-                            confirmURL: confirmURL
-                        }, {
-                            to: user.email,
-                            subject: 'You\'ve just signup for an awesome experience',
-                            stub: process.env.NODE_ENV === 'test',
-                        }, function(err, info) {
-                            if (err) throw err;
-                            if (process.env.NODE_ENV === 'test') {
-                                return res.send({
-                                    token: eToken._id,
-                                    info: info
-                                });
-                            } else {
-                                res.send(200, "Check your email for verification");
-                            }
-                        });
-                    }).catch(function(err) {
-                        throw err;
+            if(process.env.NODE_ENV === 'test') {
+                return function (user) {
+                    observer.emit('user.signup', user);
+                    observer.once('test.user.signup.response', function (body) {
+                        res.send(body);
                     });
-                } else {
-                    mail.send({
-                        to: mail.options.email,
-                        subject: 'A New Student just signed up',
-                        html: 'User:<br>'+user.toJSON(),
-                        stub: process.env.NODE_ENV === 'test',
-                    }, function(err, info) {
-                        if (process.env.NODE_ENV === 'test') {
-                            return res.send({
-                                info: info
-                            });
-                        } else {
-                            res.send(200, "Your registration is complete we will activate your account soon");
-                        }
-                    });
-                }
-                /*
-                if(user.isStudent) {
-                    res.send(200, "You registration is complete we will activate your account soon");
-                } else {
-                    res.send(200, "Check your email for verification");
-                } //*/
-                observer.emit('user.signup', user);//*/
-            };
-
+                };
+            } else {
+                return function(user) {
+                    observer.emit('user.signup', user);
+                    res.send(200, "Check your email for verification");                   
+                };    
+            }
         }
     });
 };
