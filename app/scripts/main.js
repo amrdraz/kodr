@@ -177,8 +177,9 @@ App.ForgotpassController = require('./controllers/forgotpass.js');
 
 App.GroupController = require('./controllers/group');
 App.GroupEditController = require('./controllers/group/edit');
-// App.GroupsController = require('./controllers/group');
+App.GroupsController = require('./controllers/groups');
 App.GroupsIndexController = require('./controllers/groups/index');
+App.GroupsMakeController = require('./controllers/groups/make');
 App.GroupsCreateController = require('./controllers/group/edit');
 
 App.UserIndexController = require('./controllers/user/index');
@@ -210,6 +211,7 @@ App.TrialController = require('./controllers/trial');
 // Models
 App.User = require('./models/user');
 App.Group = require('./models/group');
+App.Member = require('./models/member');
 App.Quest = require('./models/quest');
 App.Requirement = require('./models/requirement');
 App.UserQuest = require('./models/userQuest');
@@ -229,6 +231,7 @@ App.GroupIndexRoute = require('./routes/group/index');
 App.GroupEditRoute = require('./routes/group/edit');
 
 App.GroupsRoute = require('./routes/groups');
+App.GroupsMakeRoute = require('./routes/groups/make');
 App.GroupsCreateRoute = require('./routes/groups/create');
 
 

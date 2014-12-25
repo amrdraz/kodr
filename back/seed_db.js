@@ -54,6 +54,7 @@ module.exports = function(req, res, next) {
                 role: 'admin',
                 activated: true
             }),
+            Group.create({})
         ];
     }).spread(function(t, st, st2, st3, ad) {
         teacher = t;
@@ -67,13 +68,9 @@ module.exports = function(req, res, next) {
                 name: 'Variables',
                 isPublished:true,
                 description:'Try out some variable exercises'
-            }),
-            Group.create({
-                founder: t._id,
-                members: [student._id]
             })
         ];
-    }).spread(function(a, student, student2, student3, admin) {
+    }).spread(function(a) {
         arena = a;
         return [
             Challenge.create({

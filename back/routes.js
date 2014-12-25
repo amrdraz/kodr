@@ -20,6 +20,8 @@ module.exports = function(app, passport) {
     require('./routes/user')(app, passport);
     // group routes
     require('./routes/group')(app, passport);
+    // member routes
+    require('./routes/member')(app, passport);
     // quest routes
     require('./routes/quest')(app, passport);
     // userQuest routes

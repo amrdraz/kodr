@@ -25,6 +25,7 @@ module.exports = function(App) {
             path: '/groups'
         }, function () {
             this.route('create');
+            this.route('make');
         });
         this.resource('user', {path:'user/:user_id'},function () {
             this.route('edit');

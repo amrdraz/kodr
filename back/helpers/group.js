@@ -152,6 +152,27 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
+    schema.methods.addMember = function(uid) {
+        var group = this;
+        return Promise.fulfilled().then(function() {
+            return User.findOne({_id:uid}).exec();
+        }).then(function(user) {
+            if(!user) throw {http_code: 404, message:"user not found"};
+            return group.join(user);
+        });
+    };
+
+    schema.methods.addMembers = function(uids) {
+        var group = this;
+        return Promise.fulfilled().then(function() {
+            return User.find({_id:{$in:uids}}).exec();
+        }).then(function(users) {
+            return Promise.map(users, function (user) {
+               return group.join(user);
+            });
+        });
+    };
+
     schema.statics.getById = function(id) {
         var Group = this.db.model('Group');
         return Promise.fulfilled().then(function() {
@@ -171,12 +192,55 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
+    schema.statics.getMembers = function(id) {
+        return Promise.fulfilled().then(function() {
+            return Member.find({
+                group: id
+            }).exec();
+        });
+    };
+
     schema.statics.getWithMembers = function(id) {
         var Group = this.db.model('Group');
         return Promise.fulfilled().then(function() {
-            return [Group.getById_404(id), Member.find({
-                group: id
-            }).exec()];
+            return [Group.getById_404(id), Group.getMembers(id)];
+        });
+    };
+
+    schema.statics.getGroups = function(user) {
+        var Group = this.db.model('Group');
+        return Promise.fulfilled().then(function() {
+            return Member.find({
+                user: user.id
+            }).populate('group').exec();
+        }).then(function (memeberships) {
+            return _.map(memeberships, 'group');
+        });
+    };
+
+    schema.statics.findOrCreateByName = function(name) {
+        var Group = this.db.model('Group');
+        return Promise.fulfilled().then(function() {
+            return Group.findOne({
+                name: name
+            }).exec();
+        }).then(function (group) {
+            if (group) {return group;}
+            return Group.create({name:name});
+        });
+    };
+
+    schema.statics.addMember = function(gid, uid) {
+        var Group = this.db.model('Group');
+        return Group.getById_404(gid).then(function(group) {
+            return [group, group.addMember(uid)];
+        });
+    };
+
+    schema.statics.addMembers = function(gid, uids) {
+        var Group = this.db.model('Group');
+        return Group.getById_404(gid).then(function(group) {
+            return [group, group.addMembers(uids)];
         });
     };
 

@@ -1,5 +1,6 @@
 /*globals before,after,beforeEach,afterEach,describe,it */
 var Promise = require('bluebird');
+var _ = require('lodash');
 var should = require('chai').should();
 var expect = require('chai').expect;
 var request = require('supertest');
@@ -159,6 +160,56 @@ describe('Group Helper', function() {
             teacher._id.should.eql(member.user);
             done();
         }).catch(done);
+    });
+
+    it('should create by name', function (done) {
+        var name = "hello"+" "+_.random();
+        Group.findOrCreateByName(name).then(function (group) {
+            should.exist(group);
+            group.name.should.equal(name);
+            done();
+        });
+    });
+
+    it('should find by name', function (done) {
+        var name = "hello"+" "+_.random();
+        Group.findOrCreateByName(name).then(function (group) {
+            should.exist(group);
+            var id = group.id;
+            Group.findOrCreateByName(name).then(function (group) {
+                should.exist(group);
+                group.id.should.equal(id);
+            });
+            done();
+        });
+    });
+    it('should add user by id', function (done) {
+        group.addMember(student.id).then(function (member) {
+            should.exist(member);
+            done();
+        });
+    });
+    it('should staticly add user by id', function (done) {
+        Group.addMember(group.id, student.id).spread(function (group, member) {
+            should.exist(group);
+            should.exist(member);
+            done();
+        });
+    });
+
+    it('should add multiple users by id', function (done) {
+        group.addMembers([student.id, teacher.id]).then(function (members) {
+            should.exist(members);
+            done();
+        });
+    });
+    it('should staticly add multiple users by id', function (done) {
+        Group.addMembers(group.id, [student.id, teacher.id]).spread(function (group, members) {
+            should.exist(group);
+            should.exist(members);
+            members.length.should.equal(2);
+            done();
+        });
     });
     
     it('should update exp when trial is complete', function(done) {

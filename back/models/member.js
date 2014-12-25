@@ -85,5 +85,6 @@ MemberSchema.plugin(relationship, {
 });
 
 
+MemberSchema.plugin(require('../../back/helpers/member'));
 
 var Member = module.exports = mongoose.model('Member', MemberSchema);

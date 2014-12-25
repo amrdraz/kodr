@@ -5,25 +5,45 @@ module.exports = Em.ObjectController.extend({
     init: function() {
         this._super();
     },
-    students: function() {
-        return this.get('model').membersOptions();
-    }.property(),
-    selected: [],
+    isCreating: function () {
+        return App.get('currentPath').split('.').contains('create');
+    }.property('App.currentPath'),
+    selectedTeachers: [],
+    selectedStudents: [],
     actions: {
         save: function() {
             var that = this;
-            this.get('model.members').then(function(members) {
-                if(that.get('selected').length) {
-                    members.addObjects(that.get('selected'));
-                    that.set('selected', []);
-                } 
-                that.get('model').save().then(function(g) {
+            if (this.get('model.isDirty')) {
+                this.get('model').save().then(function (g) {
                     if (App.get('currentPath').split('.').contains('create'))
                         that.transitionToRoute('group.edit', g);
-                }).catch(function(xhr) {
-                    that.set('errorMessage', xhr.responseText);
                 });
-            });
+            }
+            if (this.get('selectedTeachers').length) {
+                console.log(this.get('selectedTeachers').mapBy('id'));
+                Em.$.ajax({
+                    url: '/api/groups/' + this.get('model.id') + '/members',
+                    method:'POST',
+                    data: {
+                        uids: this.get('selectedTeachers').mapBy('id')
+                    }
+                }).done(function(members) {
+                    that.store.pushPayload(members);
+                    that.set('selectedTeachers', []);
+                });
+            }
+            if (this.get('selectedStudents').length) {
+                Em.$.ajax({
+                    url: '/api/groups/' + this.get('model.id') + '/members',
+                    method:'POST',
+                    data: {
+                        uids: this.get('selectedStudents').mapBy('id')
+                    }
+                }).done(function(members) {
+                    that.store.pushPayload(members);
+                    that.set('selectedStudents', []);
+                });
+            }
         },
         delete: function() {
             var newModel = this.get('model.isNew');
@@ -39,7 +59,7 @@ module.exports = Em.ObjectController.extend({
             model.get('members').then(function(members) {
                 members.removeObject(user);
                 Em.$.ajax({
-                    url: '/api/groups/'+model.id+'/members/'+user.id,
+                    url: '/api/groups/' + model.id + '/members/' + user.id,
                     type: 'DELETE'
                 });
             });

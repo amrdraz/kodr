@@ -13,8 +13,7 @@ module.exports = DS.Model.extend({
     trials: DS.hasMany('trial',{async: true, inverse: 'user'}),
     arenasTried: DS.hasMany('arenaTrial',{async: true, inverse: 'user'}),
 
-    groups: DS.hasMany('group',{async: true, inverse: 'founder'}),
-    group: DS.belongsTo('group',{async: true, inverse: 'members'}),
+    memberships: DS.hasMany('member',{async: true, inverse: 'user'}),
 
     userQuests: DS.hasMany('userQuest', {async:true,inverse:'user'}),
 

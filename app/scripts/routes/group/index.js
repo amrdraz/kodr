@@ -3,20 +3,15 @@ module.exports = Em.Route.extend({
     // deactivate: function() {},
     // setupController: function(controller, model) {
     //     controller.set('model', model);
-    //     // controller.set('currentChallenge', model.get('arena.challenges.lastObject'));
     // },
     // renderTemplate: function() {},
     // beforeModel: function() {},
-    // afterModel: function() {
-
+    // afterModel: function(model) {
+    //     return model.get('members');
     // },
 
-    // model: function() {
-    //     var arena = this.modelFor('arena');
-    //     var record = this.store.createRecord('arenaTrial', {
-    //         arena:arena,
-    //     });
+    // model: function(params) {
     //     // record.save();
-    //     return record.save();
+    //     return this.modelfor('group');
     // }
 });

@@ -31,11 +31,6 @@
           {{/if}}
 
           {{#if session.atLeastTeacher }}
-            {{#link-to 'groups' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn" >
-              Groups
-            </a>
-            {{/link-to}}
             {{#link-to 'quests' tagName="li" href=false }}
             <a {{bind-attr href="view.href"}} class="btn" >
               Quests
@@ -43,6 +38,11 @@
             {{/link-to}}
           {{/if}}
           {{#if session.isAdmin}}
+            {{#link-to 'groups' tagName="li" href=false }}
+            <a {{bind-attr href="view.href"}} class="btn" >
+              Groups
+            </a>
+            {{/link-to}}
             {{#link-to 'users' tagName="li" href=false }}
             <a {{bind-attr href="view.href"}} class="btn">
               Users

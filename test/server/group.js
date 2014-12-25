@@ -20,7 +20,7 @@ var observer = require('../../back/observer');
  *
  * GET      groups                  return a list of groups
  * GET      groups/:id              return a group with it's challenges
- * POST     groups/:id              create a group given name and description
+ * POST     groups/                 create a group given name and description
  * POST     groups/:id/join         Addes a Member to the Group
  * PUT      groups/:id              updates name or description of group
  * PUT      groups/:id/activate     Addes a Member to the Group
@@ -90,7 +90,7 @@ describe('Group', function() {
         var accessToken;
         var group = {
             group: {}
-        };
+        },group2;
 
         before(function(done) {
             Promise.fulfilled().then(function() {
@@ -159,6 +159,26 @@ describe('Group', function() {
                     });
             });
 
+
+            it("should create many groups if admin", function(done) {
+                request(api)
+                    .post("/groups/many")
+                    .set('Authorization', 'Bearer ' + admin.token)
+                    .send({
+                        name:'E',
+                        from:1,
+                        to:5
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.groups.length.should.equal(5);
+                        res.body.groups[0].name.should.equal("E 01");
+                        group2 = res.body.groups[0];
+                        done();
+                    });
+            });
+
             it("should join group if student", function(done) {
                 request(api)
                     .post("/groups/"+group.id+"/join/")
@@ -192,19 +212,35 @@ describe('Group', function() {
                     });
             });
 
-            // it("should users can join group", function(done) {
-            //     request(api)
-            //         .post("/groups/"+group.id+"/members/"+student.id)
-            //         .set('Authorization', 'Bearer ' + teacher.token)
-            //         .end(function(err, res) {
-            //             if (err) return done(err);
-            //             res.status.should.equal(200);
-            //             should.exist(res.body.group._id);
-            //             should.exist(res.body.members);
-            //             group.group = group;
-            //             done();
-            //         });
-            // });
+            it("should  add user to group", function(done) {
+                request(api)
+                    .post("/groups/"+group.id+"/members/"+student2.id)
+                    .set('Authorization', 'Bearer ' + admin.token)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        should.exist(res.body.group._id);
+                        should.exist(res.body.member);
+                        group.group = res.body.group;
+                        done();
+                    });
+            });
+
+            it("should add multiple users to group", function(done) {
+                request(api)
+                    .post("/groups/"+group2._id+"/members/")
+                    .set('Authorization', 'Bearer ' + admin.token)
+                    .send({uids:[teacher.id,student.id,student2.id]})
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        should.exist(res.body.group._id);
+                        should.exist(res.body.members);
+                        res.body.members.length.should.equal(3);
+                        group2.members = res.body.members;
+                        done();
+                    });
+            });
         });
 
         describe("GET", function() {
@@ -238,14 +274,14 @@ describe('Group', function() {
                     .end(done);
             });
 
-            it("should return a list of all groups on if teacher", function(done) {
+            it("should return a list of all groups that user is in if teacher", function(done) {
                 request(api)
                     .get("/groups")
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.group.length.should.equal(1);
+                        res.body.group.length.should.be.gt(0);
                         done();
                     });
             });
@@ -257,7 +293,7 @@ describe('Group', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.group.length.should.equal(1);
+                        res.body.group.length.should.equal(6);
                         done();
                     });
             });
