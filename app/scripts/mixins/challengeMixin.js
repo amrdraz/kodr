@@ -53,7 +53,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
         var jconsole = this.get('console') || console;
         jconsole.Write = jconsole.Write || console.log;
         var writeTest = function(test, pass) {
-            jconsole.Write((test.fullName||test.message) + '\n', pass);
+            jconsole.Write((test.fullName||test.message.replace(/\n/g,"\\n")) + '\n', pass);
         };
         console.log(report);
         jconsole.Write("========= Running Submission " + (pass ? 'Passed' : 'Failed') + " ==========\n", pass ? 'result' : 'error');

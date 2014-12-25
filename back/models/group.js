@@ -9,16 +9,7 @@ var relationship = require("mongoose-relationship");
 var observer = require('../observer');
 
 /**
- * Arena User Schema.
- * This model holds information about user preformance inside a particular arena
- * alows us to form metrics such as how many challenges did he solve, experiance gained here
- * and anything related to user and arena
- *
- * @attribute name          String      The Name of the group
- * @attribute exp           Number      The amount of experiance gained by students in the group
- * @attribute founder       User        The owner of the group
- * @attribute members       [User]      The memebrs of the group
-
+ * Group Schema.
  * @type {mongoose.Schema}
  * @exports {mongoose.model}
  */
@@ -35,27 +26,13 @@ var GroupSchema = new mongoose.Schema({
         default:0,
         min:0
     },
-    founder: {
-        type: ObjectId,
-        ref: 'User',
-        childPath: "groups"
-    },
     members: [{
         type: ObjectId,
-        ref: 'User',
-        childPath: "group",
+        ref: 'Member',
     }]
 
 });
 
-GroupSchema.plugin(relationship, {
-    relationshipPathName: ['founder', 'members']
-});
-
-
-GroupSchema.methods.push = function(user) {
-    
-};
 
 GroupSchema.methods.changed = function(members) {
     return _.isEqual(this.members, members, function (a,b) {
@@ -63,7 +40,7 @@ GroupSchema.methods.changed = function(members) {
     });
 };
 
-
+GroupSchema.plugin(require('../../back/helpers/group'));
 
 var Group = mongoose.model('Group', GroupSchema);
 

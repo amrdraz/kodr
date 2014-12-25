@@ -16,8 +16,8 @@ module.exports = function(app, passport) {
         Promise.fulfilled().then(function() {
             return User.find({
                 role: 'student',
-                group: {
-                    $exists: false
+                membership: {
+                    $nin: {group:req.params.id}
                 }
             }, '_id username').exec();
         }).then(function(mbs) {
@@ -33,20 +33,10 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/groups/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
-        Promise.fulfilled().then(function() {
-            return [
-                Group.findOne({
-                    _id: req.params.id
-                }).exec(),
-                User.find({
-                    group: req.params.id
-                }).exec()
-            ];
-        }).spread(function(g, mbs) {
-            if (!g) return res.send(404, "Not Found");
+        Group.getWithMembers(req.params.id).spread(function(g, mbs) {
             res.json({
                 group: g,
-                users: mbs
+                members: mbs
             });
         }).catch(next);
     });
@@ -61,7 +51,7 @@ module.exports = function(app, passport) {
 
     app.get('/api/groups', access.requireRole(['teacher','admin']), function(req, res, next) {
         Group.find(req.query).exec().then(function(model) {
-            if (!model) return res.send(404, "Not Found");
+            if (!model) return res.send(404, {message:"Not Found"});
             res.json({
                 group: model
             });
@@ -69,25 +59,53 @@ module.exports = function(app, passport) {
     });
 
     /**
-     * Create new groups.
+     * Create new group.
      *
      * @param range
      * @returns {object} group
      */
 
-    app.post('/api/groups', access.requireRole(['teacher','admin']), function(req, res, next) {
-        req.body.group.founder = req.user._id;
-        Group.create(req.body.group)
-            .then(function(model) {
-                User.find({
-                    group: model.id
-                }).exec().then(function(users) {
-                    res.json({
-                        group: model,
-                        users: users
-                    });
-                });
-            }, next);
+    app.post('/api/groups', access.requireRole(['admin']), function(req, res, next) {
+        Group.create(req.body.group).then(function(model) {
+            res.json({
+                group: model
+            });
+        });
+    });
+
+    /**
+     * Create multiple groups.
+     *
+     * @param range
+     * @returns {[groups]}
+     */
+
+    app.post('/api/groups', access.requireRole(['admin']), function(req, res, next) {
+        Promise.map(req.body.groups, function (group) {
+            return Group.create(group);
+        }).then(function(models) {
+            res.json({
+                groups: models,
+            });
+        });
+    });
+
+    /**
+     * join group by adding user as member.
+     *
+     * @param range
+     * @returns {object} group
+     */
+
+    app.post('/api/groups/:id/join', access.requireRole(), function(req, res, next) {
+        Group.getById_404(req.params.id).then(function(model) {
+            return [model,model.join(req.user)];
+        }).spread(function (model, member) {
+            res.json({
+                group: model,
+                member:member
+            });
+        });
     });
 
     /**
@@ -99,46 +117,34 @@ module.exports = function(app, passport) {
 
     app.put('/api/groups/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
         var group = req.body.group;
-        Group.findOne({
-            _id: req.params.id
-        }).exec().then(function(model) {
-            if (!model) return res.send(404, "Not Found");
+        Group.getById_404(req.params.id).then(function(model) {
+            return model.canUpdate(req.user).then(function (member) {
+                return model;
+            });
+        }).then(function (model) {
             model.set(group);
             model.save(function(err, model) {
                 if (err) return next(err);
-                User.find({
-                    group: model.id
-                }).exec().then(function(users) {
-                    res.json({
-                        group: model,
-                        users: users
-                    });
+                res.json({
+                    group: model
                 });
             });
-        }, next);
+        }).catch(function (err) {
+            if(err.http_code) return res.send(err.http_code, err.message);
+            next(err);
+        });
     });
+
     /**
      * Delete group.
      *
      * @param range
-     * @returns {status} 200
+     * @returns {status} 204
      */
 
-    app.del('/api/groups/:id/members/:uid', access.requireRole(['teacher','admin']), function(req, res, next) {
-        Promise.fulfilled().then(function() {
-            return [Group.findOne({
-                _id: req.params.id
-            }).exec(), User.update({
-                _id: req.params.uid,
-            }, {$unset: {group:1}}).exec()];
-        }).spread(function(group) {
-            group.members = _.filter(group.members,function (m) {
-                return !m.equals(req.params.uid);
-            });
-            group.save(function (err, model) {
-                if(err) return next(err);
-                res.send(200);
-            });
+    app.del('/api/groups/:id/members/:uid', access.requireRole(['admin']), function(req, res, next) {
+        Group.removeMember(req.params.id, req.params.uid).then(function(group) {            
+            res.send(204);
         }).catch(next);
     });
 
@@ -146,17 +152,18 @@ module.exports = function(app, passport) {
      * Delete group.
      *
      * @param range
-     * @returns {status} 200
+     * @returns {status} 204
      */
 
-    app.del('/api/groups/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
-        Group.findById(req.params.id, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404);
+    app.del('/api/groups/:id', access.requireRole(['admin']), function(req, res, next) {
+        Group.getById_404(req.params.id).then(function(model) {
             model.remove(function(err, model) {
                 if (err) return next(err);
-                res.send(200);
+                res.send(204);
             });
+        }).catch(function (err) {
+            if(err.http_code) return res.send(err.http_code, err.message);
+            next(err);
         });
     });
 

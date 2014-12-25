@@ -79,6 +79,9 @@ app.use(function(err, req, res, next) {
     } else {
         console.error(err.stack);        
     }
+    if (err.http_code) {
+        return res.send(err.http_code, err.message);
+    }
     res.send(500, {
         message: 'Internal Server Error'
     });

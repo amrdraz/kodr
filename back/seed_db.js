@@ -87,7 +87,7 @@ module.exports = function(req, res, next) {
                 isPublished:false,
                 solution: 'int x = 3;',
                 setup: '',
-                tests: 'if(x==3) {\n  Test.pass("You did it you\'re awesome", 10);\n} else {\n  Test.fail("The value of x should not be "+x);\n}'
+                tests: '//test defined\n$test.matches($test.getCode(),"int\\s*x[\\s\\S]*;", "Defined x", "You need to define x", 5);\n//tests asigned to 3\n$test.matches($test.getCode(),"x\\s*=\\s*3\\s*;", "Set x", "You should set x to 3", 5);'
             }),
             Challenge.create({
                 arena: a.id,
@@ -100,20 +100,21 @@ module.exports = function(req, res, next) {
                 isPublished:true,
                 solution: 'System.out.print("Hello");',
                 setup: '// System.out.print();',
-                tests: 'Test.expect($userOut.toString(),"Hello", "You did it you\'re awesome!", 10);'
+                tests: '$main();\n$test.expect($userOut.toString(),"Hello", "You did it you\'re awesome!", 10);'
             }),
             Challenge.create({
                 arena: a.id,
                 author: teacher._id,
-                name: 'Get the 4th',
+                name: 'Get Plus One',
                 language:'java',
-                description: 'Print the __4th__ element of the array`',
+                description: 'Given `int x` output `x+1`',
+                inputs: ['int x'],
                 exp: 10,
                 valid:true,
                 isPublished:true,
-                solution: 'int[] x = {12,43,56,344,56};\nSystem.out.print(x[3]);',
-                setup: 'int[] x = {12,43,56,344,56};',
-                tests: 'Test.expect($userOut.toString(),""+x[3], "You did it you\'re awesome!", 10);'
+                solution: 'System.out.print(x+1);',
+                setup: '',
+                tests: '$main(3);$test.expect($userOut.toString(), ""+4, 2);\nint tests = 4;\nint x;\nfor (int i = 0; i <4;i++) {\n    $userOut.reset();\n    x = (int)(Math.random()*1000);\n    $main(x);\n    $test.expect($userOut.toString(), ""+(x+1), 2);\n}'
             }),
         ];
     }).spread(function(ch) {

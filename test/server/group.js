@@ -1,9 +1,11 @@
 /*globals before,after,beforeEach,afterEach,describe,it */
 var Promise = require('bluebird');
+var _ = require('lodash');
 var should = require('chai').should();
 var expect = require('chai').expect;
 var request = require('supertest');
 var setup = require('./setup');
+
 var Group = require('../../back/models/group');
 var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
@@ -19,10 +21,12 @@ var observer = require('../../back/observer');
  * GET      groups                  return a list of groups
  * GET      groups/:id              return a group with it's challenges
  * POST     groups/:id              create a group given name and description
+ * POST     groups/:id/join         Addes a Member to the Group
  * PUT      groups/:id              updates name or description of group
- * put      groups/user/:id    add a user to the arena
- * DELETE   groups/:id              delete group by id
- * delete   groups/user/:id    removes a user from this arena
+ * PUT      groups/:id/activate     Addes a Member to the Group
+ * PUT      groups/:id/leave        Removes a user from this Group
+ * DELETE   groups/:id              Delete group by id
+ * DELETE   groups/:id/remove       Removes a user from this Group
  *
  */
 
@@ -31,141 +35,17 @@ describe('Group', function() {
         return setup.clearDB(done);
     });
 
-    describe('Integration', function() {
-        var student,
-            student2,
-            teacher,
-            group, challenge, challenge2;
-        beforeEach(function(done) {
-            student = {
-                username: 'student',
-                email: 'student@place.com',
-                password: 'student123',
-                role: 'student',
-                activated: true
-            };
-            student2 = {
-                username: 'student2',
-                email: 'student2@place.com',
-                password: 'student123',
-                role: 'student',
-                activated: true
-            };
-            teacher = {
-                username: 'teacher',
-                email: 'teach@place.com',
-                password: 'teacher123',
-                role: 'teacher',
-                activated: true
-            };
-            Promise.fulfilled().then(function() {
-                return [
-                    User.create(teacher),
-                    User.create(student),
-                    User.create(student2)
-                ];
-            }).spread(function(t, st, st2) {
-                st.password = student.password;
-                student = st;
-                st2.password = student2.password;
-                student2 = st2;
-                t.password = teacher.password;
-                teacher = t;
-                var at = Group.create({
-                    founder: teacher._id,
-                    members: [st._id]
-                });
-                var ch = Challenge.create({
-                    exp: 4,
-                });
-                var ch2 = Challenge.create({
-                    exp: 2,
-                });
-                return [at, ch, ch2];
-            }).spread(function(g, ch1, ch2) {
-                challenge = ch1;
-                challenge2 = ch2;
-                group = g;
-                return [User.findOne({
-                    _id: teacher.id
-                }).exec(), User.findOne({
-                    _id: student.id
-                }).exec()];
-            }).spread(function(t, st) {
-                student = st;
-                teacher = t;
-            }).finally(done);
+    describe('Unit', function () {
+        var group;
+        before(function () {
+            group = new Group();
         });
-        afterEach(setup.clearDB);
-
-        it('should add memeber', function(done) {
-            group.members.length.should.equal(1);
-            group.members = [student._id, student2._id];
-            group.save(function(err, group) {
-                if (err) return done(err);
-                group.members.length.should.equal(2);
-                User.find({
-                    group: group.id
-                }, function(err, users) {
-                    if (err) return done(err);
-                    users.length.should.equal(2);
-                    done();
-                });
-            });
+        it('should have name', function () {
+            should.exist(group.name);
         });
-
-        // it('should remove memeber', function(done) {
-        //     group.members.length.should.equal(1);
-        //     expect(student.group).to.exist;
-        //     // group.members = [];
-        //     student.group = undefined;
-        //     student.save(function(err, user) {
-        //         if (err) return done(err);
-        //         expect(user.group).to.not.exist;
-        //         Group.findById(group.id, function(err, g) {
-        //             if (err) return done(err);
-        //             g.members.length.should.equal(0);
-        //             done();
-        //         });
-        //     });
-        //     // group.save(function(err, user) {
-        //     //     if (err) return done(err);
-        //     //     group.members.length.should.equal(0);
-        //     //     User.findById(student._id, function(err, user) {
-        //     //         if (err) return done(err);
-        //     //         expect(user.group).to.not.exist;
-        //     //         done();
-        //     //     });
-        //     // });
-        // });
-
-        it('should update exp when trial is complete', function(done) {
-
-            var times = 0;
-            Promise.fulfilled().then(function() {
-                return [
-                    Trial.create({
-                        challenge: challenge.id,
-                        user: student.id,
-                        complete: true
-                    }),
-                    Trial.create({
-                        challenge: challenge2.id,
-                        user: student.id,
-                        complete: true
-                    })
-                ];
-            }).spread(function(tr, tr2) {
-
-                observer.on('user.awarded', function(user, type, value) {
-                    times++;
-                    // console.log('assigned user exp ', user.exp, ' after adding ', value);
-                    if (times === 2) {
-                        user.exp.should.equal(challenge.exp + challenge2.exp);
-                        done();
-                    }
-                });
-            });
+        it('should have members list', function () {
+            should.exist(group.members);
+            group.members.length.should.equal(0);
         });
     });
 
@@ -199,6 +79,13 @@ describe('Group', function() {
                 password: 'teacher123',
                 role: 'teacher',
                 activated: true
+            },
+            admin = {
+                username: 'admin',
+                email: 'admin@place.com',
+                password: 'teacher123',
+                role: 'admin',
+                activated: true
             };
         var accessToken;
         var group = {
@@ -208,12 +95,15 @@ describe('Group', function() {
         before(function(done) {
             Promise.fulfilled().then(function() {
                 return [
+                    User.create(admin),
                     User.create(teacher),
                     User.create(student),
                     User.create(student2)
                 ];
-            }).spread(function(t, st, st2) {
+            }).spread(function(a,t, st, st2) {
                 // console.log(st,t,a);
+                a.password = admin.password;
+                admin = a;
                 st.password = student.password;
                 student = st;
                 st2.password = student2.password;
@@ -244,28 +134,82 @@ describe('Group', function() {
                     .end(done);
             });
 
-            it("should create a group if teacher", function(done) {
+            it("should not create a group if teacher", function(done) {
                 request(api)
                     .post("/groups")
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .send(group)
+                    .expect(401)
+                    .end(done);
+            });
+
+            it("should create a group if admin", function(done) {
+                request(api)
+                    .post("/groups")
+                    .set('Authorization', 'Bearer ' + admin.token)
+                    .send(group)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        expect(res.body.group._id).to.exist;
-                        expect(res.body.group.name).to.exist;
-                        res.body.users.length.should.equal(0);
-                        res.body.group.founder.should.equal(teacher.id);
+                        should.exist(res.body.group._id);
+                        should.exist(res.body.group.name);
                         group.id = res.body.group._id;
                         group.group = group;
                         done();
                     });
             });
+
+            it("should join group if student", function(done) {
+                request(api)
+                    .post("/groups/"+group.id+"/join/")
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        should.exist(res.body.group._id);
+                        should.exist(res.body.member);
+                        // var memb = _.find(res.body.members, {user:student.id});
+                        res.body.member.isActive.should.equal(false);
+                        group.group = group;
+                        done();
+                    });
+            });
+
+            it("should join group if teacher", function(done) {
+                request(api)
+                    .post("/groups/"+group.id+"/join/")
+                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        should.exist(res.body.group._id);
+                        should.exist(res.body.member);
+                        // var memb = _.find(res.body.members, {user:teacher.id});
+                        // should.exist(memb);
+                        res.body.member.isActive.should.equal(true);
+                        group.group = group;
+                        done();
+                    });
+            });
+
+            // it("should users can join group", function(done) {
+            //     request(api)
+            //         .post("/groups/"+group.id+"/members/"+student.id)
+            //         .set('Authorization', 'Bearer ' + teacher.token)
+            //         .end(function(err, res) {
+            //             if (err) return done(err);
+            //             res.status.should.equal(200);
+            //             should.exist(res.body.group._id);
+            //             should.exist(res.body.members);
+            //             group.group = group;
+            //             done();
+            //         });
+            // });
         });
 
         describe("GET", function() {
 
-            it("should get group not work without accessToken", function(done) {
+            it("should not get group without accessToken", function(done) {
                 request(api)
                     .get("/groups/" + group.id)
                     .send()
@@ -273,15 +217,15 @@ describe('Group', function() {
                     .end(done);
             });
 
-            it("should return a group by id with its users only if teacher", function(done) {
+            it("should return a group by id with its members if teacher", function(done) {
                 request(api)
                     .get("/groups/" + group.id)
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.group._id.should.exist;
-                        res.body.users.length.should.equal(0);
+                        should.exist(res.body.group._id);
+                        should.exist(res.body.members);
                         done();
                     });
             });
@@ -298,6 +242,18 @@ describe('Group', function() {
                 request(api)
                     .get("/groups")
                     .set('Authorization', 'Bearer ' + teacher.token)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.group.length.should.equal(1);
+                        done();
+                    });
+            });
+
+            it("should return a list of all groups on if admin", function(done) {
+                request(api)
+                    .get("/groups")
+                    .set('Authorization', 'Bearer ' + admin.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -337,7 +293,7 @@ describe('Group', function() {
                     .end(done);
             });
 
-            it("should update a group if teacher", function(done) {
+            it("should not update a group if teacher is part of group", function(done) {
                 var update = {
                     group: {
                         name: "new name"
@@ -355,24 +311,18 @@ describe('Group', function() {
                     });
             });
 
-            it("should add members", function(done) {
-                var update = {
-                    group: {
-                        members: [student.id, student2.id]
-                    }
-                };
-                request(api)
-                    .put("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
-                    .send(update)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.group.members.length.should.equal(2);
-                        res.body.users.length.should.equal(2);
-                        done();
-                    });
-            });
+            // it("should request to join group", function(done) {
+            //     request(api)
+            //         .post("/groups/" + group.id + "/join/"+student._id)
+            //         .set('Authorization', 'Bearer ' + student.token)
+            //         .end(function(err, res) {
+            //             if (err) return done(err);
+            //             res.status.should.equal(200);
+            //             res.body.group.members.length.should.equal(2);
+            //             res.body.users.length.should.equal(2);
+            //             done();
+            //         });
+            // });
 
             // it("should remove members", function(done) {
             //     var update = {
@@ -411,18 +361,26 @@ describe('Group', function() {
                     .end(done);
             });
 
-            it("should delete a group if teacher", function(done) {
+            it("should not delete a group if teacher", function(done) {
                 request(api)
                     .del("/groups/" + group.id)
                     .set('Authorization', 'Bearer ' + teacher.token)
-                    .expect(200)
+                    .expect(401)
                     .end(done);
             });
 
-            it("should not delete throw an error if group already deleted", function(done) {
+            it("should not delete a group if teacher", function(done) {
                 request(api)
                     .del("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('Authorization', 'Bearer ' + admin.token)
+                    .expect(204)
+                    .end(done);
+            });
+
+            it("should not delete and throw an error if group already deleted", function(done) {
+                request(api)
+                    .del("/groups/" + group.id)
+                    .set('Authorization', 'Bearer ' + admin.token)
                     .expect(404)
                     .end(done);
             });

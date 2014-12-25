@@ -101,16 +101,10 @@ var userSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'ArenaTrial'
     }],
-    groups: [{
+    memberships: [{
         type: ObjectId,
-        ref: 'Group',
-        childPath: "founder"
+        ref: 'Member',
     }],
-    group: {
-        type: ObjectId,
-        ref: 'Group',
-        childPath: "members"
-    },
     userQuests: [{
         type: ObjectId,
         ref: 'UserQuest'
@@ -122,16 +116,41 @@ var userSchema = new mongoose.Schema({
 });
 
 
-userSchema.plugin(relationship, {
-    relationshipPathName: ['groups', 'group']
-});
+// userSchema.plugin(relationship, {
+//     relationshipPathName: ['memberships']
+// });
 
 /**
- * the sum of both exp and rp
- * @return {Number}
+ * is this object a user
+ * @return {Boolean}
+ */
+userSchema.virtual('isUser').get(function() {
+    return true;
+});
+
+
+/**
+ * is user a student
+ * @return {Boolean}
  */
 userSchema.virtual('isStudent').get(function() {
     return this.role === 'student';
+});
+
+/**
+ * is user a teacher
+ * @return {Boolean}
+ */
+userSchema.virtual('isTeacher').get(function() {
+    return this.role === 'teacher';
+});
+
+/**
+ * is user admin
+ * @return {Boolean}
+ */
+userSchema.virtual('isAdmin').get(function() {
+    return this.role === 'admin';
 });
 
 /**
@@ -141,10 +160,6 @@ userSchema.virtual('isStudent').get(function() {
 userSchema.virtual('points').get(function() {
     return this.exp + this.rp;
 });
-
-// userSchema.methods.quests = function() {
-//     // UserQuest.find({_id:$in[this.userQuests]}).exec()
-// };
 
 userSchema.methods.toJSON = function() {
     var obj = this.toObject();
