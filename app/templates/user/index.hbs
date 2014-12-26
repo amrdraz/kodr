@@ -131,27 +131,22 @@
      
       {{#if isOwnPage }}
         <div class="tab-pane" id="settings">
+          <br>
           {{#if canJoinGroups }}
-            <div class="row">
-              <form class="form">
-                <div class="form-group">
-                  <div class="col-md-12">
-                    {{chosen
-                        content=groupOptions
-                        optionValuePath="content"
-                        optionLabelPath="content.name"
-                        selection=group
-                        class="group-options form-control"
-                        }}
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="col-lg-3">
-                  <button {{action "join" group }} class="btn btn-primary">Join</button>
-                  </div>
-                </div>
-              </form>
-            </div>
+            <form class="form-horizontal col-md-6 col-md-offset-1">
+              <fieldset>
+              <legend>Join Group</legend>
+              <div class="form-group">
+                {{chosen
+                    content=groupOptions
+                    optionValuePath="content"
+                    optionLabelPath="content.name"
+                    selection=group
+                    class="group-options form-control col-md-12"
+                    }}
+              </div>
+              <button {{action "join" group }} class="btn btn-primary">Join</button>
+            </form>
           {{/if}}
           {{#if fullErrors }}
             <div class="alert alert-danger">

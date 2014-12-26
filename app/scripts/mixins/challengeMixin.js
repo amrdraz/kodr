@@ -83,10 +83,9 @@ module.exports = Em.Mixin.create(Em.Evented, {
         return report.passed;
     },
     parseSterr : function (sterr) {
-        var i,column_no_start,column_no_stop,errs,msg,line,fragment,lines = sterr.replace(/\^/g, "^\n").split('\n'),found = [];
+        var i,column_no_start,column_no_stop,errs,msg,line,fragment,lines = sterr.replace(/(Error.*line)/g, "\n$1").replace(/\^/g, "^\n").split('\n'),found = [];
 
         for (i = 0;i<lines.length;) {
-            if(lines[i]==="") { i++;  continue;}
             if((/^Error/).test(lines[i])) {
                 errs = lines[i++].match(/Error.* line (\d*).*:\d+: (.*)/);
                 line = +errs[1];
@@ -101,7 +100,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
             } else if(/RuntimeError/.test(lines[i])){
                 msg = (lines[i++].match(/RuntimeError: (.*)/))[1];
                 line = +(lines[i++].match(/at.*:(\d)/))[1];
-            }
+            } else { i++;  continue;}
             found.push({
                 line_no:(line)-1,
                 column_no_start: column_no_start || 0,

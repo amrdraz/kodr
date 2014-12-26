@@ -32,8 +32,8 @@ module.exports = function(app, passport) {
         Group.getMembers().then(function(memebrs) {
             return User.find({
                 role: 'teacher',
-                membership: {
-                    $nin: _.map(memebrs, 'id')
+                _id: {
+                    $nin: _.map(memebrs, 'user')
                 }
             }, '_id username').exec();
         }).then(function(mbs) {
@@ -52,8 +52,8 @@ module.exports = function(app, passport) {
         Group.getMembers().then(function(memebrs) {
             return User.find({
                 role: 'student',
-                membership: {
-                    $nin: _.map(memebrs, 'id')
+                _id: {
+                    $nin: _.map(memebrs, 'user')
                 }
             }, '_id username').exec();
         }).then(function(mbs) {
@@ -168,7 +168,7 @@ module.exports = function(app, passport) {
      * @returns {status} 204
      */
 
-    app.post('/api/groups/:id/members/:uid', access.requireRole(['admin']), function(req, res, next) {
+    app.post('/api/groups/:id/members/:uid', access.requireRole(['teacher', 'admin']), function(req, res, next) {
         Group.addMember(req.params.id, req.params.uid).spread(function(group, member) {
             res.send({
                 group: group,
@@ -188,7 +188,7 @@ module.exports = function(app, passport) {
      * @returns {status} 204
      */
 
-    app.post('/api/groups/:id/members', access.requireRole(['admin']), function(req, res, next) {
+    app.post('/api/groups/:id/members', access.requireRole(['teacher', 'admin']), function(req, res, next) {
         Group.addMembers(req.params.id, req.body.uids).spread(function(group, members) {
             res.send({
                 group: group,
@@ -253,7 +253,7 @@ module.exports = function(app, passport) {
      * @returns {status} 204
      */
 
-    app.del('/api/groups/:id/members/:uid', access.requireRole(['admin']), function(req, res, next) {
+    app.del('/api/groups/:id/members/:uid', access.requireRole(['teacher', 'admin']), function(req, res, next) {
         Group.removeMember(req.params.id, req.params.uid).then(function(group) {
             res.send(204);
         }).catch(next);

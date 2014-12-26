@@ -1,0 +1,8 @@
+language: java
+jdk:
+    - oraclejdk8
+node_js: "0.10"
+install:
+    - npm install
+script:
+    - npm test

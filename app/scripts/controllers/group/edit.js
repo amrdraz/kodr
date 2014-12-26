@@ -4,10 +4,31 @@ module.exports = Em.ObjectController.extend({
     // needs: ['group'],
     init: function() {
         this._super();
+        this.resetGroupOptions();
     },
     isCreating: function () {
         return App.get('currentPath').split('.').contains('create');
     }.property('App.currentPath'),
+    getGroupOptionsFor: function(option) {
+        var store = this.store;
+        var dfd = DS.PromiseArray.create({
+            promise: Em.$.getJSON('api/groups/' + this.get('id') + '/'+option+'Options').then(function(response) {
+                return response.map(function(record) {
+                    record.id = record._id;
+                    return store.push('user', record);
+                });
+            })
+        });
+        return dfd;
+    },
+    resetGroupOptions: function () {
+        this.set('teacherOptions',this.getGroupOptionsFor('teacher'));
+        this.set('studentOptions',this.getGroupOptionsFor('student'));     
+        this.set('selectedTeachers', []);      
+        this.set('selectedStudents', []);      
+    },
+    teacherOptions:[],
+    studentOptions:[],
     selectedTeachers: [],
     selectedStudents: [],
     actions: {
@@ -29,7 +50,7 @@ module.exports = Em.ObjectController.extend({
                     }
                 }).done(function(members) {
                     that.store.pushPayload(members);
-                    that.set('selectedTeachers', []);
+                    that.resetGroupOptions();
                 });
             }
             if (this.get('selectedStudents').length) {
@@ -41,7 +62,7 @@ module.exports = Em.ObjectController.extend({
                     }
                 }).done(function(members) {
                     that.store.pushPayload(members);
-                    that.set('selectedStudents', []);
+                    that.resetGroupOptions();
                 });
             }
         },
