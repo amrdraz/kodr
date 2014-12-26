@@ -34,6 +34,13 @@ mongoose.connection.on('error', function() {
     console.log('← MongoDB Connection Error →');
 });
 
+var runner = require('java-code-runner');
+runner.recompile(function (err, stout, sterr) {
+    runner.runServer(function(p) {
+        console.log('started java server at http://localhost:' + p);
+    });
+});
+
 
 //  Setting up template engine
 app.engine('html', swig.renderFile);
