@@ -55,7 +55,7 @@ var MemberSchema = new mongoose.Schema({
     user: {
         type: ObjectId,
         ref: 'User',
-        childPath: "membership",
+        childPath: "memberships",
     },
     group: {
         type: ObjectId,
@@ -68,6 +68,12 @@ var MemberSchema = new mongoose.Schema({
     }
 });
 
+
+MemberSchema.plugin(relationship, {
+    relationshipPathName: ['user', 'group']
+});
+
+
 MemberSchema.virtual('isLeader').get(function() {
     return this.role==='leader';
 });
@@ -79,11 +85,6 @@ MemberSchema.virtual('isOwner').get(function() {
 MemberSchema.virtual('isSubscriber').get(function() {
     return this.role==='subscriber';
 });
-
-MemberSchema.plugin(relationship, {
-    relationshipPathName: ['user', 'group']
-});
-
 
 MemberSchema.plugin(require('../../back/helpers/member'));
 

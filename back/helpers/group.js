@@ -135,9 +135,12 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
     schema.methods.join = function(options) {
         var user = options.isUser ? options : options.user;
 
+        // so as not to handle activation for now
+        options.isActive = true;
+
         var group = this;
         return Promise.fulfilled().then(function() {
-            return Member.create({
+            return Member.findOrCreate({
                 group: group.id,
                 user: user.id,
                 uname: user.username,
@@ -148,6 +151,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
             });
         }).then(function(member) {
             group.members.push(member);
+            user.memberships.push(member);
             return member;
         });
     };
@@ -207,11 +211,10 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
-    schema.statics.getGroups = function(user) {
-        var Group = this.db.model('Group');
+    schema.statics.getGroups = function(uid) {
         return Promise.fulfilled().then(function() {
             return Member.find({
-                user: user.id
+                user: uid
             }).populate('group').exec();
         }).then(function (memeberships) {
             return _.map(memeberships, 'group');

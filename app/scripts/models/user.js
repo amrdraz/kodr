@@ -27,5 +27,8 @@ module.exports = DS.Model.extend({
     }.property('role'),
     isAdmin:function () {
         return this.get('role')==='admin';
-    }.property('role')
+    }.property('role'),
+    canJoinGroups:function () {
+        return !this.get('memberships.length') || !this.get('isStudent');
+    }.property('memberships.@each','role')
 });

@@ -53,7 +53,7 @@ observer.on('user.signup', function(user) {
     mail.send({
         to: mail.options.email,
         subject: 'A New '+user.role+' just signed up',
-        html: 'User:<br>'+user.toJSON(),
+        html: 'User:<br>'+JSON.stringify(user.toJSON()),
         stub: process.env.NODE_ENV === 'test',
     }, function(err, info) {
         if (process.env.NODE_ENV === 'test') {

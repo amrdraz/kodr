@@ -5,6 +5,22 @@ var User = require('../models/user');
 var access = require('./access');
 
 module.exports = function(app, passport) {
+    
+    /**
+     * Find teachers that can be part of this group.
+     *
+     * @param {string} id
+     * @returns {object} Users
+     */
+
+    app.get('/api/groups/groupOptions', access.requireRole(), function(req, res, next) {
+        Group.getGroups(req.user.id).then(function (groups) {
+            return Group.find({group:{$nin: _.map(groups, 'id')}}, '_id name').exec();
+        }).then(function(groups) {
+            res.send(groups);
+        }).catch(next);
+    });
+
     /**
      * Find teachers that can be part of this group.
      *
@@ -135,6 +151,7 @@ module.exports = function(app, passport) {
             return [model, model.join(req.user)];
         }).spread(function(model, member) {
             res.json({
+                user:req.user,
                 group: model,
                 member: member
             });

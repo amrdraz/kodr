@@ -1,3 +1,4 @@
+var toastr = require('toastr');
 var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
     validations:{
       username: {
@@ -42,7 +43,8 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
                     url: '/signup',
                     context: that,
                     data: that.getProperties('username', 'email', 'password', 'uniId','passwordConfirmation')
-                }).done(function() {
+                }).done(function(res) {
+                    toastr.success(res.responseText);
                     that.transitionToRoute('login');
                 }).fail(function(xhr) {
                     that.set('errorMessage', xhr.responseText);

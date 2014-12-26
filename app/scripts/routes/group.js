@@ -6,7 +6,7 @@ module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
   // beforeModel: function() {},
   // afterModel: function() {},
   
-  // model: function(params) {
-  //     return this.store.find('group', params.group_id);
-  // }
+  model: function(params) {
+      return this.store.find('group', params.group_id);
+  }
 });

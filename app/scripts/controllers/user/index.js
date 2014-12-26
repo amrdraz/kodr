@@ -15,6 +15,19 @@ var UserController = Ember.ObjectController.extend(Ember.Validations.Mixin, {
             presence: true
         }
     },
+    group:null,
+    groupOptions: function () {
+        var store = this.store;
+        var dfd = DS.PromiseArray.create({
+            promise: Em.$.getJSON('api/groups/groupOptions').then(function(response) {
+                return response.map(function(record) {
+                    record.id = record._id;
+                    return store.push('group', record);
+                });
+            })
+        });
+        return dfd;
+    }.property('memberships.@each'),
     activitySeries: function() {
         return [{
             name: 'Quantity',
@@ -28,6 +41,14 @@ var UserController = Ember.ObjectController.extend(Ember.Validations.Mixin, {
         return this.get('session.user.id') === this.get('model.id');
     }.property('model.id'),
     actions: {
+        join: function (group) {
+            var that = this;
+            Em.$.post('api/groups/'+group.id+'/join').done(function (data) {
+                that.store.pushPayload(data);
+            }).fail(function (err) {
+                toastr.error(err.statusText);
+            });
+        },
         changePass: function() {
             var that = this;
             this.validate().then(function() {

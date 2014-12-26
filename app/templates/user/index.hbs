@@ -10,7 +10,13 @@
     {{/if}}
     <li class="list-group-item text-right"><span class="pull-left"><strong>Experience</strong></span> {{model.exp}}</li>
     {{#if model.isStudent}}
-      <li class="list-group-item text-right"><span class="pull-left"><strong>Group</strong></span> {{model.group.name}}</li>
+      <li class="list-group-item text-right"><span class="pull-left"><strong>Group</strong></span>
+      {{#each member in model.memberships }}
+        {{member.gname}} 
+      {{else}}
+        You have Yet to join a group
+      {{/each}}
+      </li>
     {{/if}}
 </ul>
 {{!-- 
@@ -25,15 +31,15 @@
 <section class="col-md-8">
     <ul class="nav nav-tabs" role="tablist">
       {{#if model.isStudent }}
-      {{#unless session.isStudent}}
-        <li><a href="#progress" role="tab" data-toggle="tab">Progress</a></li>
-      {{/unless}}
-        <li><a href="#quests" role="tab" data-toggle="tab">Quests</a></li>
+        {{#unless session.isStudent}}
+          <li><a href="#progress" role="tab" data-toggle="tab">Progress</a></li>
+        {{/unless}}
+        <li class="active" \><a href="#quests" role="tab" data-toggle="tab">Quests</a></li>
       {{else}}
-        <li><a href="#groups" role="tab" data-toggle="tab">Groups</a></li>
+        <li class="active"><a href="#groups" role="tab" data-toggle="tab">Groups</a></li>
       {{/if}}
       {{#if isOwnPage }}
-      <li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
+        <li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
       {{/if}}
     </ul>
 
@@ -43,7 +49,7 @@
         <div class="tab-pane" id="progress">
           {{high-chart chartId='revenue-by-product' series=activitySeries }}
         </div>
-        <div class="tab-pane active" id="quests">
+        <div class="tab-pane" id="quests">
           <div class="panel-group" id="questAccordion" >
           {{#each quest in model.userQuests}}
             <div {{bind-attr class=":panel quest.complete:panel-success:panel-default"}} >
@@ -88,36 +94,65 @@
                 </ul>
               </div>
             </div>
+          {{else}}
+            <p class="row">
+              <div class="col-md-12">You do not have any quests</div>
+            </p>
           {{/each}}
           </div>
         </div>
       {{else}}
-        <div class="tab-pane active" id="groups">
-          <ul class="list-group">
-          {{#each group in model.groups}}
-                  <li class="list-group-item">            
-                      <h4 class="list-group-item-heading">
-                          <small class="pull-right">
-                          {{#link-to 'group.edit' group class="group-edit"}}
+         <div class="tab-pane active" id="groups">
+            <ul class="list-group">
+            {{#each member in model.memberships}}
+              <li class="list-group-item">            
+                  <h4 class="list-group-item-heading">
+                      <small class="pull-right">
+                        {{#if member.isLeader}}
+                          {{#link-to 'group.edit' member.group class="group-edit"}}
                               <i class="glyphicon glyphicon-pencil"></i> Edit
                           {{/link-to}} 
-                          <a href="#remove" {{action "remove" group }} class="group-delete">
-                              <i class="glyphicon glyphicon-trash"></i> Delete
-                          </a>
-                          </small>
-                          {{#link-to 'group' group class="group-name"}}
-                              {{group.name}}
-                          {{/link-to}}
-                      </h4>
-                  </li>
-          {{else}}
-              <p>No Groups set yet</p>
-          {{/each}}
-          </ul>
-        </div>
+                        {{/if}}
+                       {{!--  <a href="#remove" {{action "leave" member.group }} class="group-delete">
+                            <i class="glyphicon glyphicon-trash"></i> Leave
+                        </a> --}}
+                      </small>
+                      {{#link-to 'group' member.group class="group-name"}}
+                          {{member.gname}}
+                      {{/link-to}}
+                  </h4>
+              </li>
+            {{else}}
+               <div class="row"> Not a member of any group</div>
+            {{/each}}
+            </ul>
+          </div> {{!-- end of group tab --}}
       {{/if}}
+     
       {{#if isOwnPage }}
         <div class="tab-pane" id="settings">
+          {{#if canJoinGroups }}
+            <div class="row">
+              <form class="form">
+                <div class="form-group">
+                  <div class="col-md-12">
+                    {{chosen
+                        content=groupOptions
+                        optionValuePath="content"
+                        optionLabelPath="content.name"
+                        selection=group
+                        class="group-options form-control"
+                        }}
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-lg-3">
+                  <button {{action "join" group }} class="btn btn-primary">Join</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          {{/if}}
           {{#if fullErrors }}
             <div class="alert alert-danger">
               {{#each message in fullErrors }}
