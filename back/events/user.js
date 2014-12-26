@@ -25,7 +25,7 @@ observer.on('trial.award', function(trial) {
 
 observer.on('user.signup', function(user) {
     ExpiringToken.toVerify(user).then(function(eToken) {
-        var confirmURL = mail.host + '/confirmAccount/' + eToken._id;
+        var confirmURL = mail.host + '/verify/' + eToken._id;
         // template in views/mail
         return mail.renderAndSend('welcome.html', {
             confirmURL: confirmURL

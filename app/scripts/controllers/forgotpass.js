@@ -1,3 +1,4 @@
+var toastr = require('toastr');
 module.exports = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, Ember.Validations.Mixin, {
     authenticator: 'simple-auth-authenticator:oauth2-password-grant',
     validations: {
@@ -13,14 +14,14 @@ module.exports = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, Ember.
 
             var that = this;
             return this.validate().then(function() {
-                $.ajax({
+                Em.$.ajax({
                     type: 'POST',
                     url: '/api/users/forgotpass',
                     context: that,
                     data: that.getProperties('identification')
                 }).done(function(data) {
                     console.log(data);
-                    that.set('errorMessage', "email sent");
+                    toastr.success("Email sent");
                 }).fail(function(xhr) {
                     that.set('errorMessage', xhr.responseText);
                 });
