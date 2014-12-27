@@ -44,7 +44,8 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
                     context: that,
                     data: that.getProperties('username', 'email', 'password', 'uniId','passwordConfirmation')
                 }).done(function(res) {
-                    toastr.success(res.responseText);
+                    console.log(res);
+                    toastr.success(res.message);
                     that.transitionToRoute('login');
                 }).fail(function(xhr) {
                     that.set('errorMessage', xhr.responseText);

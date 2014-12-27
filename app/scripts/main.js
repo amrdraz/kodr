@@ -145,7 +145,14 @@ App.GroupSerializer = DS.RESTSerializer.extend(DS.EmbeddedRecordsMixin, {
 
 // App.ChallengeAdapter = DS.FixtureAdapter;
 // App.TrialAdapter = DS.FixtureAdapter;
-
+App.Router.reopen({
+  notifyGoogleAnalytics: function() {
+    return ga('send', 'pageview', {
+        'page': this.get('url'),
+        'title': this.get('url')
+      });
+  }.on('didTransition')
+});
 require('./router')(App);
 
 require('./helpers/markdown-helper');
