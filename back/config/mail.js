@@ -4,29 +4,21 @@ var stubTransport = require('nodemailer-stub-transport');
 // var htmlToText = require('nodemailer-html-to-text').htmlToText;
 var path = require('path');
 var emailTemplates = require('swig-email-templates');
-
+var config = require('./server')(process.env.NODE_ENV);
 var options = {
     root: path.join(__dirname, "../views/mail"),
     // any other swig options allowed here
 };
 
 // uses SMTP sending actual emails
-var smtpTransporter = nodemailer.createTransport(smtpTransport({
-    host: 'smtp.webfaction.com',
-    secure: true,
-    port: 465,
-    auth: {
-        user: 'kodr',
-        pass: 'belazy4ever'
-    }
-}));
+var smtpTransporter = nodemailer.createTransport(smtpTransport(config.mail));
 // smtpTransporter.use('compile', htmlToText());
 
 var from = '"Coding Owl" <od@kodr.in>';
 
 var stubTransport = nodemailer.createTransport(stubTransport());
 
-exports.host = require('./server')(process.env.NODE_ENV).host;
+exports.host = config.host;
 
 exports.options = {
     email:'od@kodr.in'

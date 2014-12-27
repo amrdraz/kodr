@@ -4,6 +4,8 @@ dist
 .sass-cache
 app/lib
 test/bower_components
+back/config/prod.js
+back/config/dev.js
 data
 design
 bin
