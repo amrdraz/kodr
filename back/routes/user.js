@@ -116,11 +116,15 @@ module.exports = function(app, passport) {
      * @returns {object} user
      */
 
-    app.post('/api/users/:id/verify', access.requireRole(['admin']), function(req, res, next) {
-        User.findOne({
-            _id: req.params.id
-        }).exec().then(function(user) {
-            ExpiringToken.toVerify(user).then(function(eToken) {
+    app.post('/api/users/:id/verify', function(req, res, next) {
+        Promise.fulfilled().then(function() {
+            return User.findOne({
+                _id: req.params.id
+            }).exec();
+        }).then(function(user) {
+            if(!user) { throw {http_code:404, message:'Not Found'}; }
+            if(user.activated) { throw {http_code:401, message:'User already activated'}; }
+            return ExpiringToken.toVerify(user).then(function(eToken) {
                 var confirmURL = req.headers.host + '/verify/' + eToken._id;
                 // template in views/mail
                 return mail.renderAndSend('welcome.html', {
@@ -141,10 +145,13 @@ module.exports = function(app, passport) {
                         res.send({message:'Verification Email Sent'});
                     }
                 });
-            }).catch(function(err) {
-                next(err);
-            });
-        }, next);
+            })
+        }).catch(function(err) {
+            if (err.http_code) {
+                res.send(err.http_code, err.message);
+            }
+            next(err);
+        });
 
     });
 

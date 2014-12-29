@@ -38,15 +38,15 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
         signup: function() {
             var that = this;
             this.validate().then(function() {
+                that.set('errorMessage','');
                 $.ajax({
                     type: 'POST',
                     url: '/signup',
                     context: that,
                     data: that.getProperties('username', 'email', 'password', 'uniId','passwordConfirmation')
                 }).done(function(res) {
-                    console.log(res);
-                    toastr.success(res.message);
-                    that.transitionToRoute('login');
+                    toastr.success(res);
+                    that.transitionToRoute('login', {queryParams:{email:that.get('email')}});
                 }).fail(function(xhr) {
                     that.set('errorMessage', xhr.responseText);
                 });

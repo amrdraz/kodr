@@ -1,3 +1,5 @@
+var toastr = require('toastr');
+
 var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, Ember.Validations.Mixin, {
     authenticator: 'simple-auth-authenticator:oauth2-password-grant',
     validations: {
@@ -37,7 +39,15 @@ var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, E
             this._super().then(null, function(error) {
               _this.set('errorMessage', error);
             });
-          }
+        },
+        verify: function (uid) {
+             Em.$.post('api/users/'+uid+'/verify').done(function (res) {
+                  toastr.success(res.message);
+              }).fail(function (xhr) {
+                console.log(xhr);
+                  toastr.error(xhr.message);
+              });
+        }
     }
 });
 

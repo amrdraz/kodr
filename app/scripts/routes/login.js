@@ -1,8 +1,9 @@
 module.exports = App.LoginRoute = Em.Route.extend({
   // activate: function() {},
   // deactivate: function() {},
-  setupController: function(controller, model) {
+  setupController: function(controller, model, queryParams) {
     controller.set('model', model);
+    controller.set('email', queryParams.email);
     controller.setProperties({
         'errorMessage':'',
         'identification':'',
@@ -17,7 +18,7 @@ module.exports = App.LoginRoute = Em.Route.extend({
   },
   // afterModel: function() {},
   
-  model: function() {
-      return ;
-  }
+  // model: function() {
+  //     return ;
+  // }
 });

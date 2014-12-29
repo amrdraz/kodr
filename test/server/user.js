@@ -300,19 +300,22 @@ describe('User', function() {
                     });
             });
 
-            it("should not add a user that's already has the same id", function(done) {
+            it("when adding a user id should not matter during sign up", function(done) {
                 request(url)
                     .post("/signup")
                     .send({
                         username: "amrdr",
-                        email: "amr.draz@guc.edu.eg",
-                        uniId: '13-56575',
+                        email: "amr.drazz@guc.edu.eg",
+                        uniId: user.uniId,
                         password: "drazdraz12",
                         passwordConfirmation: "drazdraz12"
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
-                        res.status.should.equal(400);
+                        res.status.should.equal(200);
+                        should.exist(res.body.user.username);
+                        should.exist(res.body.user.email);
+                        expect(res.body.user.uniId).to.exist();
                         done();
                     });
             });
@@ -502,9 +505,21 @@ describe('User', function() {
                     });
             });
 
-            it("should not send a verification email if not admin", function(done) {
+            it("should send a verification email if not admin", function(done) {
                 request(api)
                     .post("/users/" + student._id + "/verify")
+                    .send()
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        done();
+                    });
+            });
+
+
+            it("should not send a verification email if already activated", function(done) {
+                request(api)
+                    .post("/users/" + teacher._id + "/verify")
                     .send()
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -513,19 +528,6 @@ describe('User', function() {
                     });
             });
 
-            it("should send and email when user verification request is sent", function(done) {
-                request(api)
-                    .post("/users/" + student._id + "/verify")
-                    .set('Authorization', 'Bearer ' + admin.token)
-                    .send()
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        expect(res.body.info.response).to.exist;
-                        verifyToken = res.body.token;
-                        done();
-                    });
-            });
 
             it("should send and email when a password reset request is sent", function(done) {
                 request(api)

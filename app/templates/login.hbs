@@ -6,7 +6,10 @@
 
     {{#if errorMessage}}
       <div class="alert alert-danger">
-        {{errorMessage}}
+      {{errorMessage.message}}
+      {{#if errorMessage.id }}
+        if you still did not recieve any email in you inbox we can <a {{action "verify" errorMessage.id }} href="#verify">resend verifcation to {{errorMessage.email}}</a>
+      {{/if}}
       </div>
     {{/if}}
     {{#if fullErrors }}

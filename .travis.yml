@@ -5,8 +5,8 @@ node_js: "0.10"
 install:
     - sudo apt-get update -qq
     - sudo apt-get install -y ant
-    - sudo npm -g install bower
-    - sudo npm -g install grunt-cli 
+    - npm -g install bower
+    - npm -g install grunt-cli 
     - npm install
 script:
     - npm test

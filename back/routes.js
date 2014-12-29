@@ -42,13 +42,13 @@ module.exports = function(app, passport) {
         passport.authenticate('local-login', function(err, user) {
             if (err) return next(err);
             if (user) {
-                if (!user.activated) return res.send(400, 'This account is not Verified');
+                if (!user.activated) return res.send(400, {message:'This account is not Verified', id:user.id, email:user.email});
 
                 res.send({
                     access_token: user.token,
                     user_id: user._id
                 });
-            } else res.send(403, 'Incorrect username or password.');
+            } else res.send(403, {message:'Incorrect username or password.'});
         })(req, res, next);
     });
 
@@ -199,8 +199,6 @@ module.exports = function(app, passport) {
                         'username': req.body.username
                     }, {
                         'email': req.body.email,
-                    }, {
-                        'uniId': req.body.uniId,
                     }]
                 }).exec();
             };

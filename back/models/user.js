@@ -47,7 +47,6 @@ var userSchema = new mongoose.Schema({
     },
     uniId: {
         type: String,
-        unique: true,sparse: true,
         match: /^\d+\-\d{3,5}$/,
     },
     email: {
