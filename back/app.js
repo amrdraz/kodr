@@ -22,7 +22,7 @@ var config = require('./config/server.js')(process.env.NODE_ENV);
 var port = config.port || process.env.PORT || 3000;
 app.set('port', port);
 
-app.use(morgan(process.env.NODE_ENV=='production'?'combined':'dev')); // log every request to the console
+app.use(morgan(process.env.NODE_ENV=='production'?'[:date[clf]] ":method :remote-addr  :url HTTP/:http-version" :status :res[content-length] :req[Authorization] :response-time':'dev')); // log every request to the console
 app.use(cookiePraser(config.cookieSecret)); // read cookies
 app.use(bodyParser()); // get req.body from normal html form
 // app.use(multer({dest: "./uploads"}));       // get req.files for miltipart/form-data

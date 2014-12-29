@@ -77,7 +77,7 @@
     "mongoose-relationship": "0.0.6",
     "mongoose-schema-extend": "^0.1.7",
     "mongoose-version": "^0.2.4",
-    "morgan": "~1.0.0",
+    "morgan": "^1.0.1",
     "multer": "^0.1.4",
     "nodemailer": "^1.2.1",
     "nodemailer-html-to-text": "^1.0.0",
