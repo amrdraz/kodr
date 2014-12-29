@@ -105,7 +105,8 @@ ArenaTrialSchema.statics.findOrCreate = function(arenaTrial,withoutTrials) {
                     arena: model.arena,
                     user: model.user,
                     challenge: challenge._id,
-                    code: challenge.setup
+                    code: challenge.setup,
+                    completed:0
                 });
             });
             var at = trials.then(function(mods) {

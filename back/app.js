@@ -22,8 +22,8 @@ var config = require('./config/server.js')(process.env.NODE_ENV);
 var port = config.port || process.env.PORT || 3000;
 app.set('port', port);
 
-app.use(morgan('dev')); // log every request to the console
-app.use(cookiePraser('you cookie secret here')); // read cookies
+app.use(morgan(process.env.NODE_ENV=='production'?'combined':'dev')); // log every request to the console
+app.use(cookiePraser(config.cookieSecret)); // read cookies
 app.use(bodyParser()); // get req.body from normal html form
 // app.use(multer({dest: "./uploads"}));       // get req.files for miltipart/form-data
 app.use(methodOverride());
@@ -66,14 +66,14 @@ require('./config/passport.js')(passport);
 if (process.env.NODE_ENV === 'production') {
     var MongoStore = require('connect-mongo')(session);
     app.use(session({
-        secret: 'my secret sectret that no one knows about is prod',
+        secret: config.sessionSecret,
         store: new MongoStore({
             mongoose_connection: mongoose.connections[0],
         })
     }));
 } else {
     app.use(session({
-        secret: 'my secret sectret that no one knows about is od'
+        secret: config.sessionSecret
     }));
 }
 app.use(passport.initialize());

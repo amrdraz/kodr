@@ -12,5 +12,7 @@ module.exports = {
             pass: ''
         }
     },
+    cookieSecret: 'this is a secret',
+    sessionSecret: 'I don\'t know what\'s happening let\'s just see how this goes',
     port: 3000
 };
