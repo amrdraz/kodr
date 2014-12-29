@@ -213,6 +213,17 @@ describe('Group Helper', function() {
             done();
         });
     });
+     it('should be able to remove memebr', function (done) {
+        Group.addMembers(group.id, [student.id, teacher.id]).spread(function (group, members) {
+            should.exist(members);
+            members.length.should.equal(2);
+            return group.removeMember(student.id);
+        }).spread(function function_name (group, user) {
+            group.members.length.should.equal(1);
+            user.memberships.length.should.equal(0);
+            done();
+        });
+    });
     
     it('should update exp when trial is complete', function(done) {
 

@@ -145,10 +145,10 @@ module.exports = function(app, passport) {
                         res.send({message:'Verification Email Sent'});
                     }
                 });
-            })
+            });
         }).catch(function(err) {
             if (err.http_code) {
-                res.send(err.http_code, err.message);
+                res.status(err.http_code).send(err.message);
             }
             next(err);
         });

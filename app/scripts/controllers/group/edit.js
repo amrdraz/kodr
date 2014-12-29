@@ -74,15 +74,15 @@ module.exports = Em.ObjectController.extend({
             }
             this.transitionToRoute('groups');
         },
-        remove: function(user) {
+        remove: function(member) {
             var that = this;
-            var model = this.get('model');
-            model.get('members').then(function(members) {
-                members.removeObject(user);
-                Em.$.ajax({
-                    url: '/api/groups/' + model.id + '/members/' + user.id,
-                    type: 'DELETE'
-                });
+            Em.$.ajax({
+                url: '/api/groups/' + member.get('group.id') + '/members/' + member.get('data.user.id'),
+                type: 'DELETE'
+            }).done(function (data) {
+                that.store.pushPayload(data);
+            }).fail(function (err) {
+                console.log(err);
             });
         }
     }

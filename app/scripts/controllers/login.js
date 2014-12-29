@@ -41,12 +41,14 @@ var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, E
             });
         },
         verify: function (uid) {
-             Em.$.post('api/users/'+uid+'/verify').done(function (res) {
+            var that = this;
+            Em.$.post('api/users/'+uid+'/verify').done(function (res) {
                   toastr.success(res.message);
-              }).fail(function (xhr) {
+                  that.set('fullErrors','');
+            }).fail(function (xhr) {
                 console.log(xhr);
-                  toastr.error(xhr.message);
-              });
+                  toastr.error(xhr);
+            });
         }
     }
 });

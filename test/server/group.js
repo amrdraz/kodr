@@ -389,6 +389,20 @@ describe('Group', function() {
                     .end(done);
             });
 
+            it("should remove user from group", function(done) {
+                request(api)
+                    .delete("/groups/"+group.id+"/members/"+student2.id)
+                    .set('Authorization', 'Bearer ' + admin.token)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        should.exist(res.body.group._id);
+                        should.exist(res.body.group.members);
+                        group.group = res.body.group;
+                        done();
+                    });
+            });
+
             it("should not delete a group if student", function(done) {
                 request(api)
                     .del("/groups/" + group.id)

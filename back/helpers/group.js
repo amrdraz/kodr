@@ -97,11 +97,12 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
      */
     schema.methods.removeMember = function(uid) {
         var group = this;
+        var Group = this.db.model('Group');
         return group.getMember_404(uid).then(function (memb) {
             return new Promise(function (res,rej) {
                 memb.remove(function (err) {
                     if (err) return rej(err);
-                    return res(memb);
+                    res([Group.getById(group.id), User.getById(uid)]);
                 });
             });
         });
@@ -250,9 +251,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
     schema.statics.removeMember = function(gid, uid) {
         var Group = this.db.model('Group');
         return Group.getById_404(gid).then(function (group) {
-            return [group, group.removeMember(uid)];
-        }).spread(function (g, member) {
-            return g;
+            return group.removeMember(uid);
         });
     };
 };
