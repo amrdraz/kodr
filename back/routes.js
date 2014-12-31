@@ -183,7 +183,7 @@ module.exports = function(app, passport) {
                     };
                 }
 
-                if (!(/^\S+\.\S+@guc\.edu\.eg$/.test(req.body.email) || /^\S+\.\S+@student\.guc\.edu\.eg$/.test(req.body.email))) {
+                if (!(/^.+@.+\..+$/.test(req.body.email) || /^\S+\.\S+@guc\.edu\.eg$/.test(req.body.email) || /^\S+\.\S+@student\.guc\.edu\.eg$/.test(req.body.email))) {
                     throw {
                         http_code: 401,
                         message: 'Invalid Email'
@@ -233,6 +233,7 @@ module.exports = function(app, passport) {
             } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
                 return 'student';
             }
+            return 'student';
         }
 
         function emitAndRespond(req,res) {

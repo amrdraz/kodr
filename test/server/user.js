@@ -320,6 +320,26 @@ describe('User', function() {
                     });
             });
 
+             it("when none guc emails shoudl work", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send({
+                        username: "amrdrz",
+                        email: "amr.m.draz@gmail.com",
+                        uniId: user.uniId,
+                        password: "drazdraz12",
+                        passwordConfirmation: "drazdraz12"
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        should.exist(res.body.user.username);
+                        should.exist(res.body.user.email);
+                        expect(res.body.user.uniId).to.exist();
+                        done();
+                    });
+            });
+
             it("should assign role student based on email", function(done) {
                 request(url)
                     .post("/signup")
