@@ -13,7 +13,7 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
         presence:true,
         format: {
           with: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-          message: 'you need to provide a GUC email'
+          message: 'you need to provide a valid email'
         }
       },
       uniId: {

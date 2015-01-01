@@ -29,10 +29,15 @@ app.use(bodyParser()); // get req.body from normal html form
 app.use(methodOverride());
 
 var mongoose = require('mongoose');
-mongoose.connect(config.db.url);
-mongoose.connection.on('error', function() {
+var connectDB =  function() {
+    mongoose.connect(config.db.url);
+};
+mongoose.connection.on('error',function() {
     console.log('← MongoDB Connection Error →');
+    console.log('reconnedtin in 1 seccond');
+    setTimeout(connectDB, 1000);
 });
+connectDB();
 
 var runner = require('java-code-runner');
 runner.recompile(function (err, stout, sterr) {
