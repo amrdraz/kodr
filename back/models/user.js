@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var Promise = require('bluebird');
 var observer = require('../observer');
 var crypto = require('crypto');
 var util = require('util');
@@ -45,6 +46,7 @@ var userSchema = new mongoose.Schema({
         match: /^\w[\w.-\d]{3,}$/,
         trim: true
     },
+    socketId: String,
     uniId: {
         type: String,
         match: /^\d+\-\d{3,5}$/,
@@ -183,27 +185,6 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
     });
 };
 
-/**
- * award a user with amount of points based on the type of points
- * after awarding an event is published indicating that this user was awarded
- *
- * @param  {Stting} type  type of the award (can be 'exp' or 'rp')
- * @param  {Numberf} value the amount awarded
- * @param  {Mixed} obj   object that the award originated from
- * @event  'user.awarded' published the user awarded the type of award and its value
- */
-userSchema.methods.award = function(type, value, obj) {
-    var update = {
-        $inc: {}
-    };
-    update.$inc[type] = value;
-    User.findByIdAndUpdate(this.id, update, function(err, user) {
-        if (err) throw err;
-        // console.log('sending', err,user, obj);
-        observer.emit('user.awarded', user, type, value);
-    });
-};
-
 
 /**
  * User Schema pre-save hooks.
@@ -229,8 +210,33 @@ userSchema.pre('save', true, function(next, done) {
     });
 });
 
+
+/**
+ * award a user with amount of points based on the type of points
+ * after awarding an event is published indicating that this user was awarded
+ *
+ * @param  {Stting} type  type of the award (can be 'exp' or 'rp')
+ * @param  {Numberf} value the amount awarded
+ * @param  {Mixed} obj   object that the award originated from
+ * @event  'user.awarded' published the user awarded the type of award and its value
+ */
+userSchema.methods.award = function(type, value, obj) {
+    var Model = this.db.model('User');
+    var update = {
+        $inc: {}
+    };
+    update.$inc[type] = value;
+    Model.findByIdAndUpdate(this.id, update, function(err, user) {
+        if (err) throw err;
+        // console.log('sending', err,user, obj);
+        observer.emit('user.awarded', user, type, value);
+    });
+};
+
+
 userSchema.statics.findByIdentity = function (identity) {
-    return User.findOne({
+    var Model = this.db.model('User');
+    return Model.findOne({
                 $or: [{
                     'username': identity
                 }, {
@@ -239,6 +245,19 @@ userSchema.statics.findByIdentity = function (identity) {
                     'uniId': identity,
                 }]
             }).exec();
+};
+
+userSchema.statics.setSocketId = function (uid, sid) {
+    var Model = this.db.model('User');
+    return Promise.fulfilled().then(function () {
+        return Model.update({_id:uid}, { $set: { socketId: sid }}).exec();
+    });
+};
+userSchema.statics.getUserBySocketId = function (sid) {
+    var Model = this.db.model('User');
+    return Promise.fulfilled().then(function () {
+        return Model.findOne({ socketId: sid }).exec();
+    });
 };
 
 var User = mongoose.model('User', userSchema);

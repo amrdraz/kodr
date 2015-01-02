@@ -13,9 +13,9 @@ describe('Socket', function() {
     before(setup.clearDB);
     after(setup.clearDB);
 
-    options = {
+    var options = {
         'force new connection': true
-    }
+    };
     it('Should be able to broadcast messages', function(done) {
         var client1, client2, client3;
         var message = 'Hello World';

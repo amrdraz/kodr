@@ -11,6 +11,9 @@ var ApplicationController = Ember.Controller.extend({
         },
         // When EmberSockets makes a connection to the Socket.IO server.
         connect: function() {
+            if(this.get('session.isAuthenticated')) {
+                this.socket.emit('login', this.get('session.user_id'));
+            }
             console.log('EmberSockets has connected...');
         },
 

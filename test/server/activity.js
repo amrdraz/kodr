@@ -1,8 +1,10 @@
 /*globals before,after,beforeEach,afterEach,describe,it */
 var Promise = require('bluebird');
+var _ = require('lodash');
 var should = require('chai').should();
 var expect = require('chai').expect;
 var request = require('supertest-as-promised');
+var io = require('socket.io-client');
 var setup = require('./setup');
 var Activity = require('../../back/models/activity');
 var Challenge = require('../../back/models/challenge');
@@ -204,6 +206,56 @@ describe('Activity', function() {
                 acts[0].action.should.equal('logout');
                 done();
             }).catch(done);
+        });
+
+        
+        var options = {
+            'force new connection': true
+        };
+        it('Should log when user connects with socket', function(done) {
+            var client1, client2, client3;
+            var message = 'Hello World';
+            var messages = 0;
+
+            client1 = io.connect(setup.url, options);
+            
+            client1.on('connect', function() {
+                client1.emit('login', student.id);
+            });
+            client1.on('test.connect.response', function () {
+                Activity.findByAction('connect').then(function (act) {
+                   return act[0].getSubject(); 
+                }).then(function (subject) {
+                    subject.id.should.equal(student.id);
+                    client1.disconnect();
+                    done();
+                });
+            });
+        });
+        it('Should log when user disconnects from sockets', function(done) {
+            var client1, client2, client3;
+            var message = 'Hello World';
+            var messages = 0;
+
+            client1 = io.connect(setup.url, options);
+            
+            client1.on('connect', function() {
+                client1.emit('login', student.id);
+            });
+            client1.on('test.connect.response', function () {
+                client1.disconnect();
+            });
+            client1.on('disconnect', function () {
+                _.delay(function (argument) {
+                    Activity.findByAction('disconnect').then(function (act) {
+                       return act[0].getSubject(); 
+                    }).then(function (subject) {
+                        subject.id.should.equal(student.id);
+                        client1.disconnect();
+                        done();
+                    });
+                }, 40);
+            });
         });
 
         

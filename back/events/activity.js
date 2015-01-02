@@ -2,6 +2,7 @@ var observer = require('../observer');
 var util = require('util');
 var Activity = require('../models/activity');
 var Challenge = require('../models/challenge');
+var User = require('../models/user');
 var mail = require('../config/mail');
 
     
@@ -40,6 +41,37 @@ observer.on('user.logout', function(user) {
         action:'logout',
         verb:'logedout',
         object:user
+    });
+});
+
+
+observer.on('user.connect', function(user) {
+    User.setSocketId(user.user_id, user.socket_id);
+    Activity.new({
+        subjectId:user.user_id,
+        subjectModel:'User',
+        action:'connect',
+        verb:'connected',
+    }).then(function (act) {
+        if (process.env.NODE_ENV==='test') {
+            observer.emit('test.socket.respond', {sid:user.socket_id, event:'test.connect.response'});
+        }
+    });
+});
+
+
+observer.on('user.disconnect', function(id) {
+    User.getUserBySocketId(id).then(function (user) {
+        return Activity.new({
+            subject:user,
+            action:'disconnect',
+            verb:'disconnected',
+            object:user
+        });
+    }).then(function (act) {
+        if (process.env.NODE_ENV==='test') {
+            // observer.emit('test.socket.respond', {sid:id, event:'test.disconnect.response'});
+        }
     });
 });
 

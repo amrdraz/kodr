@@ -5,7 +5,10 @@ var Challenge = require('../models/challenge');
 var mail = require('../config/mail');
 
 exports.sockets = function (io) {
-    
+     //server events
+    observer.on('user.awarded', function(user, type, value) {
+        io.sockets.connected.length > 0 && io.emit('notification', user, type, value);
+    });
 };
 
 exports.model = function(User) {
