@@ -5,7 +5,7 @@ var clients = [];
 module.exports = function(io) {
 
     // require('./events/user').sockets(io);
-    // require('./events/trial')(io);
+    require('./events/activity');
 
     io.on('connection', function(socket) {
 

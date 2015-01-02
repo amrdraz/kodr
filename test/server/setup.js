@@ -1,4 +1,8 @@
 /*globals before,beforeEach,after,afterEach,describe,it */
+
+
+process.env.NODE_ENV = 'test';
+
 var mongoose = require('mongoose');
 var expect = require('chai').expect;
 var request = require('supertest-as-promised');
@@ -21,10 +25,8 @@ var clearDB = function clearDB(done) {
     return done();
 };
 
+
 var config = require('../../back/config/tests');
-
-process.env.NODE_ENV = 'test';
-
 
 
 before(function(done) {

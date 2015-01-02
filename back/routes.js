@@ -67,6 +67,7 @@ module.exports = function(app, passport) {
                 }).exec().then(function(user) {
                     user.activated = true;
                     user.save();
+                    observer.emit('user.verified', user);
                     res.render('confirm.html', {
                         user: user
                     });

@@ -1,4 +1,7 @@
 var mongoose = require('mongoose');
+var Promise = require('bluebird');
+var util = require('util');
+var _ = require('lodash');
 var ObjectId = mongoose.Schema.ObjectId;
 var Mixed = mongoose.Schema.Mixed;
 var relationship = require("mongoose-relationship");
@@ -18,26 +21,70 @@ var relationship = require("mongoose-relationship");
  * @type {mongoose.Schema}
  */
 
-var Activity = new mongoose.Schema({
+var ActivitySchema = new mongoose.Schema({
     subject:{
         type:ObjectId,
         ref:'User',
         childPath: "activities"
     },
+    subjectModel: String,
+    subjectId: ObjectId,
     action: {
         type: String,
-        'enum': ['signedout','signedin','signedup','activated','created', 'updated', 'deleted', 'viewed','started', 'completed', 'tried', 'gained', 'posted', 'completed', 'awarded']
+        // 'enum': ['signedout','signedin','signedup','activated','verified','created', 'updated', 'deleted', 'viewed','started', 'tried', 'gained', 'posted','joined', 'completed', 'awarded']
     },
-    object: String,
+    objectModel: String,
     objectId: ObjectId,
+
     time: {
         type:Date,
         default: Date.now
     }
 });
 
-Activity.plugin(relationship, {
-    relationshipPathName: ['subject']
-});
+ActivitySchema.methods.getSubject = function () {
+    var Model = this.db.model(this.subjectModel);
+    var activity = this;
+    return Promise.fulfilled().then(function() {
+        return Model.findOne({
+            _id: activity.subjectId
+        }).exec();
+    });
+};
 
-module.exports = mongoose.model('Activity', Activity);
+
+ActivitySchema.methods.getObject = function () {
+    var Model = this.db.model(this.objectModel);
+    var activity = this;
+    return Promise.fulfilled().then(function() {
+        return Model.findOne({
+            _id: activity.objectId
+        }).exec();
+    });
+};
+
+
+ActivitySchema.statics.findByAction = function (act) {
+    var Model = this.db.model('Activity');
+    return Promise.fulfilled().then(function () {
+        return Model.find({action:act}).exec();
+    });
+};
+
+ActivitySchema.statics.new = function (obj) {
+    var Model = this.db.model('Activity');
+    return Promise.fulfilled().then(function () {
+        if (obj.subject) {
+            obj.subjectId = obj.subject.id;
+            obj.subjectModel = obj.subject.constructor.modelName;
+        }
+        if (obj.object) {
+            obj.objectId = obj.object.id;
+            obj.objectModel = obj.object.constructor.modelName;
+        }
+        return Model.create(obj);
+    });
+};
+
+
+module.exports = mongoose.model('Activity', ActivitySchema);
