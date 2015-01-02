@@ -29,10 +29,11 @@ var ActivitySchema = new mongoose.Schema({
     },
     subjectModel: String,
     subjectId: ObjectId,
-    action: {
+    verb: {
         type: String,
         // 'enum': ['signedout','signedin','signedup','activated','verified','created', 'updated', 'deleted', 'viewed','started', 'tried', 'gained', 'posted','joined', 'completed', 'awarded']
     },
+    action: String,
     objectModel: String,
     objectId: ObjectId,
 
@@ -68,6 +69,13 @@ ActivitySchema.statics.findByAction = function (act) {
     var Model = this.db.model('Activity');
     return Promise.fulfilled().then(function () {
         return Model.find({action:act}).exec();
+    });
+};
+
+ActivitySchema.statics.findByVerb = function (verb) {
+    var Model = this.db.model('Activity');
+    return Promise.fulfilled().then(function () {
+        return Model.find({verb:verb}).exec();
     });
 };
 

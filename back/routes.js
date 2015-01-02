@@ -43,7 +43,7 @@ module.exports = function(app, passport) {
             if (err) return next(err);
             if (user) {
                 if (!user.activated) return res.send(400, {message:'This account is not Verified', id:user.id, email:user.email});
-
+                observer.emit('user.login', user);
                 res.send({
                     access_token: user.token,
                     user_id: user._id
@@ -54,8 +54,9 @@ module.exports = function(app, passport) {
 
     // logout
     app.del('/logout', access.hasToken, function(req, res) {
+        observer.emit('user.logout', req.user);
         req.logout();
-        res.send(200);
+        res.send(204);
     });
 
     // confirmAccount after recieving verifcation
@@ -112,7 +113,7 @@ module.exports = function(app, passport) {
                         res.render('confirm.html', {
                             user: user,
                         });
-                        ExpiringToken.useToken(user);
+                        ExpiringToken.useToken(token.id);
                     });
                 });
             } else {

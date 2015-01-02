@@ -18,16 +18,36 @@ observer.on('trial.award', function(trial) {
 observer.on('user.signup', function(user) {
     Activity.new({
         subject:user,
-        action:'signedup',
-        object:null
+        action:'signup',
+        verb:'signuped',
+        object:user
+    });
+});
+
+observer.on('user.login', function(user) {
+    Activity.new({
+        subject:user,
+        action:'login',
+        verb:'logedin',
+        object:user
     });
 });
 
 
+observer.on('user.logout', function(user) {
+    Activity.new({
+        subject:user,
+        action:'logout',
+        verb:'logedout',
+        object:user
+    });
+});
+
 observer.on('user.verified', function(user) {
     Activity.new({
         subject:user,
-        action:'verified',
-        object:null
+        action:'verify',
+        verb:'verified',
+        object:user
     });
 });

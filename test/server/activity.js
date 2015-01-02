@@ -97,10 +97,12 @@ describe('Activity', function() {
             })
             .expect(200)
             .then(function (res) {
-               return Activity.findByAction('signedup'); 
+               return Activity.findByVerb('signuped'); 
             }).then(function (acts) {
                 should.exist(acts);
                 acts.length.should.equal(1);
+                acts[0].verb.should.equal('signuped');
+                acts[0].action.should.equal('signup');
                 done();
             }).catch(done);
         });
@@ -121,10 +123,85 @@ describe('Activity', function() {
                     .get("/verify/" + activationToken)
                     .expect(200);
             }).then(function (res) {
-                return Activity.findByAction('verified'); 
+                return Activity.findByVerb('verified'); 
             }).then(function (acts) {
                 should.exist(acts);
                 acts.length.should.equal(1);
+                acts[0].verb.should.equal('verified');
+                acts[0].action.should.equal('verify');
+                done();
+            }).catch(done);
+        });
+
+        it('should log when a user verifies account', function(done) {
+            request(setup.url)
+            .post("/signup")
+            .send({
+                username: "amrdr",
+                email: "amr.draz@guc.edu.eg",
+                password: "drazdraz12",
+                passwordConfirmation: "drazdraz12"
+            })
+            .expect(200)
+            .then(function (res) {
+                var activationToken = res.body.activation_token;
+                return request(setup.url)
+                    .get("/verify/" + activationToken)
+                    .expect(200);
+            }).then(function (res) {
+                return request(setup.url)
+                    .post("/token")
+                    .send({
+                        username: "amrdr",
+                        password: "drazdraz12",
+                    })
+                    .expect(200);
+            }).then(function (res) {
+                return Activity.findByVerb('logedin'); 
+            }).then(function (acts) {
+                should.exist(acts);
+                acts.length.should.equal(1);
+                acts[0].verb.should.equal('logedin');
+                acts[0].action.should.equal('login');
+                done();
+            }).catch(done);
+        });
+
+        it('should log when a user verifies account', function(done) {
+            request(setup.url)
+            .post("/signup")
+            .send({
+                username: "amrdr",
+                email: "amr.draz@guc.edu.eg",
+                password: "drazdraz12",
+                passwordConfirmation: "drazdraz12"
+            })
+            .expect(200)
+            .then(function (res) {
+                var activationToken = res.body.activation_token;
+                return request(setup.url)
+                    .get("/verify/" + activationToken)
+                    .expect(200);
+            }).then(function (res) {
+                return request(setup.url)
+                    .post("/token")
+                    .send({
+                        username: "amrdr",
+                        password: "drazdraz12",
+                    })
+                    .expect(200);
+            }).then(function (res) {
+                return request(setup.url)
+                    .del("/logout")
+                    .set('Authorization', 'Bearer ' + res.body.access_token)
+                    .expect(204);
+            }).then(function (res) {
+                return Activity.findByVerb('logedout'); 
+            }).then(function (acts) {
+                should.exist(acts);
+                acts.length.should.equal(1);
+                acts[0].verb.should.equal('logedout');
+                acts[0].action.should.equal('logout');
                 done();
             }).catch(done);
         });
