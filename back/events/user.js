@@ -51,7 +51,7 @@ observer.on('user.signup', function(user) {
     });
 });
 
-
+/* until imap or pop server is configured
 observer.on('user.signup', function(user) {
     mail.send({
         to: mail.options.email,
@@ -67,5 +67,5 @@ observer.on('user.signup', function(user) {
         }
     });
 });
-//
+//*/
 };
