@@ -4,7 +4,7 @@ var stubTransport = require('nodemailer-stub-transport');
 // var htmlToText = require('nodemailer-html-to-text').htmlToText;
 var path = require('path');
 var emailTemplates = require('swig-email-templates');
-var config = require('./server')(process.env.NODE_ENV);
+var config = require('./server');
 var options = {
     root: path.join(__dirname, "../views/mail"),
     // any other swig options allowed here

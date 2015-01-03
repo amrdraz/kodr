@@ -1,6 +1,6 @@
 // set up ======================================================================
 // get all the tools we need
-var config = require('./config/server.js')(process.env.NODE_ENV);
+var config = require('./config/server.js');
 
 var express = require('express');
 var app = express();

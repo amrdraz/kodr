@@ -5,12 +5,12 @@ module.exports = {
         url:'localhost/tests'
     },
     mail: {
-        host: '',
-        secure: true,
-        port: 465,
+        host: 'localhost',
+        secure: false,
+        port: 2525,
         auth: {
-            user: '',
-            pass: ''
+            user: 'draz',
+            pass: 'test'
         }
     },
     ssl: {
