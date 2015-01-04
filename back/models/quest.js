@@ -1,7 +1,5 @@
 var mongoose = require('mongoose');
-var Promise = require('bluebird');
 var util = require('util');
-var UserQuest = require('./userQuest');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 
@@ -25,7 +23,11 @@ var QuestSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    endDate:{
+    timeLimit: {
+        type:Number, // time since start in seconds
+        default: 0 // ie no time limit
+    },
+    endDate: { 
        type:Date 
     },
     isPublished:{
@@ -46,28 +48,6 @@ var QuestSchema = new mongoose.Schema({
 });
 
 
-QuestSchema.methods.assign = function(userId) {
-    return Quest.assign(userId, this);
-};
+QuestSchema.plugin(require('../helpers/quest'));
 
-/**
- * Assign quest to user or updates requirements if already assigned
- * @param  {ObjectId} userId  [description]
- * @param  {Quest} quest [description]
- * @return {UserQuest}       [description]
- */
-QuestSchema.statics.assign = function(userId, quest) {
-    if(!quest.isPublished) return Promise.reject('You can not assign an Un-Published quest');
-    return Promise.fulfilled().then(function() {
-        return UserQuest.create({
-            name:quest.name,
-            description:quest.description,
-            rp:quest.rp,
-            quest: quest.id,
-            user: userId
-        }).then(function (uq) {
-            return uq.setRequirements(quest.requirements);
-        });
-    });
-};
 var Quest = module.exports = mongoose.model('Quest', QuestSchema);

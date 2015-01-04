@@ -11,9 +11,106 @@ var mail = require('../config/mail');
  * @param  {Trial} trial trial that was just complete for the first time
  * @return {[type]}       [description]
  */
-observer.on('trial.award', function(trial) {
-    // console.log('user award hook caought in user', trial.user);
-    
+observer.on('trial.complete', function(trial) {
+    Activity.new({
+        subjectId:trial.user,
+        subjectModel:'User',
+        action:'complete',
+        verb:'completed',
+        object:trial
+    });
+});
+
+observer.on('arenaTrial.complete', function(arenaTrial) {
+    Activity.new({
+        subjectId:arenaTrial.user,
+        subjectModel:'User',
+        action:'complete',
+        verb:'completed',
+        object:arenaTrial
+    });
+});
+
+observer.on('requirement.complete', function(req) {
+    Activity.new({
+        subjectId:req.user,
+        subjectModel:'User',
+        action:'complete',
+        verb:'completed',
+        object:req
+    });
+});
+//TODO quest.finished for when timout before complete
+observer.on('quest.complete', function(uq) {
+    Activity.new({
+        subjectId:uq.user,
+        subjectModel:'User',
+        action:'complete',
+        verb:'completed',
+        object:uq
+    });
+});
+
+observer.on('quest.create', function(user,q) {
+    Activity.new({
+        subject:user,
+        action:'create',
+        verb:'created',
+        object:q
+    });
+});
+
+
+observer.on('quest.update', function(user,q) {
+    Activity.new({
+        subject:user,
+        action:'update',
+        verb:'updated',
+        object:q
+    });
+});
+
+
+observer.on('quest.delete',function(user,q) {
+    Activity.new({
+        subject:user,
+        action:'delete',
+        verb:'deleted',
+        object:q
+    });
+});
+
+// when a user joins a quest
+observer.on('quest.join', function(uq) {
+    Activity.new({
+        subjectId:uq.user,
+        subjectModel:'User',
+        action:'join',
+        verb:'joined',
+        object:uq
+    });
+});
+
+// when someon assigns users to a quest
+observer.on('user.assign', function(user, quest,meta) {
+    Activity.new({
+        subject:user,
+        subjectModel:'User',
+        action:'assign',
+        verb:'assigned',
+        object:quest,
+        objectMeta:meta
+    });
+});
+
+observer.on('user.unassign', function(user, uquest) {
+    Activity.new({
+        subject:user,
+        subjectModel:'User',
+        action:'assign',
+        verb:'assigned',
+        object:uquest
+    });
 });
 
 observer.on('user.signup', function(user) {

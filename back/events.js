@@ -1,5 +1,6 @@
 var observer = require('./observer');
 var util = require('util');
+var User = require('./models/user');
 // var io = require('socket.io-emitter');
 var clients = [];
 
@@ -7,6 +8,7 @@ module.exports = function(io) {
 
     // require('./events/user').sockets(io);
     require('./events/activity');
+    require('./events/mail');
 
     io.sockets.on('connection', function(client) {
 
@@ -27,6 +29,14 @@ module.exports = function(io) {
 
     observer.on('test.socket.respond', function (obj) {
        io.sockets.connected[obj.sid].emit(obj.event, obj.response); 
+    });
+
+    observer.on('quest.assign', function (uq) {
+        User.getById(uq.user).then(function (user) {
+           if(user.socketId && io.sockets.connected[user.socketId]) {
+            io.sockets.connected[user.socketId].emit('notification', "A new Quest was just assigned to you");
+            }
+        });
     });
 
     observer.on('user.awarded', function(user, type, value) {

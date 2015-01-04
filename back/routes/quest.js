@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
+var observer = require('../observer');
 var Group = require('../models/group');
 var Quest = require('../models/quest');
 var UserQuest = require('../models/userQuest');
@@ -98,6 +99,7 @@ module.exports = function(app, passport) {
         req.body.quest.founder = req.user._id;
         Quest.create(req.body.quest)
             .then(function(model) {
+                observer.emit('quest.create', req.user, model);
                 res.json({
                     quest: model,
                 });
@@ -123,6 +125,7 @@ module.exports = function(app, passport) {
             model.set(quest);
             model.save(function(err, model) {
                 if (err) return next(err);
+                observer.emit('quest.update', req.user, model);
                 res.json({
                     quest: model,
                 });
@@ -139,24 +142,21 @@ module.exports = function(app, passport) {
 
     app.put('/api/quests/:id/assign', access.requireRole(['teacher','admin']), function(req, res, next) {
         var users = req.body.users || [];
-        var groupIds = req.body.groups;
-        Promise.fulfilled().then(function() {
-            var arr =[Quest.findOne({
-                _id: req.params.id
-            }).exec()];
-            if(groupIds) {
-                arr.push(Group.find({_id:{$in:groupIds}}).exec());
-            }
-            return arr;
-        }).spread(function(model, groups) {
-            if (!model) return res.send(404, "Not Found");
-            if (groups) {
-                users = _.union(users,_.flatten(groups,'members'));
+        var groupIds = req.body.groups || [];
+        var quest;
+        Quest.getById_404(req.params.id).then(function(q) {
+            quest = q;
+            return [q,Group.getSubscribersFor(groupIds)];
+        }).spread(function(model, subscribers) {
+            if (subscribers.length>0) {
+                users = _.union(users,_.flatten(subscribers,'user'));
             }
             return Promise.map(users, function(userId) {
                 return model.assign(userId);
             });
         }).then(function(uqs) {
+            observer.emit('user.assign', req.user, quest,req.body);
+            observer.emit('mail.quest.assign', users);
             var usrs = User.find({
                 _id: {
                     $in: users
@@ -168,12 +168,22 @@ module.exports = function(app, passport) {
             });
             return [uqs, usrs];
         }).spread(function(userquests, users) {
-            res.json({
+            if(process.env.NODE_ENV==="test") {
+                observer.once('test.mail.quest.assignment', function (infos) {
+                    console.log(infos);
+                    res.json({
+                        infos: infos,
+                        userQuests: userquests,
+                        users:users
+                    });
+                });
+            } else res.json({
                 userQuests: userquests,
                 users:users
             });
-        }).catch(function (err) {
-            if(typeof err === 'string') return res.send(401,err);
+        }).catch(function(err) {
+            console.log(err.stack);
+            if (err.http_code) return res.send(err.http_code, err.message);
             next(err);
         });
     });
@@ -194,6 +204,7 @@ module.exports = function(app, passport) {
         }).then(function(userquest) {
             userquest.remove(function(err) {
                 if (err) throw err;
+                observer.emit('quest.unassign', req.user, userquest);
                 res.send(200);
             });
         }).catch(next);
@@ -210,6 +221,7 @@ module.exports = function(app, passport) {
         Quest.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404);
+            observer.emit('quest.delete', req.user, model);
             model.remove(function(err, model) {
                 if (err) return next(err);
                 res.send(200);

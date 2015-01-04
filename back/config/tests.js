@@ -11,7 +11,9 @@ module.exports = {
         auth: {
             user: 'draz',
             pass: 'test'
-        }
+        },
+        maxConnections: 5,
+        maxMessages: 10
     },
     ssl: {
         key: fs.readFileSync(__dirname+'/local.pem'),

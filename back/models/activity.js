@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var util = require('util');
 var _ = require('lodash');
-var ObjectId = mongoose.Schema.ObjectId;
-var Mixed = mongoose.Schema.Mixed;
+var ObjectId = mongoose.Schema.Types.ObjectId;
+var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
 
 /**
@@ -22,11 +22,6 @@ var relationship = require("mongoose-relationship");
  */
 
 var ActivitySchema = new mongoose.Schema({
-    subject:{
-        type:ObjectId,
-        ref:'User',
-        childPath: "activities"
-    },
     subjectModel: String,
     subjectId: ObjectId,
     verb: {
@@ -36,7 +31,7 @@ var ActivitySchema = new mongoose.Schema({
     action: String,
     objectModel: String,
     objectId: ObjectId,
-
+    objectMeta:Mixed,
     time: {
         type:Date,
         default: Date.now

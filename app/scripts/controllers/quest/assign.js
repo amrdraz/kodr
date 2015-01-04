@@ -43,7 +43,7 @@ module.exports = Em.ObjectController.extend({
                     return that.store.pushMany('userQuest',res.userQuests);
                 }, function (err) {
                     console.log(err);
-                    toastr.error(err);
+                    toastr.error(err.responseText);
                     return false;
                 }).then(function (userQuests) {
                     that.get('model.userQuests').then(function (uqs) {

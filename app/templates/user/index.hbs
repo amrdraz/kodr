@@ -49,7 +49,7 @@
         <div class="tab-pane" id="progress">
           {{high-chart chartId='revenue-by-product' series=activitySeries }}
         </div>
-        <div class="tab-pane" id="quests">
+        <div class="tab-pane active" id="quests">
           <div class="panel-group" id="questAccordion" >
           {{#each quest in model.userQuests}}
             <div {{bind-attr class=":panel quest.complete:panel-success:panel-default"}} >

@@ -36,8 +36,7 @@ observer.on('user.signup', function(user) {
             to: user.email,
             subject: 'You\'ve just signup for an awesome experience',
             stub: process.env.NODE_ENV === 'test',
-        }, function(err, info) {
-            if (err) throw err;
+        }).then(function(info) {
             if (process.env.NODE_ENV === 'test') {
                 observer.emit('test.user.signup.response',{
                     activation_token: eToken._id,

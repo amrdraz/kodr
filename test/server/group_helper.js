@@ -170,7 +170,7 @@ describe('Group Helper', function() {
             should.exist(group);
             group.name.should.equal(name);
             done();
-        });
+        }).catch(done);
     });
 
     it('should find by name', function (done) {
@@ -183,27 +183,27 @@ describe('Group Helper', function() {
                 group.id.should.equal(id);
             });
             done();
-        });
+        }).catch(done);
     });
     it('should add user by id', function (done) {
         group.addMember(student.id).then(function (member) {
             should.exist(member);
             done();
-        });
+        }).catch(done);
     });
     it('should staticly add user by id', function (done) {
         Group.addMember(group.id, student.id).spread(function (group, member) {
             should.exist(group);
             should.exist(member);
             done();
-        });
+        }).catch(done);
     });
 
     it('should add multiple users by id', function (done) {
         group.addMembers([student.id, teacher.id]).then(function (members) {
             should.exist(members);
             done();
-        });
+        }).catch(done);
     });
     it('should staticly add multiple users by id', function (done) {
         Group.addMembers(group.id, [student.id, teacher.id]).spread(function (group, members) {
@@ -211,9 +211,9 @@ describe('Group Helper', function() {
             should.exist(members);
             members.length.should.equal(2);
             done();
-        });
+        }).catch(done);
     });
-     it('should be able to remove memebr', function (done) {
+    it('should be able to remove memeber', function (done) {
         Group.addMembers(group.id, [student.id, teacher.id]).spread(function (group, members) {
             should.exist(members);
             members.length.should.equal(2);
@@ -222,7 +222,48 @@ describe('Group Helper', function() {
             group.members.length.should.equal(1);
             user.memberships.length.should.equal(0);
             done();
+        }).catch(function (err) {
+            console.log(err);
+            done(err);
         });
+    });
+
+    it('should be able to get subscribed users', function (done) {
+        group.addMembers([student.id, teacher.id]).then(function (members) {
+            should.exist(members);
+            members.length.should.equal(2);
+            return group.getSubscribedUsers();
+        }).then(function function_name (users) {
+            should.exist(users);
+            users[0].constructor.modelName.should.equal('User');
+            users.length.should.equal(1);
+            done();
+        }).catch(done);
+    });
+
+    it('should be able to get subscribed users staticly', function (done) {
+        group.addMembers([student.id, teacher.id]).then(function (members) {
+            should.exist(members);
+            members.length.should.equal(2);
+            return Group.getSubscribedUsersFor(group.id);
+        }).then(function function_name (users) {
+            should.exist(users);
+            users[0].constructor.modelName.should.equal('User');
+            users.length.should.equal(1);
+            done();
+        }).catch(done);
+    });
+
+    it('should be able to get subscribed members staticly', function (done) {
+        group.addMembers([student.id, teacher.id]).then(function (members) {
+            should.exist(members);
+            members.length.should.equal(2);
+            return Group.getSubscribersFor(group.id);
+        }).then(function function_name (users) {
+            users[0].constructor.modelName.should.equal('Member');
+            users.length.should.equal(1);
+            done();
+        }).catch(done);
     });
     
     it('should update exp when trial is complete', function(done) {

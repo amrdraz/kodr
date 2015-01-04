@@ -21,4 +21,16 @@
 </ul>
 
 <hr>
-{{render '_groupMembersList' model.users }}
+<ul class="item-group">
+    {{#each userQuest in model.userQuests}}
+     <li class="list-group-item">            
+            <h4 class="list-group-item-heading">
+              {{#link-to 'user' userQuest.user class="user-name"}}
+                {{userQuest.user.username}}
+              {{/link-to}}
+            </h4>
+      </li>
+    {{else}}
+      This Quest is not assigned to anyone
+    {{/each}}
+  </ul>

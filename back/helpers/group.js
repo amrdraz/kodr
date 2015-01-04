@@ -9,27 +9,36 @@ var User = require('../models/user');
 module.exports = exports = function lastModifiedPlugin(schema, options) {
 
     schema.methods.getLeaders = function() {
+        var group = this;
         return Promise.fulfilled().then(function() {
             return Member.find({
-                group: this.id,
+                group: group.id,
                 role: 'leader'
             }).exec();
         });
     };
 
     schema.methods.getSubscribers = function() {
-        return Promise.fulfilled().then(function() {
+            var group = this;
+            return Promise.fulfilled().then(function() {
             return Member.find({
-                group: this.id,
+                group: group.id,
                 role: 'subscriber'
             }).exec();
         });
     };
 
+    schema.methods.getSubscribedUsers = function() {
+        return this.getSubscribers().then(function (members) {
+            return User.find({_id:{$in:_.map(members, 'user')}}).exec();
+        });
+    };
+
     schema.methods.getOwners = function() {
+        var group = this;
         return Promise.fulfilled().then(function() {
             return Member.find({
-                group: this.id,
+                group: group.id,
                 role: 'owner'
             }).exec();
         });
@@ -186,6 +195,16 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
             }).exec();
         });
     };
+
+    schema.statics.getByIds = function(ids) {
+        var Group = this.db.model('Group');
+        return Promise.fulfilled().then(function() {
+            return Group.find({
+                _id: {$in:ids}
+            }).exec();
+        });
+    };
+
     schema.statics.getById_404 = function(id) {
         var Group = this.db.model('Group');
         return Group.getById(id).then(function(g) {
@@ -253,5 +272,34 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         return Group.getById_404(gid).then(function (group) {
             return group.removeMember(uid);
         });
+    };
+
+    schema.statics.getSubscribersFor = function(gid) {
+        var Group = this.db.model('Group');
+        if(_.isArray(gid)) {
+            return Promise.fulfilled().then(function () {
+               return Member.find({
+                    group: {$in:gid},
+                    role: 'subscriber'
+                }).exec(); 
+            });
+        } else {
+            return Group.getById_404(gid).then(function(group) {
+                return group.getSubscribers();
+            });
+        }
+    };
+
+    schema.statics.getSubscribedUsersFor = function(gid) {
+        var Group = this.db.model('Group');
+        if(_.isArray(gid)) {
+            return Group.getSubscribersFor(gid).then(function (membs) {
+                return User.find({_id:{$in:_.map(membs, 'user')}}).exec();
+            });
+        } else {
+            return Group.getById_404(gid).then(function(group) {
+                return group.getSubscribedUsers();
+            });
+        }
     };
 };

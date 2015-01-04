@@ -15,6 +15,14 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
             }).exec();
         });
     };
+    schema.statics.getByIds = function(ids) {
+        var User = this.db.model('User');
+        return Promise.fulfilled().then(function() {
+            return User.find({
+                _id: {$in:ids}
+            }).exec();
+        });
+    };
     schema.statics.getById_404 = function(id) {
         var User = this.db.model('User');
         return User.getById(id).then(function(g) {
@@ -33,17 +41,6 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         }).then(function(m) {
             if (m) return m;
             return User.create(memb);
-        });
-    };
-
-    schema.statics.getGroups = function(user) {
-        var User = this.db.model('User');
-        return Promise.fulfilled().then(function() {
-            return User.find({
-                user: user.id
-            }).populate('group').exec();
-        }).then(function (memeberships) {
-            return _.map(memeberships, 'group');
         });
     };
 

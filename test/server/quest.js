@@ -12,7 +12,6 @@ var Arena = require('../../back/models/arena');
 var User = require('../../back/models/user');
 var observer = require('../../back/observer');
 
-
 /**
  * Test for Quest
  *

@@ -71,76 +71,76 @@ UserQuestSchema.methods.toJSON = function() {
 
 // this function is too big and must die
 // it checks if all requirments are set and updates the userQuest of the current progress
-UserQuestSchema.methods.check = function(userId) {
-    var quest = this;
-    return Promise.reduce(quest.requirements, function(met, req) {
-        if (req.met >= req.times) return met && true;
-        return Promise.fulfilled().then(function() {
-            if (req.model1 === 'Challenge') {
-                if (req.id1) { //specific challenge
-                    return Trial.findOne({
-                        challenge: req.id1,
-                        user: userId,
-                        complete: true
-                    }).exec().then(function(tr) {
-                        if (!tr) return false;
-                        req.met = 1;
-                        return met && req.met;
-                    });
-                } else { //any challenge
-                    if (req.id2) { // specific arena
-                        return ArenaTrial.findOne({
-                            arena: req.id2,
-                            user: userId
-                        }, '_id').exec().then(function(at) {
-                            if (!at) return false;
-                            return Trial.find({
-                                arenaTrial: at,
-                                user: userId,
-                                complete: true
-                            }).exec().then(function(tr) {
-                                req.met = tr.length;
-                                if (req.met < req.times) return false;
-                                return met && true;
-                            });
-                        });
-                    } else { // any arena
-                        return Trial.find({
-                            user: userId,
-                            complete: true
-                        }).exec().then(function(tr) {
-                            req.met = tr.length;
-                            if (req.met < req.times) return false;
-                            return met && true;
-                        });
-                    }
-                }
-            } else {
-                if (req.id1) { //specific Arena
-                    return ArenaTrial.findOne({
-                        arena: req.id1,
-                        user: userId,
-                        complete: true
-                    }).exec().then(function(tr) {
-                        if (!tr) return false;
-                        return met && true;
-                    });
-                } else { //any arena
-                    return ArenaTrial.find({
-                        user: userId,
-                        complete: true
-                    }).exec().then(function(tr) {
-                        req.met = tr.length;
-                        if (req.met < req.times) return false;
-                        return met && true;
-                    });
-                }
-            }
-        });
-    }, true).then(function(value) {
+// UserQuestSchema.methods.check = function(userId) {
+//     var quest = this;
+//     return Promise.reduce(quest.requirements, function(met, req) {
+//         if (req.met >= req.times) return met && true;
+//         return Promise.fulfilled().then(function() {
+//             if (req.model1 === 'Challenge') {
+//                 if (req.id1) { //specific challenge
+//                     return Trial.findOne({
+//                         challenge: req.id1,
+//                         user: userId,
+//                         complete: true
+//                     }).exec().then(function(tr) {
+//                         if (!tr) return false;
+//                         req.met = 1;
+//                         return met && req.met;
+//                     });
+//                 } else { //any challenge
+//                     if (req.id2) { // specific arena
+//                         return ArenaTrial.findOne({
+//                             arena: req.id2,
+//                             user: userId
+//                         }, '_id').exec().then(function(at) {
+//                             if (!at) return false;
+//                             return Trial.find({
+//                                 arenaTrial: at,
+//                                 user: userId,
+//                                 complete: true
+//                             }).exec().then(function(tr) {
+//                                 req.met = tr.length;
+//                                 if (req.met < req.times) return false;
+//                                 return met && true;
+//                             });
+//                         });
+//                     } else { // any arena
+//                         return Trial.find({
+//                             user: userId,
+//                             complete: true
+//                         }).exec().then(function(tr) {
+//                             req.met = tr.length;
+//                             if (req.met < req.times) return false;
+//                             return met && true;
+//                         });
+//                     }
+//                 }
+//             } else {
+//                 if (req.id1) { //specific Arena
+//                     return ArenaTrial.findOne({
+//                         arena: req.id1,
+//                         user: userId,
+//                         complete: true
+//                     }).exec().then(function(tr) {
+//                         if (!tr) return false;
+//                         return met && true;
+//                     });
+//                 } else { //any arena
+//                     return ArenaTrial.find({
+//                         user: userId,
+//                         complete: true
+//                     }).exec().then(function(tr) {
+//                         req.met = tr.length;
+//                         if (req.met < req.times) return false;
+//                         return met && true;
+//                     });
+//                 }
+//             }
+//         });
+//     }, true).then(function(value) {
 
-    });
-};
+//     });
+// };
 
 /**
  * Parses an array of requirement definitions making sure to reduce redundency
@@ -213,15 +213,4 @@ UserQuestSchema.methods.setRequirements = function(requirements) {
 
 var UserQuest = module.exports = mongoose.model('UserQuest', UserQuestSchema);
 
-observer.on('requirement.complete',function (req) {
-    UserQuest.findOne({_id:{$in:req.userQuests},complete:false}).populate('requirements').exec().then(function (uq) {
-        if(_.every(uq.requirements,'complete')) {
-            uq.complete = true;
-            uq.completeTime = Date.now();
-            uq.save(function (err, model) {
-                if(err) throw err;
-                observer.emit('quest.complete',model);
-            });
-        }
-    });
-});
+require('../events/userQuest').model(UserQuest);
