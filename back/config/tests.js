@@ -15,6 +15,9 @@ module.exports = {
         maxConnections: 5,
         maxMessages: 10
     },
+    admin: {
+        email: 'amr.m.draz@gmail.com'
+    },
     ssl: {
         key: fs.readFileSync(__dirname+'/local.pem'),
         cert: fs.readFileSync(__dirname+'/local-cert.pem')

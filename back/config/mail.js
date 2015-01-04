@@ -25,7 +25,7 @@ var stubTransport = nodemailer.createTransport(stubTransport());
 exports.host = config.host;
 
 exports.options = {
-    email:'od@kodr.in'
+    email:config.admin.email
 };
 
 var openSMTPPool = exports.openSMTPPool = function () {
