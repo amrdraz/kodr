@@ -47,8 +47,8 @@ mongoose.connection.on('error',function() {
 connectDB();
 
 var runner = require('java-code-runner');
-runner.recompile(function (err, stout, sterr) {
-    runner.runServer(function(p) {
+runner.server.recompile(function () {
+    runner.server.startServer(function(p) {
         console.log('started java server at http://localhost:' + p);
     });
 });
