@@ -48,7 +48,7 @@ connectDB();
 
 var runner = require('java-code-runner');
 runner.server.recompile(function () {
-    runner.server.startServer(function(p) {
+    runner.watchServer(function(p) {
         console.log('started java server at http://localhost:' + p);
     });
 });
