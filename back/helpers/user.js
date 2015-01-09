@@ -19,7 +19,9 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         var User = this.db.model('User');
         return Promise.fulfilled().then(function() {
             return User.find({
-                _id: {$in:ids}
+                _id: {
+                    $in: ids
+                }
             }).exec();
         });
     };

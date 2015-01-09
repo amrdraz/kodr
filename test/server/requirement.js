@@ -94,7 +94,7 @@ describe('UserQuest', function() {
                 challenges = chs;
                 quest = g;
                 return [
-                    quest.assign(student.id), User.findOne({
+                    quest.findOrAssign(student.id), User.findOne({
                         _id: teacher.id
                     }).exec(), User.findOne({
                         _id: student.id

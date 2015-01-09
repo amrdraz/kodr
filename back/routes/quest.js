@@ -155,26 +155,19 @@ module.exports = function(app, passport) {
             if (subscribers.length>0) {
                 users = _.union(users,_.flatten(subscribers,'user'));
             }
-            return Promise.map(users, function(userId) {
-                return model.assign(userId);
-            });
+            return model.findOrAssignMany(users);
         }).then(function(uqs) {
-            observer.emit('user.assign', req.user, quest,req.body);
-            observer.emit('mail.quest.assign', users);
-            var usrs = User.find({
-                _id: {
-                    $in: users
-                }
-            }).exec();
+            observer.emit('user.assign', req.user, quest, req.body);
+            var usrs = User.getByIds(users);
             uqs = _.map(uqs,function (uq) {
-                uq.id = uq._id;
+                uq.id = uq._id.toString();
                 return uq;
             });
             return [uqs, usrs];
         }).spread(function(userquests, users) {
-            if(process.env.NODE_ENV==="test") {
+            observer.emit('mail.quest.assign', users);
+            if(process.env.NODE_ENV!=="production") {
                 observer.once('test.mail.quest.assignment', function (infos) {
-                    console.log(infos);
                     res.json({
                         infos: infos,
                         userQuests: userquests,
