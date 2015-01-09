@@ -48,7 +48,11 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/arenas', function(req, res, next) {
-        Arena.find({}, function(err, model) {
+        if(req.query.ids) {
+            req.query._id = {$in:req.query.ids};
+            delete req.query.ids;
+        }
+        Arena.find(req.query, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             res.json({

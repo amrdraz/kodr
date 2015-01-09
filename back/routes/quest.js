@@ -80,6 +80,10 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/quests', access.requireRole(['teacher','admin']), function(req, res, next) {
+        if(req.query.ids) {
+            req.query._id = {$in:req.query.ids};
+            delete req.query.ids;
+        }
         Quest.find(req.query).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({

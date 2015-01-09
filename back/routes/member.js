@@ -30,6 +30,10 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/members', access.requireRole(['student', 'teacher', 'admin']), function(req, res, next) {
+        if(req.query.ids) {
+            req.query._id = {$in:req.query.ids};
+            delete req.query.ids;
+        }
         Member.find(req.query).exec().then(function(model) {
             if (!model) return res.send(404, {
                 message: "Not Found"

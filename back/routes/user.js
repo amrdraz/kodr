@@ -70,6 +70,10 @@ module.exports = function(app, passport) {
 
     app.get('/api/users', access.requireRole(['student', 'teacher', 'admin']), function(req, res, next) {
         var query = req.query;
+        if(query.ids) {
+            req.query._id = {$in:req.query.ids};
+            delete req.query.ids;
+        }
         if (query.group === "null") {
             query.group = null;
         }
@@ -83,7 +87,7 @@ module.exports = function(app, passport) {
                 };
                 break;
         }
-        User.find().exec().then(function(model) {
+        User.find(query).exec().then(function(model) {
             if (!model) return res.send(404, "Not Found");
             res.json({
                 user: model
