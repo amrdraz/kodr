@@ -16,7 +16,7 @@ var teacher, student, student2, student3, arena, challenge;
 module.exports = function() {
     var pass = passGen.generate();
     Promise.fulfilled().then(function() {
-        return User.findOne({email:'od@kodr.in'}).exec();
+        return User.findOne({email:mail.options.email}).exec();
     }).then(function(admin) {
         if(!admin) {
             return User.create({
