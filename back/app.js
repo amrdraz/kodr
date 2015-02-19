@@ -60,6 +60,9 @@ app.engine('html', swig.renderFile);
 app.set('view engine', 'html');
 app.set('views', __dirname + '/views');
 
+// for nginx proxy forward
+app.set('trust proxy', true);
+
 if (process.env.NODE_ENV === 'development') {
 
     // Swig will cache templates for you, but you can disable
