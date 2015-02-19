@@ -65,7 +65,14 @@ ExpiringTokenSchema.statics.useToken = function(id) {
 
 ExpiringTokenSchema.statics.toVerify = function(user) {
     return Promise.fulfilled().then(function() {
-        return ExpiringToken.create({user: user._id, 'for': 'verification'});
+        return ExpiringToken.create({user: user._id, 'for': VERIFICATION});
+    });
+};
+
+
+ExpiringTokenSchema.statics.toForgotPassword = function(user) {
+    return Promise.fulfilled().then(function() {
+        return ExpiringToken.create({user: user._id, 'for': FORGOTPASS});
     });
 };
 

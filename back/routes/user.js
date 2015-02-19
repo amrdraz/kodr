@@ -70,8 +70,10 @@ module.exports = function(app, passport) {
 
     app.get('/api/users', access.requireRole(['student', 'teacher', 'admin']), function(req, res, next) {
         var query = req.query;
-        if(query.ids) {
-            req.query._id = {$in:req.query.ids};
+        if (query.ids) {
+            req.query._id = {
+                $in: req.query.ids
+            };
             delete req.query.ids;
         }
         if (query.group === "null") {
@@ -121,35 +123,51 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/users/:id/verify', function(req, res, next) {
+        var user;
+        var token;
         Promise.fulfilled().then(function() {
             return User.findOne({
                 _id: req.params.id
             }).exec();
-        }).then(function(user) {
-            if(!user) { throw {http_code:404, message:'Not Found'}; }
-            if(user.activated) { throw {http_code:401, message:'User already activated'}; }
-            return ExpiringToken.toVerify(user).then(function(eToken) {
-                var confirmURL = req.headers.host + '/verify/' + eToken._id;
-                // template in views/mail
-                return mail.renderAndSend('welcome.html', {
-                    confirmURL: confirmURL,
-                    password: user.tempPassword || undefined
-                }, {
-                    to: user.email,
-                    subject: 'You\'ve just joined an awesome experience',
-                    stub: process.env.NODE_ENV === 'test',
-                }, function(err, info) {
-                    if (err) throw err;
-                    if (process.env.NODE_ENV === 'test') {
-                        return res.send({
-                            token: eToken._id,
-                            info: info
-                        });
-                    } else {
-                        res.send({message:'Verification Email Sent'});
-                    }
-                });
+        }).then(function(usr) {
+            if (!usr) {
+                throw {
+                    http_code: 404,
+                    message: 'Not Found'
+                };
+            }
+            if (usr.activated) {
+                throw {
+                    http_code: 401,
+                    message: 'User already activated'
+                };
+            }
+            user = usr;
+            return ExpiringToken.toVerify(usr);
+        }).then(function(eToken) {
+            token = eToken;
+            var confirmURL = req.headers.host + '/verify/' + eToken._id;
+            // template in views/mail
+            return mail.renderAndSend('welcome.html', {
+                confirmURL: confirmURL,
+                password: user.tempPassword || undefined
+            }, {
+                to: user.email,
+                subject: 'You\'ve just joined an awesome experience',
+                stub: process.env.NODE_ENV === 'test',
             });
+        }).then(function(err, info) {
+            if (err) throw err;
+            if (process.env.NODE_ENV === 'test') {
+                return res.send({
+                    token: token._id,
+                    info: info
+                });
+            } else {
+                res.send({
+                    message: 'Verification Email Sent'
+                });
+            }
         }).catch(function(err) {
             if (err.http_code) {
                 res.status(err.http_code).send(err.message);
@@ -167,41 +185,42 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/users/forgotpass', function(req, res, next) {
-
+        var user;
+        var token;
         Promise.fulfilled().then(function() {
             return User.findByIdentity(req.body.identification);
-        }).then(function(user) {
-            if (!user) {
+        }).then(function(usr) {
+            if (!usr) {
                 throw {
                     http_code: 403,
                     message: "Identity does not exist"
                 };
             }
-            ExpiringToken.create({
-                user: user._id,
-                'for': ExpiringToken.FORGOTPASS,
-            }, function(err, eToken) {
-                if (err) throw err;
-                var confirmURL = req.headers.host + '/forgotpass/' + eToken._id;
-                // template in views/mail
-                return mail.renderAndSend('forgotpass.html', {
-                    confirmURL: confirmURL
-                }, {
-                    to: user.email,
-                    subject: 'Forgot Password Request',
-                    stub: process.env.NODE_ENV === 'test',
-                }, function(err, info) {
-                    if (err) throw err;
-                    if (process.env.NODE_ENV === 'test') {
-                        return res.send({
-                            token: eToken._id,
-                            info: info
-                        });
-                    } else {
-                        res.send("Email was sent to reset your password");
-                    }
-                });
+            user = usr;
+            return ExpiringToken.toForgotPassword(usr);
+
+        }).then(function(eToken) {
+            token = eToken;
+            var confirmURL = req.headers.host + '/forgotpass/' + eToken._id;
+            // template in views/mail
+            return mail.renderAndSend('forgotpass.html', {
+                confirmURL: confirmURL
+            }, {
+                to: user.email,
+                subject: 'Forgot Password Request',
+                stub: process.env.NODE_ENV === 'test',
             });
+        }).then(function(info) {
+            if (process.env.NODE_ENV === 'test') {
+                return res.send({
+                    token: token._id,
+                    info: info
+                });
+            } else {
+                res.send({
+                    message: "Email was sent to reset your password"
+                });
+            }
         }).catch(function(err) {
             console.log(err.stack);
             if (err.http_code) {

@@ -25,18 +25,18 @@ var stubTransport = nodemailer.createTransport(stubTransport());
 exports.host = config.host;
 
 exports.options = {
-    email:config.admin.email
+    email: config.admin.email
 };
 
-var openSMTPPool = exports.openSMTPPool = function () {
+var openSMTPPool = exports.openSMTPPool = function() {
     if (!smtpPoolOpend) {
         smtpPoolOpend++;
         smtpPool = nodemailer.createTransport(smtpPoolTransport(config.mail));
     }
 };
 
-var closeSMTPPool = exports.closeSMTPPool = function () {
-    if (smtpPoolOpend>0) {
+var closeSMTPPool = exports.closeSMTPPool = function() {
+    if (smtpPoolOpend > 0) {
         smtpPoolOpend--; //this way it stays open even when closed if some other batch is called
         smtpPool.close();
     }
@@ -44,7 +44,7 @@ var closeSMTPPool = exports.closeSMTPPool = function () {
 
 
 /**
- * sends an email taking 
+ * sends an email taking
  * @param  {Object}   mailOptions options for email
  *                                -subject email subject
  *                                -html content of mail in html
@@ -59,20 +59,23 @@ var send = exports.send = function(mailOptions, cb) {
     };
 
     mailOptions.from = mailOptions.from || from;
-
-    return new Promise(function (res, rej) {
+    return new Promise(function(res, rej) {
         if (mailOptions.stub) {
-            stubTransport.sendMail(mailOptions, function (err, info) {
+            stubTransport.sendMail(mailOptions, function(err, info) {
                 if (cb) return cb(err, info);
                 if (err) return rej(err);
                 res(info);
             });
         } else {
-            (smtpPoolOpend?smtpPool:smtpTransporter).sendMail(mailOptions, function (err, info) {
+            (smtpPoolOpend ? smtpPool : smtpTransporter).sendMail(mailOptions, function(err, info) {
+                console.log("error", err);
                 if (cb) return cb(err, info);
-                if (err) return rej(err);
+                if (err) {
+                    return rej(err);
+                }
                 res(info);
             });
+
         }
     });
 };
@@ -85,8 +88,8 @@ var send = exports.send = function(mailOptions, cb) {
  * @param  {Object}   mailOptions options for mail
  * @param  {Function} cb          callback after mail is sent
  */
-var renderAndSend = exports.renderAndSend =  function(template, context, mailOptions, cb) {
-    return new Promise(function (res, rej) {
+var renderAndSend = exports.renderAndSend = function(template, context, mailOptions, cb) {
+    return new Promise(function(res, rej) {
         emailTemplates(options, function(err, render) {
             if (err) return cb(err);
             render(template, context, function(err, html, text) {
@@ -97,13 +100,13 @@ var renderAndSend = exports.renderAndSend =  function(template, context, mailOpt
                 mailOptions.text = text;
                 mailOptions.from = mailOptions.from || from;
 
-                res(send(mailOptions, cb));
+                return res(send(mailOptions, cb));
             });
         });
     });
 };
 /**
- * sends an email taking 
+ * sends an email taking
  * @param  {Object}   mailOptions options for email
  *                                -subject email subject
  *                                -html content of mail in html
@@ -120,26 +123,32 @@ var batchSend = exports.batchSend = function(tos, mailOptions, cb) {
     mailOptions.from = mailOptions.from || from;
 
     if (mailOptions.stub) {
-        Promise.map(tos, function (to) {
-            return new Promise(function (res, rej) {
+        Promise.map(tos, function(to) {
+            return new Promise(function(res, rej) {
                 mailOptions.to = to;
-                stubTransport.sendMail(mailOptions, function (err, info) {
-                    res({err:err, info:info});
+                stubTransport.sendMail(mailOptions, function(err, info) {
+                    res({
+                        err: err,
+                        info: info
+                    });
                 });
             });
-        }).then(function (infos) {
+        }).then(function(infos) {
             cb(infos);
         });
     } else {
         openSMTPPool();
-        Promise.map(tos, function (to) {
-            return new Promise(function (res, rej) {
+        Promise.map(tos, function(to) {
+            return new Promise(function(res, rej) {
                 mailOptions.to = to;
-                smtpPool.sendMail(mailOptions, function (err, info) {
-                    res({err:err, info:info});
+                smtpPool.sendMail(mailOptions, function(err, info) {
+                    res({
+                        err: err,
+                        info: info
+                    });
                 });
             });
-        }).then(function (infos) {
+        }).then(function(infos) {
             closeSMTPPool();
             cb(arguments);
         });
@@ -174,4 +183,3 @@ exports.batchRenderAndSend = function(template, context, tos, mailOptions, cb) {
         });
     });
 };
-
