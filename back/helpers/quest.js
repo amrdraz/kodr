@@ -7,9 +7,18 @@ var observer = require('../observer');
 module.exports = exports = function lastModifiedPlugin(schema, options) {
 
 
-    schema.methods.assign = function(userId) {
+    schema.methods.findOrAssign = function(userId) {
         var Quest = this.db.model('Quest');
-        return Quest.assign(userId, this);
+        return Quest.findOrAssign(this, userId);
+    };
+    schema.methods.findOrAssignMany = function(userIds) {
+        var Quest = this.db.model('Quest');
+        var quest = this;
+        return Promise.map(userIds, function (uid) {
+            return Quest.findOrAssign(quest, uid);
+        }).then(function (uqs) {
+            return uqs;
+        });
     };
 
     /**
@@ -18,20 +27,26 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
      * @param  {Quest} quest [description]
      * @return {UserQuest}       [description]
      */
-    schema.statics.assign = function(userId, quest) {
+    schema.statics.findOrAssign = function(quest, userId) {
         if(!quest.isPublished) return Promise.reject('You can not assign an Un-Published quest');
         var UserQuest = this.db.model('UserQuest');
         return Promise.fulfilled().then(function() {
+            return UserQuest.findOne({
+                quest: quest.id,
+                user: userId
+            }).exec();
+        }).then(function (uq) {
+            if(uq) return uq;
             return UserQuest.create({
                 name:quest.name,
                 description:quest.description,
                 rp:quest.rp,
                 quest: quest.id,
                 user: userId
-            }).then(function (uq) {
-                observer.emit('quest.join', uq);
-                return uq.setRequirements(quest.requirements);
             });
+        }).then(function (uq) {
+            observer.emit('quest.join', uq);
+            return uq.setRequirements(quest.requirements);
         });
     };
 

@@ -50,6 +50,21 @@ describe('User', function() {
             }, done);
         });
 
+
+        // it('Should get user by id', function(done) {
+        //     User.getById(user.model.id).then(function (user) {
+        //         should.exist(user);
+        //         done();
+        //     });
+        // });
+
+        // it('Should get users by ids', function(done) {
+        //     User.getByIds([user.model.id]).then(function (users) {
+        //         should.exist(users);
+        //         done();
+        //     });
+        // });
+
         it("should not change after User is saved", function(done) {
             var newname = 'drazy';
             user.model.set({
@@ -300,7 +315,7 @@ describe('User', function() {
                     });
             });
 
-            it("when adding a user id should not matter during sign up", function(done) {
+            it("when adding a user, uniId should not matter during sign up", function(done) {
                 request(url)
                     .post("/signup")
                     .send({
@@ -635,7 +650,7 @@ describe('User', function() {
                     .set('Authorization', 'Bearer ' + teacher.token)
                     .then(function(res) {
                         res.status.should.equal(200);
-                        res.body.user.length.should.equal(4);
+                        res.body.user.length.should.equal(3);
                         done();
                     });
             });

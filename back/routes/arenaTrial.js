@@ -41,7 +41,11 @@ module.exports = function(app, passport) {
                     });
                 }).catch(next);
         } else {
-            ArenaTrial.find(req.params, function(err, model) {
+            if(req.query.ids) {
+                req.query._id = {$in:req.query.ids};
+                delete req.query.ids;
+            }
+            ArenaTrial.find(req.query, function(err, model) {
                 if (err) return next(err);
                 if (!model) return res.send(404, "Not Found");
                 res.json({

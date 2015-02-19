@@ -130,7 +130,8 @@ App.ApplicationSerializer = DS.RESTSerializer.extend({
 
 // App.ApplicationAdapter = DS.FixtureAdapter;
 App.ApplicationAdapter = DS.RESTAdapter.extend({
-    namespace: 'api'
+    namespace: 'api',
+    coalesceFindRequests: true
 });
 
 App.GroupSerializer = DS.RESTSerializer.extend(DS.EmbeddedRecordsMixin, {

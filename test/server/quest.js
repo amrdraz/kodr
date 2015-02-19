@@ -2,13 +2,14 @@
 var Promise = require('bluebird');
 var should = require('chai').should();
 var expect = require('chai').expect;
-var request = require('supertest');
+var request = require('supertest-as-promised');
 var setup = require('./setup');
 var Quest = require('../../back/models/quest');
 var UserQuest = require('../../back/models/userQuest');
 var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
 var Arena = require('../../back/models/arena');
+var Group = require('../../back/models/group');
 var User = require('../../back/models/user');
 var observer = require('../../back/observer');
 
@@ -35,7 +36,7 @@ describe('Quest', function() {
     describe('Unit', function() {
         var student,
             student2,
-            teacher,
+            teacher, group,
             quest, challenge, challenge2;
         beforeEach(function(done) {
             student = {
@@ -67,8 +68,9 @@ describe('Quest', function() {
                     Challenge.create({
                         exp: 20
                     }),
+                    Group.create({}),
                 ];
-            }).spread(function(t, st, st2, ch) {
+            }).spread(function(t, st, st2, ch,g) {
                 student = st;
                 student2 = st2;
                 challenge = ch;
@@ -83,6 +85,7 @@ describe('Quest', function() {
                     isPublished: true,
                     author: teacher.id
                 });
+                g.addMembers([st.id, st2.id]);
                 return [at];
             }).spread(function(g) {
                 quest = g;
@@ -102,7 +105,7 @@ describe('Quest', function() {
 
         it('should assign user to quest', function(done) {
             student.userQuests.length.should.equal(0);
-            quest.assign(student.id).then(function(userquest) {
+            quest.findOrAssign(student.id).then(function(userquest) {
                 userquest.user.should.eql(student._id);
                 return [Quest.findOne({
                     _id: quest.id
@@ -114,12 +117,42 @@ describe('Quest', function() {
                 quest.userQuests.length.should.equal(1);
             }).finally(done);
         });
+
+        it('should not assign user to quest twice', function(done) {
+            student.userQuests.length.should.equal(0);
+            quest.findOrAssign(student.id).then(function () {
+                return quest.findOrAssign(student.id);
+            }).then(function(userquest) {
+                userquest.user.should.eql(student._id);
+                return [Quest.findOne({
+                    _id: quest.id
+                }).exec(), User.findOne({
+                    _id: student.id
+                }).exec()];
+            }).spread(function(quest, user) {
+                user.userQuests.length.should.equal(1);
+                quest.userQuests.length.should.equal(1);
+            }).finally(done);
+        });
+
+        it('should assign many user to quest', function(done) {
+            student.userQuests.length.should.equal(0);
+            quest.findOrAssignMany([student.id, student2.id]).then(function(userquests) {
+                should.exist(userquests);
+                userquests[0].user.should.eql(student._id);
+                return [Quest.getById(quest.id), User.getById(student.id), User.getById(student2.id)];
+            }).spread(function(quest, st,st2) {
+                st.userQuests.length.should.equal(1);
+                st2.userQuests.length.should.equal(1);
+                quest.userQuests.length.should.equal(2);
+            }).finally(done);
+        });
         
         it('should complete quest', function(done) {
             observer.once('quest.complete', function(req) {
                 done();
             });
-            quest.assign(student.id).then(function(userquest) {
+            quest.findOrAssign(student.id).then(function(userquest) {
                 Trial.create({user:student._id,challenge:challenge._id,complete:true}); 
             });
         });
@@ -135,7 +168,7 @@ describe('Quest', function() {
             password: "drazdraz12",
             passwordConfirmation: "drazdraz12"
         };
-        var student = {
+        var group,student = {
                 username: 'student',
                 email: 'student@place.com',
                 password: 'student123',
@@ -174,9 +207,10 @@ describe('Quest', function() {
                 return [
                     User.create(teacher),
                     User.create(student),
-                    User.create(student2)
+                    User.create(student2),
+                    Group.create({}),
                 ];
-            }).spread(function(t, st, st2) {
+            }).spread(function(t, st, st2, g) {
                 // console.log(st,t,a);
                 st.password = student.password;
                 student = st;
@@ -184,7 +218,11 @@ describe('Quest', function() {
                 student2 = st2;
                 t.password = teacher.password;
                 teacher = t;
-            }).finally(done);
+                group = g;
+                return g.addMembers([t.id,st.id, st2.id]);
+            }).then(function () {
+                done();
+            }).catch(done);
         });
 
         after(setup.clearDB);
@@ -356,6 +394,23 @@ describe('Quest', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.userQuests.length.should.equal(1);
+                        done();
+                    });
+            });
+            it("should assign student to a quest by group", function(done) {
+              
+                var update = {
+                    users: [],
+                    groups: [group.id]
+                };
+                request(api)
+                    .put("/quests/" + quest.id + "/assign")
+                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .send(update)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.userQuests.length.should.equal(2);
                         done();
                     });
             });

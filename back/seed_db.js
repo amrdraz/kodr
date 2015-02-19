@@ -84,7 +84,7 @@ module.exports = function(req, res, next) {
                 isPublished:false,
                 solution: 'int x = 3;',
                 setup: '',
-                tests: '//test defined\n$test.matches($test.getCode(),"int\\s*x[\\s\\S]*;", "Defined x", "You need to define x", 5);\n//tests asigned to 3\n$test.matches($test.getCode(),"x\\s*=\\s*3\\s*;", "Set x", "You should set x to 3", 5);'
+                tests: '//test defined\n$test.matches($test.getCode(),"int\\\\s*x[\\\\s\\\\S]*;", "Defined x", "You need to define x", 5);\n//tests asigned to 3\n$test.matches($test.getCode(),"x\\\\s*=\\\\s*3\\\\s*;", "Set x", "You should set x to 3", 5);'
             }),
             Challenge.create({
                 arena: a.id,

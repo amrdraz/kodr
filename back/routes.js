@@ -39,17 +39,30 @@ module.exports = function(app, passport) {
      */
 
     app.post('/token', function(req, res, next) {
-        passport.authenticate('local-login', function(err, user) {
-            if (err) return next(err);
-            if (user) {
-                if (!user.activated) return res.send(400, {message:'This account is not Verified', id:user.id, email:user.email});
-                observer.emit('user.login', user);
-                res.send({
-                    access_token: user.token,
-                    user_id: user._id
-                });
-            } else res.send(403, {message:'Incorrect username or password.'});
-        })(req, res, next);
+        if(process.env.NODE_ENV==="development") {
+            User.findByIdentity(req.body.username).then(function  (user) {
+                if (user) {
+                    if (!user.activated) return res.send(400, {message:'This account is not Verified', id:user.id, email:user.email});
+                    observer.emit('user.login', user);
+                    res.send({
+                        access_token: user.token,
+                        user_id: user._id
+                    });
+                } else res.send(403, {message:'Incorrect username or password.'});
+            });
+        } else {
+            passport.authenticate('local-login', function(err, user) {
+                if (err) return next(err);
+                if (user) {
+                    if (!user.activated) return res.send(400, {message:'This account is not Verified', id:user.id, email:user.email});
+                    observer.emit('user.login', user);
+                    res.send({
+                        access_token: user.token,
+                        user_id: user._id
+                    });
+                } else res.send(403, {message:'Incorrect username or password.'});
+            })(req, res, next);
+        }
     });
 
     // logout

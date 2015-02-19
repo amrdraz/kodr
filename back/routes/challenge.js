@@ -32,7 +32,11 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/challenges', function(req, res, next) {
-        Challenge.find({}, function(err, model) {
+        if(req.query.ids) {
+            req.query._id = {$in:req.query.ids};
+            delete req.query.ids;
+        }
+        Challenge.find(req.query, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
 
