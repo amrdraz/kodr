@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var log = require('util').log;
 var observer = require('./observer');
 var User = require('./models/user');
 var ExpiringToken = require('./models/expiringToken');
@@ -39,28 +40,40 @@ module.exports = function(app, passport) {
      */
 
     app.post('/token', function(req, res, next) {
-        if(process.env.NODE_ENV==="development") {
-            User.findByIdentity(req.body.username).then(function  (user) {
+        if (process.env.NODE_ENV === "development") {
+            User.findByIdentity(req.body.username).then(function(user) {
                 if (user) {
-                    if (!user.activated) return res.send(400, {message:'This account is not Verified', id:user.id, email:user.email});
+                    if (!user.activated) return res.send(400, {
+                        message: 'This account is not Verified',
+                        id: user.id,
+                        email: user.email
+                    });
                     observer.emit('user.login', user);
                     res.send({
                         access_token: user.token,
                         user_id: user._id
                     });
-                } else res.send(403, {message:'Incorrect username or password.'});
+                } else res.send(403, {
+                    message: 'Incorrect username or password.'
+                });
             });
         } else {
             passport.authenticate('local-login', function(err, user) {
                 if (err) return next(err);
                 if (user) {
-                    if (!user.activated) return res.send(400, {message:'This account is not Verified', id:user.id, email:user.email});
+                    if (!user.activated) return res.send(400, {
+                        message: 'This account is not Verified',
+                        id: user.id,
+                        email: user.email
+                    });
                     observer.emit('user.login', user);
                     res.send({
                         access_token: user.token,
                         user_id: user._id
                     });
-                } else res.send(403, {message:'Incorrect username or password.'});
+                } else res.send(403, {
+                    message: 'Incorrect username or password.'
+                });
             })(req, res, next);
         }
     });
@@ -155,7 +168,7 @@ module.exports = function(app, passport) {
             .then(validateRequestBody(req))
             .then(findUser(req))
             .then(createIfNewUser(req))
-            .then(emitAndRespond(req,res))
+            .then(emitAndRespond(req, res))
             .catch(function(err) {
                 console.log(err.stack);
                 if (err.http_code) {
@@ -251,20 +264,42 @@ module.exports = function(app, passport) {
             return 'student';
         }
 
-        function emitAndRespond(req,res) {
-            if(process.env.NODE_ENV === 'test') {
-                return function (user) {
+        function emitAndRespond(req, res) {
+            if (process.env.NODE_ENV === 'test') {
+                return function(user) {
                     observer.emit('user.signup', user);
-                    observer.once('test.user.signup.response', function (body) {
+                    observer.once('test.user.signup.response', function(body) {
                         res.send(body);
                     });
                 };
             } else {
                 return function(user) {
                     observer.emit('user.signup', user);
-                    res.send(200, "Check your email for verification");                   
-                };    
+                    res.send(200, "Check your email for verification");
+                };
             }
         }
+    });
+
+    app.get('/pull/master', function(req,res) {
+        var exec = require('child_process').exec;
+        exec('./pull.sh', {
+            cwd: __dirname + '/..',
+            env: process.env
+        }, function (err, stout,sterr) {
+            if(err) {
+                log("failed to complete pull request");
+                log(err);
+                log(stout);
+                log(sterr);
+                return res.send(500);
+            }
+            if (sterr) {
+                log(sterr);
+                return res.send(500);
+            }
+            log("pull complete");
+            return res.send(200);
+        });
     });
 };
