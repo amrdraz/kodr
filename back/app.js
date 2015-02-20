@@ -130,7 +130,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 http.listen(config.port, function() {
-    console.log('Express server running https port ' + config.port);
+    console.log('Express server running http port ' + config.port);
 });
 
 // var httpApp = express();
