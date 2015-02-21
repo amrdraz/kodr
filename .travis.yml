@@ -7,6 +7,7 @@ install:
     - sudo apt-get install -y ant
     - npm -g install bower
     - npm -g install grunt-cli 
+    - npm -g install pm2 
     - npm install
 script:
     - npm test
@@ -16,5 +17,5 @@ services:
 before_script:
   - sleep 15
   - mongo mydb_test --eval 'db.addUser("travis", "test");'
-  - node test-server.js
+  - pm2 start test-server.js
   - sleep 5
