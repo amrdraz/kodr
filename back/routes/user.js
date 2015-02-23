@@ -150,14 +150,13 @@ module.exports = function(app, passport) {
             // template in views/mail
             return mail.renderAndSend('welcome.html', {
                 confirmURL: confirmURL,
-                password: user.tempPassword || undefined
+                password: user.tempPassword || undefined,
             }, {
                 to: user.email,
                 subject: 'You\'ve just joined an awesome experience',
                 stub: process.env.NODE_ENV === 'test',
             });
-        }).then(function(err, info) {
-            if (err) throw err;
+        }).then(function(info) {
             if (process.env.NODE_ENV === 'test') {
                 return res.send({
                     token: token._id,
@@ -170,7 +169,7 @@ module.exports = function(app, passport) {
             }
         }).catch(function(err) {
             if (err.http_code) {
-                res.status(err.http_code).send(err.message);
+                res.status(err.http_code).send(err);
             }
             next(err);
         });

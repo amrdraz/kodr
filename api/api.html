@@ -1,0 +1,627 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Kodr</title><link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"><link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"><link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,700|Inconsolata|Raleway:200"><style>/* Highlight.js Theme Tomorrow */
+.hljs-comment,.hljs-title{color:#8e908c}.hljs-variable,.hljs-attribute,.hljs-tag,.hljs-regexp,.ruby .hljs-constant,.xml .hljs-tag .hljs-title,.xml .hljs-pi,.xml .hljs-doctype,.html .hljs-doctype,.css .hljs-id,.css .hljs-class,.css .hljs-pseudo{color:#c82829}.hljs-number,.hljs-preprocessor,.hljs-pragma,.hljs-built_in,.hljs-literal,.hljs-params,.hljs-constant{color:#f5871f}.ruby .hljs-class .hljs-title,.css .hljs-rules .hljs-attribute{color:#eab700}.hljs-string,.hljs-value,.hljs-inheritance,.hljs-header,.ruby .hljs-symbol,.xml .hljs-cdata{color:#718c00}.css .hljs-hexcolor{color:#3e999f}.hljs-function,.python .hljs-decorator,.python .hljs-title,.ruby .hljs-function .hljs-title,.ruby .hljs-title .hljs-keyword,.perl .hljs-sub,.javascript .hljs-title,.coffeescript .hljs-title{color:#4271ae}.hljs-keyword,.javascript .hljs-function{color:#8959a8}.hljs{display:block;background:white;color:#4d4d4c;padding:.5em}.coffeescript .javascript,.javascript .xml,.tex .hljs-formula,.xml .javascript,.xml .vbscript,.xml .css,.xml .hljs-cdata{opacity:.5}</style><style>body,
+h4,
+h5 {
+  font-family: 'Roboto' sans-serif !important;
+}
+h1,
+h2,
+h3,
+.aglio {
+  font-family: 'Raleway' sans-serif !important;
+}
+h1 a,
+h2 a,
+h3 a,
+h4 a,
+h5 a {
+  display: none;
+}
+h1:hover a,
+h2:hover a,
+h3:hover a,
+h4:hover a,
+h5:hover a {
+  display: inline;
+}
+code {
+  color: #444;
+  background-color: #ddd;
+  font-family: 'Inconsolata' monospace !important;
+}
+a[data-target] {
+  cursor: pointer;
+}
+h4 {
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.back-to-top {
+  position: fixed;
+  z-index: 1;
+  bottom: 0px;
+  right: 24px;
+  padding: 4px 8px;
+  background-color: #eee;
+  text-decoration: none !important;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  border-right: 1px solid rgba(0,0,0,0.1);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+.panel {
+  overflow: hidden;
+}
+.panel-heading code {
+  margin-left: 3px;
+  color: #c7254e;
+  background-color: rgba(255,255,255,0.7);
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.panel-heading h3 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+a.list-group-item:hover {
+  background-color: #f8f8f8;
+  border-left: 2px solid #555;
+  padding-left: 15px;
+}
+.indent {
+  display: block;
+  text-indent: 16px;
+}
+.list-group-item {
+  padding-left: 16px;
+}
+.list-group-item .toggle .open {
+  display: block;
+}
+.list-group-item .toggle .closed {
+  display: none;
+}
+.list-group-item.collapsed .toggle .open {
+  display: none;
+}
+.list-group-item.collapsed .toggle .closed {
+  display: block;
+}
+a.list-group-item {
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+a.list-group-item.heading {
+  font-size: 15px;
+  background-color: #f5f5f5;
+}
+a.list-group-item.heading:hover {
+  background-color: #f8f8f8;
+}
+.list-group-item.collapse {
+  display: none;
+}
+.list-group-item.collapse.in {
+  display: block;
+}
+.list-group-item a span.closed {
+  display: none;
+}
+.list-group-item a span.open {
+  display: block;
+}
+.list-group-item a.collapsed span.closed {
+  display: block;
+}
+.list-group-item a.collapsed span.open {
+  display: none;
+}
+#nav {
+  width: inherit;
+  margin-top: 38px;
+  max-width: 255px;
+  top: 0;
+  bottom: 0;
+  padding-right: 12px;
+  padding-bottom: 12px;
+  overflow-y: auto;
+}
+@media (max-width: 1199px) {
+  #nav {
+    max-width: 212px;
+  }
+}
+</style></head><body><a href="#top" class="text-muted back-to-top"><i class="fa fa-toggle-up"></i>&nbsp;Back to top</a><div class="container"><div class="row"><div class="col-md-3"><nav id="nav" class="hidden-sm hidden-xs affix nav"><div class="list-group"><a data-toggle="" data-target="#-menu" href="#" class="list-group-item heading collapsed">Resource Group</a><div id="-menu"><a href="#-search" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span>Search</a><a href="#-upload" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-success"><i class="fa fa-plus"></i></span>Upload</a><a href="#-single-submission" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span>Single Submission</a></div></div><div class="list-group"><a data-toggle="" data-target="#course-menu" href="#course" class="list-group-item heading collapsed">Course</a><div id="course-menu"><a href="#course-courses-collection" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item">Courses Collection</a><a href="#course-courses-collection-get" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span><span class="indent">View Courses</span></a><a href="#course-courses-collection-post" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-success"><i class="fa fa-plus"></i></span><span class="indent">Create a new Course</span></a><a href="#course-single-course" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span>Single Course</a><a href="#course-course-submissions" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span>Course Submissions</a><a href="#course-course-tas" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item">Course TAs</a><a href="#course-course-tas-get" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span><span class="indent">List TAs</span></a><a href="#course-course-tas-delete" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-danger"><i class="fa fa-times"></i></span><span class="indent">Remove TA</span></a><a href="#course-course-tas-post" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-success"><i class="fa fa-plus"></i></span><span class="indent">Add TA</span></a><a href="#course-course-students" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item">Course Students</a><a href="#course-course-students-get" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span><span class="indent">List Students</span></a><a href="#course-course-students-delete" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-danger"><i class="fa fa-times"></i></span><span class="indent">Remove Student</span></a><a href="#course-course-students-post" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-success"><i class="fa fa-plus"></i></span><span class="indent">Add Student</span></a></div></div><div class="list-group"><a data-toggle="" data-target="#project-menu" href="#project" class="list-group-item heading collapsed">Project</a><div id="project-menu"><a href="#project-projects" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item">Projects</a><a href="#project-projects-get" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span><span class="indent">List all</span></a><a href="#project-projects-post" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-success"><i class="fa fa-plus"></i></span><span class="indent">Create New</span></a><a href="#project-submissions" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item">Submissions</a><a href="#project-submissions-get" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span><span class="indent">List all Submissions</span></a><a href="#project-submissions-post" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-success"><i class="fa fa-plus"></i></span><span class="indent">Create New Submission</span></a><a href="#project-single-project" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item">Single project</a><a href="#project-single-project-get" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span><span class="indent">GET /project/{project_name}</span></a><a href="#project-single-project-put" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-warning"><i class="fa fa-pencil"></i></span><span class="indent">PUT /project/{project_name}</span></a></div></div><div class="list-group"><a data-toggle="" data-target="#user-menu" href="#user" class="list-group-item heading collapsed">User</a><div id="user-menu"><a href="#user-users-collection" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item">Users collection</a><a href="#user-users-collection-post" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-success"><i class="fa fa-plus"></i></span><span class="indent">Create new user</span></a><a href="#user-users-collection-get" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span><span class="indent">GET /users</span></a><a href="#user-single-user" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item">Single User</a><a href="#user-single-user-get" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-info"><i class="fa fa-arrow-down"></i></span><span class="indent">GET /user/{id}</span></a><a href="#user-single-user-delete" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-danger"><i class="fa fa-times"></i></span><span class="indent">DELETE /user/{id}</span></a><a href="#user-single-user-put" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-warning"><i class="fa fa-pencil"></i></span><span class="indent">PUT /user/{id}</span></a></div></div><div class="list-group"><a data-toggle="" data-target="#token-menu" href="#token" class="list-group-item heading collapsed">Token</a><div id="token-menu"><a href="#token-" style="border-top-left-radius: 0; border-top-right-radius: 0" class="list-group-item"><span class="badge alert-success"><i class="fa fa-plus"></i></span>Create new token</a></div></div></nav></div><div class="col-md-8"><div><header><div class="page-header"><h1 id="top">Kodr</h1></div></header><div class="description"><h1>User</h1>
+</div></div><div><div class="panel panel-default"><div class="panel-heading"><h3 id="">Resource Group&nbsp;<a href="#"><i class="fa fa-link"></i></a></h3></div><div class="panel-body"><h4 id="-search">Search&nbsp;<a href="#-search"><i class="fa fa-link"></i></a></h4><section id="-search-get" class="panel panel-info"><div class="panel-heading"><div style="float:left"><a href="#-search-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/submissions{?course,student,project}</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>course</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd><dt>student</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>16-0000</span></span><p>student GUC id.</p>
+</dd><dt>project</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>milestone 1</span></span><p>name of project.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#f66cfad08e2381c1c7c2aede6016de1d" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="f66cfad08e2381c1c7c2aede6016de1d" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#d0440fc806ce909cc480b30c0544204b" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="d0440fc806ce909cc480b30c0544204b" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    { 
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/submission/1"</span></span>,
+    "<span class="hljs-attribute">project</span>":
+    <span class="hljs-value">{
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Milestone 1"</span></span>,
+        "<span class="hljs-attribute">course</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+            "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+            "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+               "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+               "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+            </span>}</span>,
+            "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+            "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1"</span></span>,
+        "<span class="hljs-attribute">submission_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1/submissions"</span></span>,
+        "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span>
+    </span>}</span>,  
+    "<span class="hljs-attribute">submitter</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>, 
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John Student"</span></span>,
+        "<span class="hljs-attribute">guc_id</span>": <span class="hljs-value"><span class="hljs-string">"22-0000"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/2"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">tests</span>": <span class="hljs-value">[
+        {
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"FooTest"</span></span>, 
+            "<span class="hljs-attribute">cases</span>": <span class="hljs-value">[
+                {
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"capacityShouldScaleByTwo"</span></span>,
+                    "<span class="hljs-attribute">pass</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>, "<span class="hljs-attribute">detail</span>": <span class="hljs-value"><span class="hljs-string">""</span>
+                </span>},
+                {
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"initialCapacityShouldBeTen"</span></span>,
+                    "<span class="hljs-attribute">pass</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>, "<span class="hljs-attribute">detail</span>": <span class="hljs-value"><span class="hljs-string">"InitialCapacity expected:&lt;10&gt; but was:&lt;0&gt;"</span>
+                </span>}
+            ]</span>,
+            "<span class="hljs-attribute">success</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
+        </span>}
+
+    ]</span>,
+    "<span class="hljs-attribute">processed</span>": <span class="hljs-value"><span class="hljs-literal">true</span>
+    </span>}
+]
+</code></pre></li></ul></section><h4 id="-upload">Upload&nbsp;<a href="#-upload"><i class="fa fa-link"></i></a></h4><section id="-upload-post" class="panel panel-success"><div class="panel-heading"><div style="float:left"><a href="#-upload-post" class="btn btn-xs btn-success">POST</a></div><div style="overflow:hidden"><code>/submissions/{course}/{project}</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>course</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd><dt>project</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>milestone1</span></span><p>name of the project.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload gzip file</code></strong><a data-toggle="collapse" data-target="#7cfa6c2c480b5a4e7bfe8a6b9105da45" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="7cfa6c2c480b5a4e7bfe8a6b9105da45" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-gzip</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload tar file</code></strong><a data-toggle="collapse" data-target="#de671519b6df3d3bc76089b907e06a07" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="de671519b6df3d3bc76089b907e06a07" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-tar</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload zip file</code></strong><a data-toggle="collapse" data-target="#6f9aa32850e9fb80ce1e10839d1bda59" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="6f9aa32850e9fb80ce1e10839d1bda59" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/zip</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload 7z file</code></strong><a data-toggle="collapse" data-target="#ea78f96b9d200571d3ec1b94836b31bf" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="ea78f96b9d200571d3ec1b94836b31bf" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-7z-compressed</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload rar file</code></strong><a data-toggle="collapse" data-target="#03e5dff8c8a0d1a78e16ab07a14de2e9" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="03e5dff8c8a0d1a78e16ab07a14de2e9" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-rar-compressed</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload bzip2 file</code></strong><a data-toggle="collapse" data-target="#0be8b6db3cc8a77d0ead82ab6a5a6cc3" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="0be8b6db3cc8a77d0ead82ab6a5a6cc3" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-bzip2</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#2f867e7a11e751ea9418aca08f033c6e" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="2f867e7a11e751ea9418aca08f033c6e" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">42</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/submission/42"</span>
+</span>}
+</code></pre></li></ul></section><h4 id="-single-submission">Single Submission&nbsp;<a href="#-single-submission"><i class="fa fa-link"></i></a></h4><section id="-single-submission-get" class="panel panel-info"><div class="panel-heading"><div style="float:left"><a href="#-single-submission-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/submission/{id}</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>id</dt><dd><code>int</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>id of submission</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Retrieve single submission</code></strong><a data-toggle="collapse" data-target="#28eb41a68f0663acde317ec46ec60457" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="28eb41a68f0663acde317ec46ec60457" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#7eadf265095514c136d5052ddc9cc769" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="7eadf265095514c136d5052ddc9cc769" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{ 
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/submission/1"</span></span>,
+    "<span class="hljs-attribute">project</span>":
+    <span class="hljs-value">{
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Milestone 1"</span></span>,
+        "<span class="hljs-attribute">course</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+            "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+            "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+               "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+               "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+               "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+            </span>}</span>,
+            "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+            "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span></span>,
+            "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1"</span></span>,
+        "<span class="hljs-attribute">submission_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1/submissions"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">submitter</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>, 
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John Student"</span></span>,
+        "<span class="hljs-attribute">guc_id</span>": <span class="hljs-value"><span class="hljs-string">"22-0000"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/2"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">tests</span>": <span class="hljs-value">[
+        {
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"FooTest"</span></span>, 
+            "<span class="hljs-attribute">cases</span>": <span class="hljs-value">[
+                {
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"capacityShouldScaleByTwo"</span></span>,
+                    "<span class="hljs-attribute">pass</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>, "<span class="hljs-attribute">detail</span>": <span class="hljs-value"><span class="hljs-string">""</span>
+                </span>},
+                {
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"initialCapacityShouldBeTen"</span></span>,
+                    "<span class="hljs-attribute">pass</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>, "<span class="hljs-attribute">detail</span>": <span class="hljs-value"><span class="hljs-string">"InitialCapacity expected:&lt;10&gt; but was:&lt;0&gt;"</span>
+                </span>}
+            ]</span>,
+            "<span class="hljs-attribute">success</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
+        </span>}
+
+    ]</span>,
+    "<span class="hljs-attribute">processed</span>": <span class="hljs-value"><span class="hljs-literal">true</span>
+</span>}
+</code></pre></li></ul></section></div></div></div><div><div class="panel panel-default"><div class="panel-heading"><h3 id="course">Course&nbsp;<a href="#course"><i class="fa fa-link"></i></a></h3></div><div class="panel-body"><h4 id="course-courses-collection">Courses Collection&nbsp;<a href="#course-courses-collection"><i class="fa fa-link"></i></a></h4><section id="course-courses-collection-get" class="panel panel-info"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">View Courses</span></div><div style="float:left"><a href="#course-courses-collection-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/courses</code></div></div><ul class="list-group"><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#38efc7fdf5dde80b7ae770e16ad7af7a" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="38efc7fdf5dde80b7ae770e16ad7af7a" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    {"<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+     "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+     "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+     </span>}</span>,
+     "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+     "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span></span>,
+     "<span class="hljs-attribute">submissions_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/submissions"</span></span>,
+     "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span>
+    </span>}
+]
+</code></pre></li></ul></section><section id="course-courses-collection-post" class="panel panel-success"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Create a new Course</span></div><div style="float:left"><a href="#course-courses-collection-post" class="btn btn-xs btn-success">POST</a></div><div style="overflow:hidden"><code>/courses</code></div></div><div class="panel-body"><ul>
+<li><p><code>name</code> is a <strong>required</strong> field, and represents the name of the <code>Course</code> to be created.</p></li>
+<li><p><code>description</code> is an <strong>optional</strong> field and represets some description of the course.</p></li>
+<li><p>The <code>X-Auth-Token</code> Header field will be used to get the user and that user will be set as the course supervisor.</p></li>
+</ul>
+</div><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#16ee8b03764a189c419016e918694765" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="16ee8b03764a189c419016e918694765" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Advanced computer lab, bla bla.."</span></span>,
+}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong><a data-toggle="collapse" data-target="#d3a8b19a8bbcfe4164baf84a20ea018b" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="d3a8b19a8bbcfe4164baf84a20ea018b" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Advanced computer lab, bla bla.."</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+    "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+       "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+    "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span></span>,
+    "<span class="hljs-attribute">submissions_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/submissions"</span></span>,
+    "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span>
+</span>}
+</code></pre></li></ul></section><h4 id="course-single-course">Single Course&nbsp;<a href="#course-single-course"><i class="fa fa-link"></i></a></h4><section id="course-single-course-get" class="panel panel-info"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Retrieve Course</span></div><div style="float:left"><a href="#course-single-course-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/course/{name}</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#3718c6be9efaec18325402c83391406c" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="3718c6be9efaec18325402c83391406c" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Advanced computer lab, bla bla.."</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+    "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+       "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+    "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span></span>,
+    "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span></span>,
+    "<span class="hljs-attribute">projects</span>": <span class="hljs-value">[
+        {
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Milestone 1"</span></span>,
+            "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1"</span></span>,
+            "<span class="hljs-attribute">submission_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1/submissions"</span> 
+        </span>}
+    ]
+</span>}
+</code></pre></li></ul></section><h4 id="course-course-submissions">Course Submissions&nbsp;<a href="#course-course-submissions"><i class="fa fa-link"></i></a></h4><section id="course-course-submissions-get" class="panel panel-info"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">List Submissions</span></div><div style="float:left"><a href="#course-course-submissions-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/course/{name}/submissions</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#dda9c99e26ecdfd03eb53fe28e814a55" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="dda9c99e26ecdfd03eb53fe28e814a55" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#c0d65c0db83a4093edace032e2c4fb46" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="c0d65c0db83a4093edace032e2c4fb46" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    { 
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/submission/1"</span></span>,
+    "<span class="hljs-attribute">project</span>":
+    <span class="hljs-value">{
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Milestone 1"</span></span>,
+        "<span class="hljs-attribute">course</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+            "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+            "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+               "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+               "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+               "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+            </span>}</span>,
+            "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span></span>,
+            "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+            "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1"</span></span>,
+        "<span class="hljs-attribute">submission_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1/submissions"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">submitter</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>, 
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John Student"</span></span>,
+        "<span class="hljs-attribute">guc_id</span>": <span class="hljs-value"><span class="hljs-string">"22-0000"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/2"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">tests</span>": <span class="hljs-value">[
+        {
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"FooTest"</span></span>, 
+            "<span class="hljs-attribute">cases</span>": <span class="hljs-value">[
+                {
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"capacityShouldScaleByTwo"</span></span>,
+                    "<span class="hljs-attribute">pass</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>, "<span class="hljs-attribute">detail</span>": <span class="hljs-value"><span class="hljs-string">""</span>
+                </span>},
+                {
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"initialCapacityShouldBeTen"</span></span>,
+                    "<span class="hljs-attribute">pass</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>, "<span class="hljs-attribute">detail</span>": <span class="hljs-value"><span class="hljs-string">"InitialCapacity expected:&lt;10&gt; but was:&lt;0&gt;"</span>
+                </span>}
+            ]</span>,
+            "<span class="hljs-attribute">success</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
+        </span>}
+
+    ]</span>,
+    "<span class="hljs-attribute">processed</span>": <span class="hljs-value"><span class="hljs-literal">true</span>
+    </span>}
+]
+</code></pre></li></ul></section><h4 id="course-course-tas">Course TAs&nbsp;<a href="#course-course-tas"><i class="fa fa-link"></i></a></h4><section id="course-course-tas-get" class="panel panel-info"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">List TAs</span></div><div style="float:left"><a href="#course-course-tas-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/course/{name}/tas</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#e1a4b743122b600f0e215d5d89b3594e" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="e1a4b743122b600f0e215d5d89b3594e" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#0d0151b822ce1cc0e5d0725818c1d15b" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="0d0151b822ce1cc0e5d0725818c1d15b" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+   "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+   "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+   "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+</span>} 
+</code></pre></li></ul></section><section id="course-course-tas-delete" class="panel panel-danger"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Remove TA</span></div><div style="float:left"><a href="#course-course-tas-delete" class="btn btn-xs btn-danger">DELETE</a></div><div style="overflow:hidden"><code>/course/{name}/tas</code></div></div><div class="panel-body"><ul>
+<li><code>id</code> is a <strong>required</strong> field, it represents the TA’s id.</li>
+</ul>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#1f9e67ac7444fb613e06f82d4761696c" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="1f9e67ac7444fb613e06f82d4761696c" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre><h5>Body</h5><pre><code><span class="hljs-string">"id"</span>: <span class="hljs-number">2</span>
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>204</code></strong></li></ul></section><section id="course-course-tas-post" class="panel panel-success"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Add TA</span></div><div style="float:left"><a href="#course-course-tas-post" class="btn btn-xs btn-success">POST</a></div><div style="overflow:hidden"><code>/course/{name}/tas</code></div></div><div class="panel-body"><ul>
+<li><code>id</code> is a <strong>required</strong> field, it represents the TA’s id.</li>
+</ul>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#8028b09986e9eba9bc185c2baff2a417" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="8028b09986e9eba9bc185c2baff2a417" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre><h5>Body</h5><pre><code><span class="hljs-string">"id"</span>: <span class="hljs-number">2</span>
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>204</code></strong></li></ul></section><h4 id="course-course-students">Course Students&nbsp;<a href="#course-course-students"><i class="fa fa-link"></i></a></h4><section id="course-course-students-get" class="panel panel-info"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">List Students</span></div><div style="float:left"><a href="#course-course-students-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/course/{name}/students</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#aec1af9aa7258294d5b36309e4209da3" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="aec1af9aa7258294d5b36309e4209da3" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#20b5b0d6b5894b48785c35031d8128a5" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="20b5b0d6b5894b48785c35031d8128a5" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>, 
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John Student"</span></span>,
+        "<span class="hljs-attribute">guc_id</span>": <span class="hljs-value"><span class="hljs-string">"22-0000"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/2"</span>
+    </span>}
+]
+</code></pre></li></ul></section><section id="course-course-students-delete" class="panel panel-danger"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Remove Student</span></div><div style="float:left"><a href="#course-course-students-delete" class="btn btn-xs btn-danger">DELETE</a></div><div style="overflow:hidden"><code>/course/{name}/students</code></div></div><div class="panel-body"><ul>
+<li><code>id</code> is a <strong>required</strong> field, it represents the student’s id (not guc id).</li>
+</ul>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#6adcc8cf3368cf435fc3f8f50c05795d" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="6adcc8cf3368cf435fc3f8f50c05795d" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre><h5>Body</h5><pre><code><span class="hljs-string">"id"</span>: <span class="hljs-number">2</span>
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong></li></ul></section><section id="course-course-students-post" class="panel panel-success"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Add Student</span></div><div style="float:left"><a href="#course-course-students-post" class="btn btn-xs btn-success">POST</a></div><div style="overflow:hidden"><code>/course/{name}/students</code></div></div><div class="panel-body"><ul>
+<li><code>id</code> is a <strong>required</strong> field, it represents the student’s id (not guc id).</li>
+</ul>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#58f70004a2f48fb7762812b226710a22" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="58f70004a2f48fb7762812b226710a22" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre><h5>Body</h5><pre><code><span class="hljs-string">"id"</span>: <span class="hljs-number">2</span>
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>204</code></strong></li></ul></section></div></div></div><div><div class="panel panel-default"><div class="panel-heading"><h3 id="project">Project&nbsp;<a href="#project"><i class="fa fa-link"></i></a></h3></div><div class="panel-body"><h4 id="project-projects">Projects&nbsp;<a href="#project-projects"><i class="fa fa-link"></i></a></h4><section id="project-projects-get" class="panel panel-info"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">List all</span></div><div style="float:left"><a href="#project-projects-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/course/{name}/projects/</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>course name.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#8916a02b864e779091bf8e4b01feaa6d" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="8916a02b864e779091bf8e4b01feaa6d" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#c459a9b3bac579b22c3bf0007313e5b0" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="c459a9b3bac579b22c3bf0007313e5b0" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    {
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Milestone 1"</span></span>,
+        "<span class="hljs-attribute">course</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+            "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+            "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+               "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+               "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+               "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+            </span>}</span>,
+            "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+            "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span></span>,
+            "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1"</span></span>,
+        "<span class="hljs-attribute">submission_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1/submissions"</span>
+    </span>}
+]
+</code></pre></li></ul></section><section id="project-projects-post" class="panel panel-success"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Create New</span></div><div style="float:left"><a href="#project-projects-post" class="btn btn-xs btn-success">POST</a></div><div style="overflow:hidden"><code>/course/{name}/projects/</code></div></div><div class="panel-body"><ul>
+<li><code>name</code> is a <strong>required</strong> field, this is the project’s name.</li>
+</ul>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>course name.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#20381620480e45ffc5fc3900c85e4d45" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="20381620480e45ffc5fc3900c85e4d45" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br>-X-Auth-Token: &lt;auth-token&gt;<br></code></pre><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"name"</span>: <span class="hljs-string">"Milestone 1"</span>,
+    <span class="hljs-string">"language"</span>: <span class="hljs-string">"J"</span>,
+    <span class="hljs-string">"due_date"</span>: <span class="hljs-string">"2015-02-05T17:55:00.000Z"</span>,
+    <span class="hljs-string">"test_timeout"</span>: <span class="hljs-number">600</span>,
+    <span class="hljs-string">"file[0]"</span>: <span class="hljs-keyword">...</span>,
+}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#eb402a73bbc34f260a0bb7f3245c5e24" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="eb402a73bbc34f260a0bb7f3245c5e24" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">created_at</span>": <span class="hljs-value"><span class="hljs-string">"2015-02-03T07:03:03+00:00"</span></span>,
+    "<span class="hljs-attribute">course</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">guc_id</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Teacher One"</span></span>,
+            "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/54c8b1172d1f907fef478b91"</span></span>,
+            "<span class="hljs-attribute">created_at</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-28T09:51:19+00:00"</span></span>,
+            "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"teacher1@guc.edu.eg"</span></span>,
+            "<span class="hljs-attribute">active</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"54c8b1172d1f907fef478b91"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Test Course"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course"</span></span>,
+        "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/tas"</span></span>,
+        "<span class="hljs-attribute">submissions_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/submissions"</span></span>,
+        "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/projects"</span></span>,
+        "<span class="hljs-attribute">created_at</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-28T09:52:15+00:00"</span></span>,
+        "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/students"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Please Ignore"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">tests</span>": <span class="hljs-value">[
+        {
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"M1Tests.java"</span></span>,
+            "<span class="hljs-attribute">download_url</span>": <span class="hljs-value"><span class="hljs-string">"/project/54d072a72d1f900f3e1b7d97/tests/M1Tests.java"</span>
+        </span>}
+    ]</span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"New Project"</span></span>,
+    "<span class="hljs-attribute">language</span>": <span class="hljs-value"><span class="hljs-string">"J"</span></span>,
+    "<span class="hljs-attribute">due_date</span>": <span class="hljs-value"><span class="hljs-string">"2015-02-05T17:55:00+00:00"</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/project/54d072a72d1f900f3e1b7d97"</span></span>,
+    "<span class="hljs-attribute">submissions_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/projects/New%20Project/submissions"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"54d072a72d1f900f3e1b7d97"</span></span>,
+    "<span class="hljs-attribute">can_submit</span>": <span class="hljs-value"><span class="hljs-literal">true</span>
+</span>}
+</code></pre></li></ul></section><h4 id="project-submissions">Submissions&nbsp;<a href="#project-submissions"><i class="fa fa-link"></i></a></h4><section id="project-submissions-get" class="panel panel-info"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">List all Submissions</span></div><div style="float:left"><a href="#project-submissions-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/course/{name}/projects/{project_name}/submissions</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd><dt>project_name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>milestone1</span></span><p>name of the project.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#19afbfaabc34cb0d3bde20fe37f2fe77" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="19afbfaabc34cb0d3bde20fe37f2fe77" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#12e93f7d82fa5cade9649439b4270fab" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="12e93f7d82fa5cade9649439b4270fab" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    { 
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/submission/1"</span></span>,
+    "<span class="hljs-attribute">project</span>":
+    <span class="hljs-value">{
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Milestone 1"</span></span>,
+        "<span class="hljs-attribute">course</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+            "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+            "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+               "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+               "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+               "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+            </span>}</span>,
+            "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+            "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span></span>,
+            "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1"</span></span>,
+        "<span class="hljs-attribute">submission_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1/submissions"</span>
+    </span>}</span>,  
+    "<span class="hljs-attribute">submitter</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>, 
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John Student"</span></span>,
+        "<span class="hljs-attribute">guc_id</span>": <span class="hljs-value"><span class="hljs-string">"22-0000"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/2"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">tests</span>": <span class="hljs-value">[
+        {
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"FooTest"</span></span>, 
+            "<span class="hljs-attribute">cases</span>": <span class="hljs-value">[
+                {
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"capacityShouldScaleByTwo"</span></span>,
+                    "<span class="hljs-attribute">pass</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>, "<span class="hljs-attribute">detail</span>": <span class="hljs-value"><span class="hljs-string">""</span>
+                </span>},
+                {
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"initialCapacityShouldBeTen"</span></span>,
+                    "<span class="hljs-attribute">pass</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>, "<span class="hljs-attribute">detail</span>": <span class="hljs-value"><span class="hljs-string">"InitialCapacity expected:&lt;10&gt; but was:&lt;0&gt;"</span>
+                </span>}
+            ]</span>,
+            "<span class="hljs-attribute">success</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
+        </span>}
+
+    ]</span>,
+    "<span class="hljs-attribute">processed</span>": <span class="hljs-value"><span class="hljs-literal">true</span>
+    </span>}
+]
+</code></pre></li></ul></section><section id="project-submissions-post" class="panel panel-success"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Create New Submission</span></div><div style="float:left"><a href="#project-submissions-post" class="btn btn-xs btn-success">POST</a></div><div style="overflow:hidden"><code>/course/{name}/projects/{project_name}/submissions</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd><dt>project_name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>milestone1</span></span><p>name of the project.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload gzip file</code></strong><a data-toggle="collapse" data-target="#27fa2efadac29351f7f605d338b641e9" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="27fa2efadac29351f7f605d338b641e9" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-gzip</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload tar file</code></strong><a data-toggle="collapse" data-target="#3d0d04d3d74ca275cd600c5a9c6e71aa" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="3d0d04d3d74ca275cd600c5a9c6e71aa" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-tar</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload zip file</code></strong><a data-toggle="collapse" data-target="#381a7fa9fd7d9518757031932b540841" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="381a7fa9fd7d9518757031932b540841" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/zip</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload 7z file</code></strong><a data-toggle="collapse" data-target="#c60ed099f35cd26e63872dfc4781b3a8" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="c60ed099f35cd26e63872dfc4781b3a8" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-7z-compressed</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload rar file</code></strong><a data-toggle="collapse" data-target="#59ff3bc79a05c805316b4dd7dbe490b9" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="59ff3bc79a05c805316b4dd7dbe490b9" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-rar-compressed</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Request&nbsp;&nbsp;<code>Upload bzip2 file</code></strong><a data-toggle="collapse" data-target="#8f02618c2ee3cf2a135849e2824c857a" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="8f02618c2ee3cf2a135849e2824c857a" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/x-bzip2</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#552eb70be123c3e81df3569e4b622437" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="552eb70be123c3e81df3569e4b622437" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">42</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/submission/42"</span>
+</span>}
+</code></pre></li></ul></section><h4 id="project-single-project">Single project&nbsp;<a href="#project-single-project"><i class="fa fa-link"></i></a></h4><section id="project-single-project-get" class="panel panel-info"><div class="panel-heading"><div style="float:left"><a href="#project-single-project-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/project/{project_name}</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd><dt>project_name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>milestone1</span></span><p>name of the project.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#24370f469022b70e065b8bf73835774d" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="24370f469022b70e065b8bf73835774d" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#01ceaa89f7484bc4978f4874e2bae1de" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="01ceaa89f7484bc4978f4874e2bae1de" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Milestone 1"</span></span>,
+    "<span class="hljs-attribute">course</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"csen401"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401"</span></span>,
+        "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+           "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">22</span></span>,
+           "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+           "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/22"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/tas"</span></span>,
+        "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/students"</span></span>,
+        "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/courses/csen401/projects"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1"</span></span>,
+    "<span class="hljs-attribute">submission_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/csen401/projects/milestone1/submissions"</span>
+</span>}
+</code></pre></li></ul></section><section id="project-single-project-put" class="panel panel-warning"><div class="panel-heading"><div style="float:left"><a href="#project-single-project-put" class="btn btn-xs btn-warning">PUT</a></div><div style="overflow:hidden"><code>/project/{project_name}</code></div></div><div class="panel-body"><p>Modifies the due_data and test files fields.
+Test files are simply replaced.</p>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>csen401</span></span><p>name of the course.</p>
+</dd><dt>project_name</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>milestone1</span></span><p>name of the project.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#5ec3d6afd9476959a664e6250cff23b1" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="5ec3d6afd9476959a664e6250cff23b1" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br>-X-Auth-Token: &lt;auth-token&gt;<br></code></pre><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"due_date"</span>: <span class="hljs-string">"2015-02-06T17:55:00.000Z"</span>,
+    <span class="hljs-string">"file[0]"</span>: <span class="hljs-keyword">...</span>,
+}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#05d7853647894dcf6d00e026502cce3b" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="05d7853647894dcf6d00e026502cce3b" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">created_at</span>": <span class="hljs-value"><span class="hljs-string">"2015-02-03T07:03:03+00:00"</span></span>,
+    "<span class="hljs-attribute">course</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">supervisor</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">guc_id</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Teacher One"</span></span>,
+            "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/54c8b1172d1f907fef478b91"</span></span>,
+            "<span class="hljs-attribute">created_at</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-28T09:51:19+00:00"</span></span>,
+            "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"teacher1@guc.edu.eg"</span></span>,
+            "<span class="hljs-attribute">active</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"54c8b1172d1f907fef478b91"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Test Course"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course"</span></span>,
+        "<span class="hljs-attribute">tas_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/tas"</span></span>,
+        "<span class="hljs-attribute">submissions_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/submissions"</span></span>,
+        "<span class="hljs-attribute">projects_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/projects"</span></span>,
+        "<span class="hljs-attribute">created_at</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-28T09:52:15+00:00"</span></span>,
+        "<span class="hljs-attribute">students_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/students"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Please Ignore"</span>
+    </span>}</span>,
+    "<span class="hljs-attribute">tests</span>": <span class="hljs-value">[
+        {
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"M1Tests.java"</span></span>,
+            "<span class="hljs-attribute">download_url</span>": <span class="hljs-value"><span class="hljs-string">"/project/54d072a72d1f900f3e1b7d97/tests/M1Tests.java"</span>
+        </span>}
+    ]</span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"New Project"</span></span>,
+    "<span class="hljs-attribute">language</span>": <span class="hljs-value"><span class="hljs-string">"J"</span></span>,
+    "<span class="hljs-attribute">due_date</span>": <span class="hljs-value"><span class="hljs-string">"2015-02-05T17:55:00+00:00"</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/project/54d072a72d1f900f3e1b7d97"</span></span>,
+    "<span class="hljs-attribute">submissions_url</span>": <span class="hljs-value"><span class="hljs-string">"/course/Test%20Course/projects/New%20Project/submissions"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"54d072a72d1f900f3e1b7d97"</span></span>,
+    "<span class="hljs-attribute">can_submit</span>": <span class="hljs-value"><span class="hljs-literal">true</span>
+</span>}
+</code></pre></li></ul></section></div></div></div><div><div class="panel panel-default"><div class="panel-heading"><h3 id="user">User&nbsp;<a href="#user"><i class="fa fa-link"></i></a></h3></div><div class="panel-body"><h4 id="user-users-collection">Users collection&nbsp;<a href="#user-users-collection"><i class="fa fa-link"></i></a></h4><section id="user-users-collection-post" class="panel panel-success"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Create new user</span></div><div style="float:left"><a href="#user-users-collection-post" class="btn btn-xs btn-success">POST</a></div><div style="overflow:hidden"><code>/users</code></div></div><div class="panel-body"><ul>
+<li><p><code>email</code> is a <strong>required</strong> field, this should be guc email.</p></li>
+<li><p><code>name</code> is a <strong>required</strong> field, this should be the user’s full name.</p></li>
+<li><p><code>password</code> is a <strong>required</strong> field.</p></li>
+<li><p><code>guc_id</code> is a <strong>required</strong> field, iff email is @student<a href="http://.guc.edu.eg">.guc.edu.eg</a></p></li>
+</ul>
+</div><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#4460cb86acbaa564ef3f0501804feaa1" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="4460cb86acbaa564ef3f0501804feaa1" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">password</span>": <span class="hljs-value"><span class="hljs-string">"password"</span></span>,
+    "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"example@guc.edu.eg"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span>
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong><a data-toggle="collapse" data-target="#968bba9e75b361b95e35aa386e5ccc96" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="968bba9e75b361b95e35aa386e5ccc96" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"example@guc.edu.eg"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+    "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/1"</span>
+</span>}
+</code></pre></li></ul></section><section id="user-users-collection-get" class="panel panel-info"><div class="panel-heading"><div style="float:left"><a href="#user-users-collection-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/users</code></div></div><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#1585f22ad41df466874d198298243edf" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="1585f22ad41df466874d198298243edf" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong><a data-toggle="collapse" data-target="#9f41eb1e4f1eee8c89c9bbaa544599df" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="9f41eb1e4f1eee8c89c9bbaa544599df" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"example@guc.edu.eg"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/1"</span>
+    </span>}
+]
+</code></pre></li></ul></section><h4 id="user-single-user">Single User&nbsp;<a href="#user-single-user"><i class="fa fa-link"></i></a></h4><section id="user-single-user-get" class="panel panel-info"><div class="panel-heading"><div style="float:left"><a href="#user-single-user-get" class="btn btn-xs btn-primary">GET</a></div><div style="overflow:hidden"><code>/user/{id}</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>22</span></span><p>User’s ID.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#a1bdc64ae4ce0d71dbd36a626bc3945f" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="a1bdc64ae4ce0d71dbd36a626bc3945f" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#d7642c1bab7c957f3ae2eeb30c6116a8" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="d7642c1bab7c957f3ae2eeb30c6116a8" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+
+        "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"example@guc.edu.eg"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"John TA"</span></span>,
+        "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/user/1"</span>
+    </span>}
+]
+</code></pre></li></ul></section><section id="user-single-user-delete" class="panel panel-danger"><div class="panel-heading"><div style="float:left"><a href="#user-single-user-delete" class="btn btn-xs btn-danger">DELETE</a></div><div style="overflow:hidden"><code>/user/{id}</code></div></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>22</span></span><p>User’s ID.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#9a751ef346df8df5b25840580de57eac" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="9a751ef346df8df5b25840580de57eac" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong></li></ul></section><section id="user-single-user-put" class="panel panel-warning"><div class="panel-heading"><div style="float:left"><a href="#user-single-user-put" class="btn btn-xs btn-warning">PUT</a></div><div style="overflow:hidden"><code>/user/{id}</code></div></div><div class="panel-body"><ul>
+<li><p><code>name</code> is an <strong>optional</strong> field, this should be the user’s full name.</p></li>
+<li><p><code>password</code> is an <strong>optional</strong> field.</p></li>
+<li><p><code>guc_id</code> is an <strong>optional</strong> field, iff email is @student<a href="http://.guc.edu.eg">.guc.edu.eg</a></p></li>
+</ul>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>22</span></span><p>User’s ID.</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#f76967b2d731cc452a2977c9c8b8adaf" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="f76967b2d731cc452a2977c9c8b8adaf" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">X-Auth-Token</span>: <span class="hljs-string">&lt;auth-token&gt;</span><br></code></pre><h5>Body</h5><pre><code>{"<span class="hljs-attribute">password</span>": <span class="hljs-value"><span class="hljs-string">"harder_password"</span></span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong></li></ul></section></div></div></div><div><div class="panel panel-default"><div class="panel-heading"><h3 id="token">Token&nbsp;<a href="#token"><i class="fa fa-link"></i></a></h3></div><div class="panel-body"><h4 id="token-">Resources&nbsp;<a href="#token-"><i class="fa fa-link"></i></a></h4><section id="token--post" class="panel panel-success"><div class="panel-heading"><div style="float:right"><span style="text-transform: lowercase">Create new token</span></div><div style="float:left"><a href="#token--post" class="btn btn-xs btn-success">POST</a></div><div style="overflow:hidden"><code>/tokens</code></div></div><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#d8c6bc60f8c41e8f25afa955b05a8891" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="d8c6bc60f8c41e8f25afa955b05a8891" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong><a data-toggle="collapse" data-target="#f753cb2929ebc835897e422a59b00164" class="pull-right collapsed"><span class="closed">Show</span><span class="open">Hide</span></a></li><li id="f753cb2929ebc835897e422a59b00164" class="list-group-item panel-collapse collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{"<span class="hljs-attribute">token</span>": <span class="hljs-value"><span class="hljs-string">"some_long_ciphertext"</span></span>}
+</code></pre></li></ul></section></div></div></div></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 21 Feb 2015</p><div id="localFile" style="display: none; position: absolute; top: 0; left: 0; width: 100%; color: white; background: red; font-size: 150%; text-align: center; padding: 1em;">This page may not display correctly when opened as a local file. Instead, view it from a web server.
+
+</div></body><script src="//code.jquery.com/jquery-1.11.0.min.js"></script><script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script><script>(function() {
+  if (location.protocol === 'file:') {
+    document.getElementById('localFile').style.display = 'block';
+  }
+
+}).call(this);
+</script><script>(function() {
+  $('table').addClass('table');
+
+}).call(this);
+</script></html>
