@@ -157,22 +157,34 @@
      
       {{#if isOwnPage }}
         <div class="tab-pane" id="settings">
-          <br>
+          <div class="row">
+            <h3>Groups</h3>
+            <div class="col-md-12">
+                {{#each member in model.memberships }}
+                  <button {{action "leave" member }} class="btn btn-primary">Leave {{member.gname}}</button>
+                {{else}}
+                 <p>You have yet to Join any group</p>
+                {{/each}}
+            </div>
+          </div>
           {{#if canJoinGroups }}
-            <form class="form-horizontal col-md-6 col-md-offset-1">
+          <div class="row">
+            <form class="form-horizontal col-md-11">
               <fieldset>
-              <legend>Join Group</legend>
-              <div class="form-group">
-                {{chosen
-                    content=groupOptions
-                    optionValuePath="content"
-                    optionLabelPath="content.name"
-                    selection=group
-                    class="group-options form-control col-md-12"
-                    }}
-              </div>
-              <button {{action "join" group }} class="btn btn-primary">Join</button>
-            </form>
+                <legend>Join Group</legend>
+                <div class="form-group">
+                  {{chosen
+                      content=groupOptions
+                      optionValuePath="content"
+                      optionLabelPath="content.name"
+                      selection=group
+                      class="group-options form-control col-md-12"
+                      }}
+                </div>
+                <button {{action "join" group }} class="btn btn-primary">Join</button>
+              </fieldset>
+            </form>            
+          </div>
           {{/if}}
           {{#if fullErrors }}
             <div class="alert alert-danger">
@@ -181,20 +193,22 @@
               {{/each}}
             </div>
           {{/if}}
-          <form role="form-horizontal col-md-6 col-md-offset-1">
-            <fieldset>
-              <legend>Change Password</legend>
-              <div class="form-group">
-                  <label for="name" class="control-label">New Password</label>
-                  {{input type="password" value=password class="form-control"}}
-              </div>
-              <div class="form-group">
-                  <label for="name" class="control-label">New Password Confirmation</label>
-                  {{input type="password" value=passwordConfirmation class="form-control"}}
-              </div>
-              <button {{action "changePass"}} class="btn btn-default">Change</button>
-            <fieldset>
-          </form>
+          <div class="row">
+            <form role="form-horizontal col-md-12">
+              <fieldset>
+                <legend>Change Password</legend>
+                <div class="form-group">
+                    <label for="name" class="control-label">New Password</label>
+                    {{input type="password" value=password class="form-control"}}
+                </div>
+                <div class="form-group">
+                    <label for="name" class="control-label">New Password Confirmation</label>
+                    {{input type="password" value=passwordConfirmation class="form-control"}}
+                </div>
+                <button {{action "changePass"}} class="btn btn-default">Change</button>
+              </fieldset>
+            </form>
+          </div>
         </div>
       {{/if}}
     </div>

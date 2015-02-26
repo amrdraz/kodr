@@ -10,7 +10,7 @@ Achivments showcase what the student learned and can be used to guide his learni
 
 ###Install
 
-This project requires nodejs, bower, grunt, mongodb, redis and java8 to run
+This project requires nodejs, bower, grunt, mongodb, redis and java8 and ant to run
 
 You need to supply an SMTP mailerver configuration (see config test) we use haraka in production
 

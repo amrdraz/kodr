@@ -24,7 +24,7 @@ exports.hasToken = function(req, res, next) {
 function fullfilesRole(roles, user, params){
     if(_.isEmpty(roles)) return true;
     if (_.isArray(roles)) {
-        return _.contains(roles, user.role) || ( _.contains(roles,'$self') && user._id.toString()===params.id );
+        return _.contains(roles, user.role) || ( _.contains(roles,'$self') && (user._id.toString()===params.id || user._id.toString()===params.uid) );
     }
     var role = _.find(roles.roles, {role:user.role});
     // console.log(role);

@@ -257,7 +257,7 @@ module.exports = function(app, passport) {
      * @returns {status} 204
      */
 
-    app.del('/api/groups/:id/members/:uid', access.requireRole(['teacher', 'admin']), function(req, res, next) {
+    app.del('/api/groups/:id/members/:uid', access.requireRole(['$self','teacher', 'admin']), function(req, res, next) {
         Group.removeMember(req.params.id, req.params.uid).spread(function(group, user) {
             res.send({
                 group:group,
