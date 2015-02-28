@@ -15,29 +15,13 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/arenas/:id', function(req, res, next) {
-        Promise.fulfilled().then(function() {
-            return [
-                Arena.findOne({
-                    _id: req.params.id
-                }).exec(),
-                Challenge.find({
-                    arena: req.params.id
-                }).exec()
-            ];
-        }).spread(function(arena, challenges) {
-            // console.log(arena, challenges);
-            if (!arena) {
-                return res.send(404, "Not Found");
-            }
+        Arena.getByIdWithChallanges(req.params.id)
+        .spread(function(arena, challenges) {
             res.json({
                 arena: arena,
                 challenges: challenges
             });
-        }).catch(function(err) {
-            console.log(err);
-            return res.send(400);
-        });
-
+        }).catch(next);
     });
 
     /**
