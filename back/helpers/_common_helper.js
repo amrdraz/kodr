@@ -60,7 +60,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
     };
 
 
-    schema.statics.findOneByQueryOrCreate = function(query, update) {
+    schema.statics.getOneByQueryOrCreate = function(query, update) {
         var model = this.db.model(Model);
         return model.getOneByQuery(query).then(function(m) {
             if (m) return m;

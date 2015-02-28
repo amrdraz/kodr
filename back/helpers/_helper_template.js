@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var mongoose = require('mongoose');
 var _ = require('lodash');
 var observer = require('../observer');
 

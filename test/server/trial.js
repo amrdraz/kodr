@@ -42,7 +42,7 @@ describe('Trial', function() {
                 challenge: challenge.id,
                 code: challenge.setup
             }).then(function(trial) {
-                expect(trial).to.exist;
+                should.exist(trial);
                 done();
             });
         });

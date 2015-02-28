@@ -62,94 +62,9 @@ ArenaTrialSchema.plugin(relationship, {
     relationshipPathName: ['arena', 'user']
 });
 
-ArenaTrialSchema.methods.getCompletedTrials = function() {
-    return Trial.find({
-        arenaTrial: this._id,
-        complete: true
-    }).exec();
-};
+ArenaTrialSchema.plugin(require('../helpers/arenaTrial_helper'), 'ArenaTrial');
 
-/**
- * Get Challenges in this arena
- * @return {Promise} contining array of challanges
- */
-ArenaTrialSchema.methods.getArenaChallenges = function() {
-    return Challenge.find({
-        arena: this.arena,
-    }).sort('exp').exec();
-};
-
-/**
- * Find ir create an ArenaTrial along with it's associated Trials
- * @param  {hash} arenaTrial arena trial to create requires arena and user
- * @param  {boolean} withoutTrials wether to create trials along with this arena trial
- * @return {Promise} array contianing arenaTrial as first element and trials as second unless withoutTrials is true
- */
-ArenaTrialSchema.statics.findOrCreate = function(arenaTrial,withoutTrials) {
-    var promise = Promise.fulfilled().then(function() {
-        return ArenaTrial.findOne({
-            user: arenaTrial.user,
-            arena: arenaTrial.arena
-        }).exec().then(function(model) {
-            if (model) return Promise.resolve(model);
-            return ArenaTrial.create(arenaTrial);
-        });
-    });
-    if(withoutTrials) {
-        return [promise];
-    } else {
-        return promise.then(function(model) {
-            var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
-                return Trial.findOrCreate({
-                    arenaTrial: model._id,
-                    arena: model.arena,
-                    user: model.user,
-                    challenge: challenge._id,
-                    code: challenge.setup,
-                    completed:0
-                });
-            });
-            var at = trials.then(function(mods) {
-                return ArenaTrial.findOne({
-                    _id: model._id
-                }).exec();
-            });
-            return [at, trials];
-        });
-    }
-};
 
 var ArenaTrial = module.exports = mongoose.model('ArenaTrial', ArenaTrialSchema);
 
-var queue = Promise.fulfilled();
-var timeout;
-observer.on('trial.award', function(trial) {
-    if (trial.arenaTrial)
-        queue = queue.then(function(model) {
-            return ArenaTrial.findOneAndUpdate({
-                _id: trial.arenaTrial
-            }, {
-                $inc: {
-                    completed: 1,
-                    exp: trial.exp
-                }
-            }, {unset:true}).exec().then(function(arenaTrial) {
-                if (arenaTrial.trials.length === arenaTrial.completed) {
-                    arenaTrial.complete = true;
-                    arenaTrial.completeTime = Date.now();
-                    return new Promise(function(resolve, reject) {
-                        arenaTrial.save(function(err, model) {
-                            if (err) return reject(err);
-                            if (model.complete) {
-                                observer.emit('arenaTrial.complete', model);
-                            }
-                            observer.emit('arenaTrial.trial.awarded', model);
-                            resolve(model);
-                        });
-                    });
-                }
-                observer.emit('arenaTrial.trial.awarded', arenaTrial);
-                return arenaTrial;
-            });
-        });
-});
+require('../events/arenaTrial_events').model(ArenaTrial);
