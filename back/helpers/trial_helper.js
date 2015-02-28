@@ -4,10 +4,10 @@ var _ = require('lodash');
 var observer = require('../observer');
 
 module.exports = exports = function lastModifiedPlugin(schema, options) {
-    var Model  = options.model || options;
+    var Model = options.model || options;
     schema.plugin(require('./_common_helper'), options);
 
-     schema.pre('save', true, function(next, done) {
+    schema.pre('save', true, function(next, done) {
         var Challenge = mongoose.model('Challenge');
         next(null, this);
         if (this.complete) {
@@ -44,16 +44,14 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         var Challenge = mongoose.model('Challenge');
         var ArenaTrial = mongoose.model('ArenaTrial');
 
-        var promise = Promise.fulfilled().then(function() {
-            return Trial.findOne({
-                user: trial.user,
-                challenge: trial.challenge
-            }).exec();
+        var promise = Trial.getOneByQuery({
+            user: trial.user,
+            challenge: trial.challenge
         }).then(function(model) {
-            if (model) return model; // foudn model
+            if (model) return model; // found model
 
             if (trial.arena && trial.arenaTrial) {
-                delete trial.tests; // sometimes a tests filed is submited, it is not known whther this has any significance, shoudl probably remove this line
+                delete trial.tests; // sometimes a tests field is submited, it is not known whther this has any significance, should probably remove this line
                 return Trial.create(trial);
             } else {
                 var tpromise = Promise.fulfilled().then(function() {

@@ -101,4 +101,4 @@ TrialSchema.plugin(require('../helpers/trial_helper'), 'Trial');
 
 var Trial = module.exports = mongoose.model('Trial', TrialSchema);
 
-require('../events/trial').model(Trial);
+require('../events/trial_events').model(Trial);
