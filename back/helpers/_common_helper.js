@@ -3,7 +3,7 @@ var _ = require('lodash');
 var observer = require('../observer');
 
 module.exports = exports = function lastModifiedPlugin(schema, options) {
-    var Model  = options.model || options;
+    var Model = options.model || options;
 
     schema.statics.getById = function(id) {
         var model = this.db.model(Model);
@@ -14,11 +14,14 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
+
     schema.statics.getByIds = function(ids) {
         var model = this.db.model(Model);
         return Promise.fulfilled().then(function() {
             return model.find({
-                _id: {$in:ids}
+                _id: {
+                    $in: ids
+                }
             }).exec();
         });
     };
@@ -34,12 +37,32 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
-
-    schema.statics.findByQueryOrCreate = function(query,update) {
+    schema.statics.getOneByQuery = function(query) {
         var model = this.db.model(Model);
-        return Promise.fulfilled().then(function () {
+        return Promise.fulfilled().then(function() {
             return model.findOne(query).exec();
-        }).then(function(m) {
+        });
+    };
+
+
+    schema.statics.getByQuery = function(query) {
+        if (query.ids) {
+            query._id = {
+                $in: query.ids
+            };
+            delete query.ids;
+        }
+        var model = this.db.model(Model);
+
+        return Promise.fulfilled().then(function() {
+            return model.find(query).exec();
+        });
+    };
+
+
+    schema.statics.findOneByQueryOrCreate = function(query, update) {
+        var model = this.db.model(Model);
+        return model.getOneByQuery(query).then(function(m) {
             if (m) return m;
             return model.create(update);
         });

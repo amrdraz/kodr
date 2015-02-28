@@ -13,7 +13,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
 
     schema.statics.findOrCreate = function(memb) {
         var Member = this.db.model('Member');
-        return Member.findByQueryOrCreate({group:memb.group, user:memb.user},memb);
+        return Member.findOneByQueryOrCreate({group:memb.group, user:memb.user},memb);
     };
 
     schema.statics.getGroups = function(user) {

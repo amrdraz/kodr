@@ -3,10 +3,11 @@ var _ = require('lodash');
 var observer = require('../observer');
 var javaRunner = require('java-code-runner');
 
-module.exports = function (schema, options) {
+var Arena = require('../models/arena');
+
+module.exports = function(schema, options) {
     var Model = options.model || options;
     schema.plugin(require('./_common_helper'), options);
-
 
     schema.methods.run = function(code) {
         var Challenge = this.db.model('Challenge');
@@ -56,6 +57,23 @@ module.exports = function (schema, options) {
                 case 'ruby':
                     break;
             }
+        });
+    };
+
+    schema.statics.KCreate = function(challenge) {
+        var Challenge = this.db.model('Challenge');
+        var promise = Promise.fulfilled();
+
+        if (!challenge.order && challenge.arena) {
+            promise = promise.then(function() {
+                return Arena.getById(challenge.arena).then(function(arena) {
+                    challenge.order = arena.challenges.length + 1;
+                });
+            });
+        }
+
+        return promise.then(function() {
+            return Challenge.create(challenge);
         });
     };
 };

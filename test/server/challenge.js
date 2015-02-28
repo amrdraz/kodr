@@ -125,32 +125,6 @@ describe('Challenge', function() {
         });
     });
 
-    describe('Unit', function() {
-        var challenge, arena;
-
-        afterEach(setup.clearDB);
-
-        it('shoud auto incriment order', function(done) {
-            Promise.fulfilled().then(function() {
-                return Arena.create({});
-            }).then(function(a) {
-                arena = a;
-                return Challenge.create({
-                    arena: arena.id
-                });
-            }).then(function(ch) {
-                challenge = ch;
-                challenge.order.should.equal(1);
-                return Challenge.create({
-                    arena: arena.id
-                });
-            }).then(function(ch) {
-                ch.order.should.equal(2);
-                done();
-            }).catch(done);
-        });
-    });
-
     describe("API", function() {
         var url = 'http://localhost:3000';
         var api = url + '/api';
@@ -311,6 +285,16 @@ describe('Challenge', function() {
         });
 
         describe("GET", function() {
+
+            it("should return 404 if not correct id", function(done) {
+                request(api)
+                    .get("/challenges/" + "54ffff7fffcbcfffefff5fff")
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(404);
+                        done();
+                    });
+            });
 
             it("should return a challenge by id", function(done) {
                 request(api)
