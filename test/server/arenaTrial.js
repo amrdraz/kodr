@@ -129,7 +129,7 @@ describe('ArenaTrial', function() {
                     arena: arena._id,
                     user: user._id
                 };
-                return ArenaTrial.findOrCreate(at);
+                return ArenaTrial.findOrCreateWithTrials(at);
             }).spread(function(at, trials) {
                 at._id.should.eql(arenaTrial._id);
                 trials.length.should.equal(2);

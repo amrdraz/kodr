@@ -37,35 +37,30 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
      * @param  {boolean} withoutTrials wether to create trials along with this arena trial
      * @return {Promise} array contianing arenaTrial as first element and trials as second unless withoutTrials is true
      */
-    schema.statics.findOrCreate = function(arenaTrial, withoutTrials) {
+    schema.statics.findOrCreateWithTrials = function(arenaTrial) {
         var ArenaTrial = mongoose.model('ArenaTrial');
         var Trial = mongoose.model('Trial');
 
-        var promise = ArenaTrial.getOneByQueryOrCreate({
+        return ArenaTrial.getOneByQueryOrCreate({
             user: arenaTrial.user,
             arena: arenaTrial.arena
-        }, arenaTrial);
-
-        if (withoutTrials) {
-            return [promise];
-        } else {
-            return promise.then(function(model) {
-                var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
-                    return Trial.findOrCreate({
-                        arenaTrial: model._id,
-                        arena: model.arena,
-                        user: model.user,
-                        challenge: challenge._id,
-                        code: challenge.setup,
-                        completed: 0
-                    });
+        }, arenaTrial).then(function(model) {
+            var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
+                return Trial.findOrCreate({
+                    arenaTrial: model._id,
+                    arena: model.arena,
+                    user: model.user,
+                    challenge: challenge._id,
+                    order: challenge.order,
+                    code: challenge.setup,
+                    completed: 0
                 });
-                var at = trials.then(function(mods) {
-                    return ArenaTrial.getById(model.id);
-                });
-                return [at, trials];
             });
-        }
+            var at = trials.then(function(mods) {
+                return ArenaTrial.getById(model.id);
+            });
+            return [at, trials];
+        });
     };
 
 };

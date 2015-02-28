@@ -44,45 +44,38 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         var Challenge = mongoose.model('Challenge');
         var ArenaTrial = mongoose.model('ArenaTrial');
 
-        var promise = Trial.getOneByQuery({
-            user: trial.user,
-            challenge: trial.challenge
-        }).then(function(model) {
-            if (model) return model; // found model
+        if (trial.arena && trial.arenaTrial) {
+            return Trial.getOneByQueryOrCreate({
+                user: trial.user,
+                challenge: trial.challenge
+            }, trial);
+        }
 
-            if (trial.arena && trial.arenaTrial) {
-                delete trial.tests; // sometimes a tests field is submited, it is not known whther this has any significance, should probably remove this line
-                return Trial.create(trial);
-            } else {
-                var tpromise = Promise.fulfilled().then(function() {
-                    return Challenge.findOne({
-                        _id: trial.challenge
-                    }).exec();
-                }).then(function(challenge) {
-                    if (!challenge) throw new Error(403);
-                    trial.arena = challenge.arena.toString();
-                    trial.code = challenge.setup;
-                    return challenge;
-                });
-                // console.log("trial.arenaTrial", trial.arenaTrial);
-                if (trial.arenaTrial) {
-                    return tpromise.then(function(challenge) {
-                        return Trial.findOrCreate(trial);
-                    });
-                } else {
-                    return tpromise.then(function(challenge) {
-                        return ArenaTrial.findOrCreate({
-                            arena: challenge.arena,
-                            user: trial.user
-                        }, true);
-                    }).spread(function(at) {
-                        trial.arenaTrial = at.id;
-                        // console.log("trial findOrCreate",trial);
-                        return Trial.findOrCreate(trial);
-                    });
-                }
-            }
+        //get challenge
+        var promise = Challenge.getById_404(trial.challenge).then(function(challenge) {
+            trial.arena = challenge.arena;
+            trial.code = challenge.setup;
+            return challenge;
         });
+
+        if (trial.arenaTrial) {
+            return promise.then(function(challenge) {
+                return Trial.findOrCreate(trial);
+            });
+        } else {
+            return promise.then(function(challenge) {
+                var arenaTrial = {
+                    arena: challenge.arena,
+                    user: trial.user
+                };
+                return ArenaTrial.getOneByQueryOrCreate(arenaTrial,arenaTrial);
+            }).then(function(at) {
+                trial.arenaTrial = at.id;
+                // console.log("trial findOrCreate",trial);
+                return Trial.findOrCreate(trial);
+            });
+        }
+
 
         return promise;
     };
