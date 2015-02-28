@@ -1,35 +1,31 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
-var generateName = require('sillyname');
-var debounce = _.debounce;
 var observer = require('../observer');
 
 module.exports = exports = function lastModifiedPlugin(schema, options) {
-    var Model = options.model || options;
-    schema.plugin(require('./_common_helper'), options);
-
+    var Model  = options.model || options;
 
     schema.statics.getById = function(id) {
-        var User = this.db.model('User');
+        var model = this.db.model(Model);
         return Promise.fulfilled().then(function() {
-            return User.findOne({
+            return model.findOne({
                 _id: id
             }).exec();
         });
     };
+
     schema.statics.getByIds = function(ids) {
-        var User = this.db.model('User');
+        var model = this.db.model(Model);
         return Promise.fulfilled().then(function() {
-            return User.find({
-                _id: {
-                    $in: ids
-                }
+            return model.find({
+                _id: {$in:ids}
             }).exec();
         });
     };
+
     schema.statics.getById_404 = function(id) {
-        var User = this.db.model('User');
-        return User.getById(id).then(function(g) {
+        var model = this.db.model(Model);
+        return model.getById(id).then(function(g) {
             if (!g) throw {
                 http_code: 404,
                 message: "Not Found"
@@ -38,13 +34,14 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
-    schema.statics.findOrCreate = function(memb) {
-        var User = this.db.model('User');
+
+    schema.statics.findByQueryOrCreate = function(query,update) {
+        var model = this.db.model(Model);
         return Promise.fulfilled().then(function () {
-            return User.findOne({group:memb.group, user:memb.user}).exec();
+            return model.findOne(query).exec();
         }).then(function(m) {
             if (m) return m;
-            return User.create(memb);
+            return model.create(update);
         });
     };
 

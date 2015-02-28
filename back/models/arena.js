@@ -53,4 +53,7 @@ ArenaSchema.plugin(relationship, {
     relationshipPathName: ['author']
 });
 
+
+ArenaSchema.plugin(require('../helpers/arena'), 'Arena');
+
 module.exports = mongoose.model('Arena', ArenaSchema);

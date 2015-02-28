@@ -48,6 +48,6 @@ var QuestSchema = new mongoose.Schema({
 });
 
 
-QuestSchema.plugin(require('../helpers/quest'));
+QuestSchema.plugin(require('../helpers/quest'), 'Quest');
 
 var Quest = module.exports = mongoose.model('Quest', QuestSchema);

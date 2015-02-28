@@ -61,7 +61,7 @@ UserQuestSchema.plugin(relationship, {
     relationshipPathName: ['user', 'quest']
 });
 
-UserQuestSchema.plugin(require('../helpers/userQuest'));
+UserQuestSchema.plugin(require('../helpers/userQuest'), 'UserQuest');
 
 
 UserQuestSchema.methods.toJSON = function() {

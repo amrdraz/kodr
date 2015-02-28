@@ -5,7 +5,7 @@ var debounce = _.debounce;
 var observer = require('../observer');
 
 module.exports = exports = function lastModifiedPlugin(schema, options) {
-
+    schema.plugin(require('./_common_helper'), options);
 
     schema.methods.findOrAssign = function(userId) {
         var Quest = this.db.model('Quest');

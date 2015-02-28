@@ -19,7 +19,7 @@ describe('Challenge', function() {
 
     var code = 'char c =\'a\'; int a = 40, b = 20; System.out.print("a - b = " + (a - b));';
     var testchallenge = {
-        language:'java',
+        language: 'java',
         tests: '\
         $main(); \
   if ($userOut.toString().equals("a - b = 20")) {\
@@ -27,22 +27,22 @@ describe('Challenge', function() {
   } else {\
    $test.fail("it\'s "+$userOut.toString()+" to equal "+"a - b = 20"); \
   }',
-        postCode:'//comment won\'t be striped\n char y = \'1\';',
-        preCode:'//comment to be striped',
-        exp:1
+        postCode: '//comment won\'t be striped\n char y = \'1\';',
+        preCode: '//comment to be striped',
+        exp: 1
     };
     var out = "a - b = 20";
 
     describe('Code', function() {
         it('should run java', function(done) {
-            Challenge.run(code,testchallenge).spread(function(sterr, stout) {
+            Challenge.run(code, testchallenge).spread(function(sterr, stout) {
                 if (sterr) return done(sterr);
                 stout.should.equal(out);
                 done();
             }).catch(done);
         });
         it('should run java and show error', function(done) {
-            Challenge.run(code+'\n x = 3',testchallenge).spread(function(sterr, stout) {
+            Challenge.run(code + '\n x = 3', testchallenge).spread(function(sterr, stout) {
                 sterr.should.exist;
                 // stout.should.equal(out);
                 done();
@@ -50,10 +50,10 @@ describe('Challenge', function() {
         });
 
         it('should test java', function(done) {
-            Challenge.test(code,testchallenge,testchallenge).spread(function(report, stout, sterr) {
-                if(sterr) return done(sterr);
+            Challenge.test(code, testchallenge, testchallenge).spread(function(report, stout, sterr) {
+                if (sterr) return done(sterr);
                 // console.log(stout);
-                expect(report).to.have.property('passed',true);
+                expect(report).to.have.property('passed', true);
                 done();
             }).catch(done);
         });
@@ -125,6 +125,32 @@ describe('Challenge', function() {
         });
     });
 
+    describe('Unit', function() {
+        var challenge, arena;
+
+        afterEach(setup.clearDB);
+
+        it('shoud auto incriment order', function(done) {
+            Promise.fulfilled().then(function() {
+                return Arena.create({});
+            }).then(function(a) {
+                arena = a;
+                return Challenge.create({
+                    arena: arena.id
+                });
+            }).then(function(ch) {
+                challenge = ch;
+                challenge.order.should.equal(1);
+                return Challenge.create({
+                    arena: arena.id
+                });
+            }).then(function(ch) {
+                ch.order.should.equal(2);
+                done();
+            }).catch(done);
+        });
+    });
+
     describe("API", function() {
         var url = 'http://localhost:3000';
         var api = url + '/api';
@@ -188,7 +214,7 @@ describe('Challenge', function() {
                 teacher._id = t._id;
                 accessToken = teacher.token = t.token;
                 challenge.challenge.arena = arena.id;
-                return setup.challengeTest(done);
+                done();
             }).catch(done);
         });
 
@@ -253,7 +279,7 @@ describe('Challenge', function() {
                     .send({
                         code: code,
                         language: 'java',
-                        inputs:['int x']
+                        inputs: ['int x']
                     })
                     .expect(200)
                     .end(function(err, res) {
@@ -268,8 +294,8 @@ describe('Challenge', function() {
                     .post("/challenges/test")
                     .set('Authorization', 'Bearer ' + student.token)
                     .send({
-                        code:code,
-                        challenge:testchallenge
+                        code: code,
+                        challenge: testchallenge
                     })
                     .expect(200)
                     .end(function(err, res) {
@@ -303,7 +329,7 @@ describe('Challenge', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.challenge.length.should.equal(4); // 3 from setup + 1 from post
+                        res.body.challenge.length.should.gte(1); // 3 from setup + 1 from post
                         done();
                     });
             });

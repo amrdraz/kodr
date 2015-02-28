@@ -40,7 +40,7 @@ GroupSchema.methods.changed = function(members) {
     });
 };
 
-GroupSchema.plugin(require('../../back/helpers/group'));
+GroupSchema.plugin(require('../helpers/group'), 'Group');
 
 var Group = mongoose.model('Group', GroupSchema);
 
