@@ -10,7 +10,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
 
 /**
  * Trial Schema.
- * A trial is a users attempt on a challenge
+ * A trial is a users attempt on a challenge, most fileds are a replica of the original challenge
  * versions of the trial are maintained for analysing the user's preformance
  * experiance is tipically granted on completion but would be intresting if the challenge awards exp in  adifferent way
  *
@@ -88,7 +88,7 @@ TrialSchema.plugin(version, {
     collection: 'TrialVersions',
     logError: true,
     suppressVersionIncrement: false,
-    ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge', 'arena'],
+    ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge', 'arena', 'order'],
     strategy: 'array'
 });
 
@@ -101,4 +101,4 @@ TrialSchema.plugin(require('../helpers/trial_helper'), 'Trial');
 
 var Trial = module.exports = mongoose.model('Trial', TrialSchema);
 
-require('../events/trial')();
+require('../events/trial').model(Trial);

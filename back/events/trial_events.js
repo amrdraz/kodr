@@ -2,10 +2,8 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var observer = require('../observer');
 var util = require('util');
-var Challenge = require('../models/challenge');
-var Trial = require('../models/trial');
 
-module.exports = function (io) {
+exports.model = function (Trial) {
   // removing trial from arena trial so that it wouldn't show up
     // while still retaining the data for the user's histroy (tho maybe that's not a good idea)
     observer.on('challenge.removed', function(challenge) {
