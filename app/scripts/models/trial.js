@@ -3,6 +3,7 @@ module.exports = DS.Model.extend({
     input: DS.attr('string'),
     times: DS.attr('number'),
     exp: DS.attr('number'),
+    order: DS.attr('number'),
     complete: DS.attr('boolean'),
     completed: DS.attr('number'),
     report:DS.attr(),
