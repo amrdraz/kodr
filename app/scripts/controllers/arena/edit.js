@@ -1,10 +1,13 @@
 var toastr = require('toastr');
 module.exports = Em.ObjectController.extend({
-    breadCrumb:'arena',
-    breadCrumbPath:'arena',
+    breadCrumb: 'arena',
+    breadCrumbPath: 'arena',
     needs: ['arena'],
-    canPublish: function () {
-        return this.get('model.canPublish') && this.get('model.challenges').filterProperty('isPublished', true).length>=1;
+    isCreating: function() {
+        return App.get('currentPath').split('.').contains('create');
+    }.property('App.currentPath'),
+    canPublish: function() {
+        return this.get('model.canPublish') && this.get('model.challenges').filterProperty('isPublished', true).length >= 1;
     }.property('model.challenges.@each.isPublished'),
     actions: {
         reset: function() {
@@ -12,24 +15,27 @@ module.exports = Em.ObjectController.extend({
         },
         save: function() {
             var that = this;
-            this.get('model').save().then(function(ch) {
-                if (App.get('currentPath').contains('create'))
-                    that.transitionToRoute('arena.edit', ch.get('id'));
+            var model = this.get('model');
+            model.save().then(function(arena) {
+                if (that.get('isCreating')) {
+                    that.transitionToRoute('arena.edit', arena.id);
+                }
             }).catch(function(xhr) {
-                that.set('errorMessage', xhr.responseText);
+                console.error(xhr.message);
+                toastr.error(xhr.message);
             });
         },
         delete: function() {
             var newModel = this.get('model.isNew');
             this.get('model').destroyRecord();
-            if(!newModel) {
+            if (!newModel) {
                 this.get('model').save();
             }
             this.transitionToRoute('arenas');
         },
         publish: function() {
             var model = this.get('model');
-            if(this.get('canPublish')) {
+            if (this.get('canPublish')) {
                 this.set('model.isPublished', true);
                 this.get('model').save().then(function(ch) {
                     console.log('published');
