@@ -51,6 +51,7 @@ var ChallengeModel = module.exports = DS.Model.extend({
         inverse: 'challenges'
     }),
 
+    order: attr('number', {defaultValue:0}),
     exp: attr('number', {defaultValue:10}),
     expOptions: [{
         rank: "direct",

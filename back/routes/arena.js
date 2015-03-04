@@ -15,29 +15,13 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/arenas/:id', function(req, res, next) {
-        Promise.fulfilled().then(function() {
-            return [
-                Arena.findOne({
-                    _id: req.params.id
-                }).exec(),
-                Challenge.find({
-                    arena: req.params.id
-                }).exec()
-            ];
-        }).spread(function(arena, challenges) {
-            // console.log(arena, challenges);
-            if (!arena) {
-                return res.send(404, "Not Found");
-            }
+        Arena.getByIdWithChallanges(req.params.id)
+        .spread(function(arena, challenges) {
             res.json({
                 arena: arena,
                 challenges: challenges
             });
-        }).catch(function(err) {
-            console.log(err);
-            return res.send(400);
-        });
-
+        }).catch(next);
     });
 
     /**
@@ -48,17 +32,11 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/arenas', function(req, res, next) {
-        if(req.query.ids) {
-            req.query._id = {$in:req.query.ids};
-            delete req.query.ids;
-        }
-        Arena.find(req.query, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404, "Not Found");
+        Arena.getByQuery(req.query).then(function(model) {
             res.json({
                 arena: model
             });
-        });
+        }).catch(next);
     });
 
     /**
@@ -72,7 +50,6 @@ module.exports = function(app, passport) {
         req.body.arena.author = req.user.id;
         Arena.create(req.body.arena, function(err, model) {
             if (err) return next(err);
-            if (!model) return res.send(403, "Not Found");
             res.json({
                 arena: model
             });
@@ -104,14 +81,12 @@ module.exports = function(app, passport) {
      */
 
     app.del('/api/arenas/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
-        Arena.findById(req.params.id, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404);
+        Arena.getById_404(req.params.id).then(function(model) {
             model.remove(function(err, model) {
                 if (err) return next(err);
                 res.send(200);
             });
-        });
+        }).catch(next);
     });
 
 };

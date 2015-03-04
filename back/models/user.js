@@ -120,7 +120,7 @@ var userSchema = new mongoose.Schema({
 // userSchema.plugin(relationship, {
 //     relationshipPathName: ['memberships']
 // });
-userSchema.plugin(require('../helpers/user'));
+userSchema.plugin(require('../helpers/user'), 'User');
 // 
 /**
  * is this object a user

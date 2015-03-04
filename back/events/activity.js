@@ -167,7 +167,7 @@ observer.on('user.disconnect', function(id) {
         });
     }).then(function (act) {
         if (process.env.NODE_ENV==='test') {
-            // observer.emit('test.socket.respond', {sid:id, event:'test.disconnect.response'});
+            // observer.emit('test.disconnect.response', act);
         }
     });
 });

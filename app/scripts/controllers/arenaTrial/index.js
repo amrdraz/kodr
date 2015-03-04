@@ -3,6 +3,12 @@ module.exports = Em.ObjectController.extend({
     // breadCrumbPath:'arenaTrial',
     needs: ['arenaTrial'],
     arena: Ember.computed.alias("controllers.arenaTrial.model"),
+    trials: function() {
+        return Ember.ArrayProxy.createWithMixins(Em.SortableMixin, {
+            sortProperties: ['order'],
+            content: this.get('model.trials')
+        });
+    }.property('model.trials'),
     init: function() {
         this._super();
         // this.addObserver('hasSandbox', this, function () {
@@ -19,12 +25,12 @@ module.exports = Em.ObjectController.extend({
         //     sb.on('log', handler);
         // });
     },
-    currentTrial:function () {
+    currentTrial: function() {
         return this.get('model.trials.firstObject');
     }.property('arena.challenges.@each'),
     actions: {
-      try: function (trial) {
-          this.transitionToRoute('trial', trial);
-      }
+        try: function(trial) {
+            this.transitionToRoute('trial', trial);
+        }
     }
 });

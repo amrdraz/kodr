@@ -86,6 +86,6 @@ MemberSchema.virtual('isSubscriber').get(function() {
     return this.role==='subscriber';
 });
 
-MemberSchema.plugin(require('../../back/helpers/member'));
+MemberSchema.plugin(require('../helpers/member'), 'Member');
 
 var Member = module.exports = mongoose.model('Member', MemberSchema);

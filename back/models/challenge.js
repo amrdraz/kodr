@@ -3,7 +3,6 @@ var Promise = require('bluebird');
 var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
 var observer = require('../observer');
-var javaRunner = require('java-code-runner');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
@@ -27,7 +26,7 @@ var ChallengeSchema = new mongoose.Schema({
         'default': 'java',
         enum: ['javascript', 'java', 'python']
     },
-    inputs:[String],
+    inputs: [String],
     setup: {
         type: String,
         'default': '// Starting Code leave blank if you want Student to start from scratch\n'
@@ -61,7 +60,12 @@ var ChallengeSchema = new mongoose.Schema({
     exp: {
         type: Number,
         'default': 1,
-        min: 1
+        min: 0
+    },
+    order: {
+        type: Number,
+        'default': 0,
+        min: 0
     },
     author: {
         type: ObjectId,
@@ -88,57 +92,12 @@ ChallengeSchema.plugin(relationship, {
     relationshipPathName: ['arena', 'author']
 });
 
+ChallengeSchema.plugin(require('../helpers/challenge'), 'Challenge');
+
 ChallengeSchema.post('remove', function(doc) {
     observer.emit('challenge.removed', doc);
 });
 
-ChallengeSchema.methods.run = function(code) {
-    return Challenge.run(code,this);
-};
-
-ChallengeSchema.statics.run = function(code, options) {
-    return new Promise(function(resolve, reject) {
-        switch (options.language) {
-            case 'javascript':
-                resolve(['no server js','']);
-                break;
-            case 'java':
-                javaRunner.run(code,options,function (err,stout,sterr) {
-                    if(err && !sterr) return reject(err);
-                    return resolve([sterr, stout]);
-                });
-                break;
-            case 'python':
-                break;
-            case 'ruby':
-                break;
-        }
-    });
-};
-
-
-ChallengeSchema.methods.test = function(code) {
-    return Challenge.test(code,this);
-};
-
-ChallengeSchema.statics.test = function(code, challenge) {
-    return new Promise(function(resolve, reject) {
-        switch (challenge.language) {
-            case 'javascript':
-                resolve({},['no server js','']);
-                break;
-            case 'java':
-                javaRunner.test(code,challenge.tests,challenge,function (err,report,stout,sterr) {
-                    if(err && !sterr) return reject(err);
-                    return resolve([report,stout, sterr]);
-                });
-                break;
-            case 'python':
-                break;
-            case 'ruby':
-                break;
-        }
-    });
-};
-
 var Challenge = module.exports = mongoose.model('Challenge', ChallengeSchema);
+
+require('../events/challenge').model(Challenge);

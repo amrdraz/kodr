@@ -49,6 +49,17 @@ var UserController = Ember.ObjectController.extend(Ember.Validations.Mixin, {
                 toastr.error(err.statusText);
             });
         },
+        leave: function (member) {
+            var that = this;
+            Em.$.ajax({
+                method:'DELETE',
+                url:'api/groups/'+member.get('data.group.id')+'/members/'+member.get('data.user.id')
+            }).done(function (data) {
+                that.store.pushPayload(data);
+            }).fail(function (err) {
+                toastr.error(err.statusText);
+            });
+        },
         changePass: function() {
             var that = this;
             this.validate().then(function() {

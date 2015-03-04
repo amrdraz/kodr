@@ -33,7 +33,7 @@ module.exports = function(app, passport) {
     app.get('/api/arenaTrials', access.requireRole(), function(req, res, next) {
         var arena = req.query.arena;
         if (arena) {
-            ArenaTrial.findOrCreate({user:req.user.id,arena:arena})
+            ArenaTrial.findOrCreateWithTrials({user:req.user.id,arena:arena})
                 .spread(function(model, trials) {
                     res.json({
                         arenaTrial: model,
@@ -64,7 +64,7 @@ module.exports = function(app, passport) {
 
     app.post('/api/arenaTrials', access.requireRole(), function(req, res, next) {
         req.body.arenaTrial.user = req.user.id;
-        ArenaTrial.findOrCreate(req.body.arenaTrial)
+        ArenaTrial.findOrCreateWithTrials(req.body.arenaTrial)
             .spread(function(model, trials) {
                 res.json({
                     arenaTrial: model,

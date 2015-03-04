@@ -7,6 +7,8 @@ var Member = require('../models/member');
 var User = require('../models/user');
 
 module.exports = exports = function lastModifiedPlugin(schema, options) {
+    var Model  = options.model || options;
+    schema.plugin(require('./_common_helper'), options);
 
     schema.methods.getLeaders = function() {
         var group = this;
@@ -184,35 +186,6 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
             return Promise.map(users, function (user) {
                return group.join(user);
             });
-        });
-    };
-
-    schema.statics.getById = function(id) {
-        var Group = this.db.model('Group');
-        return Promise.fulfilled().then(function() {
-            return Group.findOne({
-                _id: id
-            }).exec();
-        });
-    };
-
-    schema.statics.getByIds = function(ids) {
-        var Group = this.db.model('Group');
-        return Promise.fulfilled().then(function() {
-            return Group.find({
-                _id: {$in:ids}
-            }).exec();
-        });
-    };
-
-    schema.statics.getById_404 = function(id) {
-        var Group = this.db.model('Group');
-        return Group.getById(id).then(function(g) {
-            if (!g) throw {
-                http_code: 404,
-                message: "Not Found"
-            };
-            return g;
         });
     };
 

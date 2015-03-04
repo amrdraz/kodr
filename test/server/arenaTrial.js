@@ -124,17 +124,16 @@ describe('ArenaTrial', function() {
         });
 
         it('should find or create arenaTrial with trials for user given arena and user', function(done) {
-            Promise.fulfilled()
-                .then(function() {
-                    var at = {
-                        arena: arena._id,
-                        user: user._id
-                    };
-                    return ArenaTrial.findOrCreate(at).spread(function(at, trials) {
-                        at._id.should.eql(arenaTrial._id);
-                        trials.length.should.equal(2);
-                    });
-                }).finally(done);
+            Promise.fulfilled().then(function() {
+                var at = {
+                    arena: arena._id,
+                    user: user._id
+                };
+                return ArenaTrial.findOrCreateWithTrials(at);
+            }).spread(function(at, trials) {
+                at._id.should.eql(arenaTrial._id);
+                trials.length.should.equal(2);
+            }).finally(done);
         });
 
     });

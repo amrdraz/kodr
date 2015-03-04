@@ -5,6 +5,8 @@ var debounce = _.debounce;
 var observer = require('../observer');
 
 module.exports = exports = function lastModifiedPlugin(schema, options) {
+    var Model = options.model || options;
+    schema.plugin(require('./_common_helper'), options);
 
 
     schema.statics.getById = function(id) {

@@ -17,13 +17,11 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/trials/:id', function(req, res, next) {
-        Trial.findById(req.params.id, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404, "Not Found");
+        Trial.getById(req.params.id).then(function(model) {
             res.json({
                 trial: model
             });
-        });
+        }).catch(next);
     });
 
     /**
@@ -34,17 +32,11 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/trials', function(req, res, next) {
-        if(req.query.ids) {
-            req.query._id = {$in:req.query.ids};
-            delete req.query.ids;
-        }
-        Trial.find(req.query, function(err, model) {
-            if (err) return next(err);
-            if (!model) return res.send(404, "Not Found");
+        Trial.getByQuery(req.query).then(function (model) {
             res.json({
                 trial: model
             });
-        });
+        }).catch(next);
     });
 
     /**

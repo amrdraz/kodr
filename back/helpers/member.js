@@ -7,34 +7,13 @@ var User = require('../models/user');
 
 module.exports = exports = function lastModifiedPlugin(schema, options) {
 
-
-    schema.statics.getById = function(id) {
-        var Member = this.db.model('Member');
-        return Promise.fulfilled().then(function() {
-            return Member.findOne({
-                _id: id
-            }).exec();
-        });
-    };
-    schema.statics.getById_404 = function(id) {
-        var Member = this.db.model('Member');
-        return Member.getById(id).then(function(g) {
-            if (!g) throw {
-                http_code: 404,
-                message: "Not Found"
-            };
-            return g;
-        });
-    };
+    var Model  = options.model || options;
+    schema.plugin(require('./_common_helper'), options);
+    
 
     schema.statics.findOrCreate = function(memb) {
         var Member = this.db.model('Member');
-        return Promise.fulfilled().then(function () {
-            return Member.findOne({group:memb.group, user:memb.user}).exec();
-        }).then(function(m) {
-            if (m) return m;
-            return Member.create(memb);
-        });
+        return Member.getOneByQueryOrCreate({group:memb.group, user:memb.user},memb);
     };
 
     schema.statics.getGroups = function(user) {
