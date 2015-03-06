@@ -39,12 +39,6 @@ Ember.Application.initializer({
     }
 });
 
-// Ember.Application.initializer({
-//   name: 'authentication',
-//   initialize: function(container, application) {
-//     Ember.SimpleAuth.setup(container, application, {routeAfterLogin:'profile'});
-//   }
-// });
 try {
     var emberSockets = EmberSockets; //cause I removed EmberSocket during testing
 } catch(e) {

@@ -28,7 +28,8 @@
     "socket.io-client": "~1.0.6",
     "ember-sockets": "~0.6.10",
     "highcharts": "~4.0.4",
-    "chosen_v1.3.0": "https://github.com/harvesthq/chosen/releases/download/v1.3.0/chosen_v1.3.0.zip"
+    "chosen_v1.3.0": "https://github.com/harvesthq/chosen/releases/download/v1.3.0/chosen_v1.3.0.zip",
+    "sweetalert": "~0.4.2"
   },
   "devDependencies": {
     "jquery-mockjax": "~1.5.3",

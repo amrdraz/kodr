@@ -38,7 +38,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
         model.set('complete', complete);
         this.save(function (model) {
             if(model.get('completed')===1) {
-                toastr.success('You just earned '+model.get('exp')+' EXP');
+                swal("+"+model.get('exp')+" EXP", "For completeing this challenge", "success");
             }
         });
     },
@@ -48,7 +48,7 @@ module.exports = Em.ObjectController.extend(ChallengeMixin, {
             return model.save().then(cb);
         } else {
             if(model.get('complete')){
-                toastr.info('You could have earned '+model.get('challenge.exp')+' EXP if you where logged in');
+                swal("Great Job", "You could have earned "+model.get('challenge.exp')+" EXP if you where logged in", "success");
             } else {
                 toastr.info('You meight want to change those failures in your code, check the console');
             }

@@ -7,6 +7,10 @@ var ArenaModel = module.exports = DS.Model.extend({
     description: attr('string', {
         defaultValue: "A new Arena"
     }),
+    fllow: attr('string', {
+        defaultValue: "any"
+    }),
+    fllowType: ['any', 'sequencial'],
     isPublished: attr('boolean', {defaultValue:false}),
     challenges: DS.hasMany('challenge', {async: true, inverse: 'arena'}),
     trials: DS.hasMany('trial', {async: true, inverse: 'arena'}),
@@ -24,9 +28,3 @@ var ArenaModel = module.exports = DS.Model.extend({
         return !this.get('isDirty') && !this.get('isPublished');
     }.property('isDirty', 'isPublished')
 });
-
-ArenaModel.FIXTURES = [{
-    id: 1,
-    name: 'Basic Test',
-    challanges:[1]
-}];
