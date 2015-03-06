@@ -1,7 +1,4 @@
 var mongoose = require('mongoose');
-var Promise = require('bluebird');
-var util = require('util');
-var _ = require('lodash');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 var relationship = require("mongoose-relationship");
@@ -38,56 +35,6 @@ var ActivitySchema = new mongoose.Schema({
     }
 });
 
-ActivitySchema.methods.getSubject = function () {
-    var Model = this.db.model(this.subjectModel);
-    var activity = this;
-    return Promise.fulfilled().then(function() {
-        return Model.findOne({
-            _id: activity.subjectId
-        }).exec();
-    });
-};
-
-
-ActivitySchema.methods.getObject = function () {
-    var Model = this.db.model(this.objectModel);
-    var activity = this;
-    return Promise.fulfilled().then(function() {
-        return Model.findOne({
-            _id: activity.objectId
-        }).exec();
-    });
-};
-
-
-ActivitySchema.statics.findByAction = function (act) {
-    var Model = this.db.model('Activity');
-    return Promise.fulfilled().then(function () {
-        return Model.find({action:act}).exec();
-    });
-};
-
-ActivitySchema.statics.findByVerb = function (verb) {
-    var Model = this.db.model('Activity');
-    return Promise.fulfilled().then(function () {
-        return Model.find({verb:verb}).exec();
-    });
-};
-
-ActivitySchema.statics.new = function (obj) {
-    var Model = this.db.model('Activity');
-    return Promise.fulfilled().then(function () {
-        if (obj.subject) {
-            obj.subjectId = obj.subject.id;
-            obj.subjectModel = obj.subject.constructor.modelName;
-        }
-        if (obj.object) {
-            obj.objectId = obj.object.id;
-            obj.objectModel = obj.object.constructor.modelName;
-        }
-        return Model.create(obj);
-    });
-};
-
+ActivitySchema.plugin(require('../helpers/activity_helper'), 'Activity');
 
 module.exports = mongoose.model('Activity', ActivitySchema);

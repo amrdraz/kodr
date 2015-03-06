@@ -27,9 +27,14 @@ var ArenaSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
-    // requiredAchievements: {
-    //     type: [ObjectId], ref: 'Achievement'
-    // },
+    requires: {
+        type: [ObjectId], ref: 'Requirement'
+    },
+    fllow:  {
+        type: String,
+        default:'any',
+        enum: ['any', 'sequencial']
+    },
     challenges: [{
         type: ObjectId,
         ref: 'Challenge',

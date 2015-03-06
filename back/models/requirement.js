@@ -73,26 +73,8 @@ RequirementSchema.plugin(relationship, {
 });
 
 
-/**
- * takes a user and checks whether this requirment is active for him
- * @param  {[type]}  user [description]
- * @return {Boolean}      [description]
- */
-RequirementSchema.methods.isActive = function(obj) {
-    var res = false;
-    switch (this.condition) {
-        case '>=':
-            res = (obj[this.property] >= this.activation);
-            break;
-        case '<=':
-            res = (obj[this.property] <= this.activation);
-            break;
-        case '==':
-            res = (obj[this.property] === this.activation);
-            break;
-    }
-    return res;
-};
+RequirementSchema.plugin(require('../helpers/requirement_helper'), 'Requirement');
+
 
 var Requirement = module.exports = mongoose.model('Requirement', RequirementSchema);
 

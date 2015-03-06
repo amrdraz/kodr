@@ -37,6 +37,9 @@ var ArenaTrialSchema = new mongoose.Schema({
     completeTime: {
         type: Date
     },
+    startTime: {
+        type: Date
+    },
     completed: {
         type: Number,
         'default': 0
