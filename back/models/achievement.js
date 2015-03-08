@@ -10,7 +10,6 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * @type {mongoose.Schema}
  */
 
-
 var AchievementSchema = new mongoose.Schema({
     name: {
         type: String,
