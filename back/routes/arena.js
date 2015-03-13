@@ -3,7 +3,7 @@ var User = require('../models/user');
 var access = require('./access');
 var Arena = require('../models/arena');
 var Challenge = require('../models/challenge');
-
+var VChallenge = require('../models/vchallenge');
 module.exports = function(app, passport) {
 
 
@@ -16,10 +16,11 @@ module.exports = function(app, passport) {
 
     app.get('/api/arenas/:id', function(req, res, next) {
         Arena.getByIdWithChallanges(req.params.id)
-        .spread(function(arena, challenges) {
+        .spread(function(arena, challenges, vchallenges) {
             res.json({
                 arena: arena,
-                challenges: challenges
+                challenges: challenges,
+                vchallenges: vchallenges
             });
         }).catch(next);
     });

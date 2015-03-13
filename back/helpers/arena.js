@@ -10,8 +10,11 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
     schema.statics.getByIdChallenges = function (id) {
         var Arena = this.db.model(Model);
         var Challenge = this.db.model('Challenge');
+        var VChallenge = this.db.model('VChallenge');
         return Promise.fulfilled().then(function () {
-            return Challenge.find({arena:id}).sort('order').exec();
+            return Challenge.find({arena:id}).sort('order').exec().then(function () {
+                return VChallenge.find({arena:id}).sort('order').exec();
+            })
         });
     };
 

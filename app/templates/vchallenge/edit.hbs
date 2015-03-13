@@ -1,0 +1,134 @@
+<section class="vchallenge-controlles row">
+  <ul class="nav nav-pills pull-right">
+    <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat vchallenge-reset"></i> Reset</a></li>
+    {{#unless isPublished }}
+    <li {{action "save"}} {{bind-attr class="canSave::disabled :vchallenge-save"}} ><a href="#">
+        <i class="glyphicon glyphicon-save"></i> Save</a>
+    </li>
+    {{/unless}}
+    {{#unless isPublished }}
+      <li {{action "publish"}} {{bind-attr class="canPublish::disabled :vchallenge-publish "}}><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
+    {{else}}
+      <li {{action "save"}} {{bind-attr class="canSave::disabled :vchallenge-unpublish"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
+      <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
+    {{/unless}}
+    <li {{action 'delete' }} class="vchallenge-delete"><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
+    <li {{action 'validate' }} {{bind-attr class="valid:active :vchallenge-validate "}}><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
+  </ul>
+</section>
+<section class="vchallenge-settings row">
+<form role="form">
+  <div class="form-group">
+    <div class="col-md-6">
+      <label for="name" class="control-label">VChallenge name</label>
+      {{input id="name" value=model.name class="vchallenge-name form-control"}}
+    </div>
+  </div>
+  <div class="form-group">
+    <div class=" col-md-6">
+      <label for="language" class="control-label">Language</label>
+      {{chosen
+          class=":vchallenge-language-select"
+          content=vchallengeLanguages
+          value=model.language
+      }}
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-6">
+      <label for="ecp" class="control-label">Difficulty</label>
+      {{chosen
+          class=":vchallenge-exp-select"
+          content=model.expOptions
+          optionValuePath="content.points"
+          optionLabelPath="content.rank"
+          value=model.exp
+      }}
+      <span class="label label-primary vchallenge-exp">Estimated difficulty awards: {{model.exp}} Exp</span>
+    </div>
+  </div>
+  {{#if isJava }}
+    <div class="form-group">
+    <div class="col-md-6">
+      <label for="inputs" class="control-label">Inputs</label>
+      {{#each inp in model.inputs}}
+            {{input value=inp.value class="vchallenge-name form-control"}}
+            <button type="button" {{action "removeInput" inp }} class="close"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      {{/each}}
+      <button {{action "addInput" }}class="btn btn-primary">+ Add</button>
+    </div>
+  </div>
+  {{/if}}
+</form>
+</section>
+<hr>
+<section class="vchallenge-content row">
+  
+  <div class="col-lg-6">
+    <a id="run" {{action "run"}} class="btn btn-default pull-right vchallenge-run"><i class="glyphicon glyphicon-play"></i> Run in Console</a>
+      
+      <ul class="nav nav-tabs">
+        <li><a href="#import" data-toggle="tab">Import</a></li>
+        <li class="active"><a href="#solution" data-toggle="tab">Solution</a></li>
+        <li><a href="#setup" data-toggle="tab">Setup</a></li>
+        <li><a href="#tests" data-toggle="tab">Test</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade in active" id="solution">
+          {{view 'App.CodeEditorView'
+              name="solutionEditor"
+              id="solutionEditor"
+              class="col-lg-12"
+              model=model
+              lint=true
+              attr='solution' }}
+        </div>
+        <div class="tab-pane fade " id="setup">
+          {{view 'App.CodeEditorView'
+            name="setup"
+            id="setupEditor"
+            class="col-lg-12"
+            model=model
+            attr='setup' }}
+        </div>
+        <div class="tab-pane fade" id="tests">
+          {{view 'App.CodeEditorView'
+              name="testsEditor"
+              id="testsEditor"
+              class="col-lg-12"
+              model=model
+              attr='tests' }}
+        </div>
+      </div>
+  </div>
+  <div class="col-lg-6">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+        <li><a href="#descriptionPreview" data-toggle="tab">Description Preview</a></li>
+        <li><a href="#console" data-toggle="tab">Console</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane  fade in active" id="description">
+          {{view 'App.CodeEditorView'
+            name="description"
+            id="descriptionEditor"
+            class="col-lg-12"
+            model=model
+            attr='description'
+            highlight='markdown'
+            }}
+        </div>
+
+        <div class="tab-pane fade" id="descriptionPreview">
+          {{view 'App.MarkedMathView' model=model observable='description' }}
+        </div>
+        <div class="tab-pane fade" id="console">
+          {{view App.ConsoleView }}
+        </div>
+        <div id="sandbox">
+          {{view App.SandboxView }}
+        </div>
+      </div>
+  
+  </div>
+</section>

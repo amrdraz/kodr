@@ -12,6 +12,8 @@ var ArenaModel = module.exports = DS.Model.extend({
     trials: DS.hasMany('trial', {async: true, inverse: 'arena'}),
     users: DS.hasMany('arenaTrial', {async: true, inverse: 'arena'}),
     author: DS.belongsTo('user', {async:true, inverse:'arenas'}),
+    //vchallenges: DS.hasMany('vchallenge', {async: true, inverse: 'arena'}),
+    //vtrials: DS.hasMany('trial', {async: true, inverse: 'arena'}),
 
 
     canSave: function() {
@@ -28,5 +30,6 @@ var ArenaModel = module.exports = DS.Model.extend({
 ArenaModel.FIXTURES = [{
     id: 1,
     name: 'Basic Test',
-    challanges:[1]
+    challanges:[1],
+    vchallenges:[1]
 }];

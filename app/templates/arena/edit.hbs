@@ -41,3 +41,11 @@
     {{render '_arenaChallengesList' model.challenges }}
   </div>
 </section>
+<section class="arean-vchallenges row">
+<div class="col-lg-12 clearfix">
+  {{#link-to 'challenges.create' class="btn btn-primary create-vchallenge" classNameBindings='isNew:disabled'}} <i class="glyphicon glyphicon-plus"></i> Add VChallenge{{/link-to}}
+</div>
+  <div class="col-lg-12">
+    {{render '_arenaVChallengesList' model.vchallenges }}
+  </div>
+</section>

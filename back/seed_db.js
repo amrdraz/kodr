@@ -6,6 +6,7 @@ var Quest = require('./models/quest');
 var Arena = require('./models/arena');
 var ArenaTrial = require('./models/arenaTrial');
 var Challenge = require('./models/challenge');
+var VChallenge = require('./models/vchallenge');
 var Trial = require('./models/trial');
 var Activity = require('./models/activity');
 var Achievement = require('./models/achievement');

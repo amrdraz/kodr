@@ -34,6 +34,10 @@ var ArenaSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Challenge',
     }],
+    vchallenges: [{
+         type: ObjectId,
+         ref: 'VChallenge',
+    }],
     trials: [{
         type: ObjectId,
         ref: 'Trial',

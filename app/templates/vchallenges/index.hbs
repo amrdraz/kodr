@@ -1,0 +1,35 @@
+
+{{#if session.isAuthenticated}}
+  {{#link-to 'vchallenges.create' class="btn btn-primary pull-right create-vchallenge" }} <i class="glyphicon glyphicon-plus"></i> Create VChallenge{{/link-to}}
+{{/if}}
+
+<h3>VChallenges</h3>
+
+<ul class="list-group">
+{{#each vchallenge in model}}
+    <li class="list-group-item">            
+        <span class="pull-right label label-info">awards {{vchallenge.exp}} Exp</span>
+        <h4 class="list-group-item-heading">
+            {{#link-to 'vchallenge' vchallenge class="vchallenge-name"}}
+                {{vchallenge.name}}
+            {{/link-to}}
+        </h4>
+        <section class="list-group-item-text">
+            <div>
+                <a class='vchallenge-discussion' href="#"><i class="glyphicon glyphicon-comment"></i> Discussion</a>
+                {{#link-to 'vchallenge.edit' vchallenge class=":vchallenge-edit"}}
+                    <i class="glyphicon glyphicon-pencil"></i> Edit
+                {{/link-to}}
+                {{#link-to 'vchallenge.try' vchallenge class=":vchallenge-try"}}
+                    <i class="glyphicon glyphicon-play"></i> Try
+                {{/link-to}}
+            </div>
+            <div>
+                <span class="label label-default"><i class="glyphicon glyphicon-tags"></i> Tags</span>
+            </div>
+        </section>
+    </li>
+    {{else}}
+    <p>No VChallanges set yet</p>
+{{/each}}
+</ul>

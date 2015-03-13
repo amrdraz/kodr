@@ -11,6 +11,8 @@ module.exports = function(app, passport) {
 
     // challenge routes
     require('./routes/challenge')(app, passport);
+    // vchallenge routes
+    require('./routes/vchallenge')(app, passport);
     // trial routes
     require('./routes/trial')(app, passport);
     // arena routes
