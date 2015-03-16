@@ -16,6 +16,10 @@ var User = require('../../back/models/user');
 var observer = require('../../back/observer');
 
 
+describe('Requirement', function () {
+    
+});
+
 describe('UserQuest', function() {
     before(function(done) {
         return setup.clearDB(done);
@@ -110,7 +114,7 @@ describe('UserQuest', function() {
 
         it('should update when a challenge is complete', function(done) {
             observer.once('requirement.complete', function(req) {
-                req.id1.should.equal(challenges[2].id);
+                req.id1.toString().should.equal(challenges[2].id);
                 done();
             });
             ArenaTrial.create({
@@ -154,6 +158,8 @@ describe('UserQuest', function() {
         it('should update when an arena is complete', function(done) {
             var count = 0;
             var test = function(req) {
+                                // console.log(req);
+
                 if (req.model1 === 'Arena') {
                     count++;
                 }

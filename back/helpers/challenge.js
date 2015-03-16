@@ -76,4 +76,5 @@ module.exports = function(schema, options) {
             return Challenge.create(challenge);
         });
     };
+
 };

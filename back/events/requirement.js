@@ -7,7 +7,7 @@ var mail = require('../config/mail');
 
 exports.model = function (Requirement) {
 
-// when a any or a specific challenge is complete
+// when any or a specific challenge is complete
 observer.on('trial.award', function(trial) {
     Promise.fulfilled().then(function() {
         return Requirement.find({

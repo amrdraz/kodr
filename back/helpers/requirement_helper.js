@@ -29,48 +29,29 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         return res;
     };
 
-    schema.methods.getSubject = function() {
-        var Model = this.db.model(this.subjectModel);
-        var activity = this;
+    schema.methods.getModel1 = function() {
+        var Model = this.db.model(this.model1);
+        var requirement = this;
         return Promise.fulfilled().then(function() {
             return Model.findOne({
-                _id: activity.subjectId
+                _id: requirement.id1
             }).exec();
         });
     };
 
 
-    schema.methods.getObject = function() {
-        var Model = this.db.model(this.objectModel);
-        var activity = this;
+    schema.methods.getModel2 = function() {
+        var Model = this.db.model(this.model2);
+        var requirement = this;
         return Promise.fulfilled().then(function() {
             return Model.findOne({
-                _id: activity.objectId
-            }).exec();
-        });
-    };
-
-
-    schema.statics.findByAction = function(act) {
-        var Model = this.db.model('Activity');
-        return Promise.fulfilled().then(function() {
-            return Model.find({
-                action: act
-            }).exec();
-        });
-    };
-
-    schema.statics.findByVerb = function(verb) {
-        var Model = this.db.model('Activity');
-        return Promise.fulfilled().then(function() {
-            return Model.find({
-                verb: verb
+                _id: requirement.id2
             }).exec();
         });
     };
 
     schema.statics.new = function(obj) {
-        var Model = this.db.model('Activity');
+        var Model = this.db.model(Model);
         return Promise.fulfilled().then(function() {
             if (obj.subject) {
                 obj.subjectId = obj.subject.id;

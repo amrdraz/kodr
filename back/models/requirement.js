@@ -23,12 +23,12 @@ var RequirementSchema = new mongoose.Schema({
         type: String,
         default: 'Challenge'
     },
-    id1: String,
+    id1: ObjectId,
     model2: {
         type: String,
         default: 'Arena'
     },
-    id2: String,
+    id2: ObjectId,
     action: {
         type: String,
         default: 'complete',

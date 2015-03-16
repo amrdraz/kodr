@@ -29,10 +29,6 @@ var UserQuestSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    requirements: [{
-        type: ObjectId,
-        ref: 'Requirement'
-    }],
     startTime: {
         type:Date,
         default:Date.now
@@ -61,6 +57,7 @@ UserQuestSchema.plugin(relationship, {
     relationshipPathName: ['user', 'quest']
 });
 
+UserQuestSchema.plugin(require('../helpers/trigger'), {model:'UserQuest'});
 UserQuestSchema.plugin(require('../helpers/userQuest'), 'UserQuest');
 
 
