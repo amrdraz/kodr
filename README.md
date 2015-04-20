@@ -3,7 +3,7 @@
 Kodr is an online gamified learning system that teaches programing concepts. It does so through engaging students in challenges.
 
 Supported Challenges
-coding challanges (Javascript and (Java)[https://github.com/amrdraz/java-code-runner]), evaluated using bdd styled tests, tho the JS support grew week since the course focused on Java.
+coding challanges (Javascript and [Java](https://github.com/amrdraz/java-code-runner)), evaluated using bdd styled tests, tho the JS support grew week since the course focused on Java.
 
 Users learn by partaking in challenges and following Quests which gives them experience, awarding them achivements.
 Achievements showcase what the student learned and can be used to guide his learning process.
