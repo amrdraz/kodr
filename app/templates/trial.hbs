@@ -18,7 +18,7 @@
     {{#if model.challenge.isJava }}
       <pre>{{#if model.challenge.hasInput}}import java.util.Scanner;
 {{/if}}public class Main {
-  public static void main (String[] args) { {{#each inp in model.challenge.inputs}}
+  public static void main (String[] args) { {{#each model.challenge.inputs as |inp| }}
     {{inp.value}};{{/each}}</pre>
     {{/if}}
       <div class="tab-pane fade in active" id="code">
@@ -39,7 +39,7 @@
     </div>
 </div>
 <div class="col-lg-6">
-    <a id="run" {{action "test"}} {{bind-attr class=":btn model.complete:btn-success:btn-primary :pull-right model.canSubmit::disabled :challenge-submit" }} >
+    <a id="run" {{action "test"}} class="btn {{if model.complete 'btn-success' 'btn-primary'}} pull-right {{if model.canSubmit '' 'disabled'}} challenge-submit" }} >
       {{#if model.complete}}
         {{#if isDirtyish}}
           Re-Submit <i class="glyphicon glyphicon-play"></i>

@@ -6,7 +6,7 @@
 <h3>Challenges</h3>
 
 <ul class="list-group">
-{{#each challenge in model}}
+{{#each model as |challenge| }}
     <li class="list-group-item">            
         <span class="pull-right label label-info">awards {{challenge.exp}} Exp</span>
         <h4 class="list-group-item-heading">

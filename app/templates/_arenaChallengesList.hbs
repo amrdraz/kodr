@@ -1,6 +1,6 @@
 
 <ul class="list-group">
-{{#each challenge in model}}
+{{#each model as |challenge| }}
     <li class="list-group-item">            
         <span class="pull-right">
             {{#if challenge.isPublished}}

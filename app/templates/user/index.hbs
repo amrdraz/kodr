@@ -11,7 +11,7 @@
     <li class="list-group-item text-right"><span class="pull-left"><strong>Experience</strong></span> {{model.exp}}</li>
     {{#if model.isStudent}}
       <li class="list-group-item text-right"><span class="pull-left"><strong>Group</strong></span>
-      {{#each member in model.memberships }}
+      {{#each model.memberships as |member| }}
         {{member.gname}} 
       {{else}}
         You have Yet to join a group
@@ -51,19 +51,19 @@
         </div>
         <div class="tab-pane active" id="quests">
           <div class="panel-group" id="questAccordion" >
-          {{#each quest in model.userQuests}}
-            <div {{bind-attr class=":panel quest.complete:panel-success:panel-default"}} >
+          {{#each model.userQuests as |quest| }}
+            <div class="panel {{if quest.complete 'panel-success' 'panel-default'}}" >
               <div class="panel-heading">
                 <h4 class="panel-title">
                   {{#if quest.complete }}
                     <span class="pull-right"><i class="glyphicon glyphicon-ok-circle"></i></span>
                   {{/if}}
-                  <a data-toggle="collapse" data-parent="#questAccordion" {{bind-attr href=quest.hash }} >
+                  <a data-toggle="collapse" data-parent="#questAccordion" href={{quest.hash}} >
                     {{quest.name}}
                   </a>
                 </h4>
               </div>
-              <div {{bind-attr id=quest.id }} class="panel-collapse collapse">
+              <div id={{quest.id}} class="panel-collapse collapse">
                 <div class="panel-body">
                 {{#if quest.description}}
                   <p>
@@ -72,7 +72,7 @@
                 {{/if}}
                 </div>
                 <ul class="list-group">    
-                  {{#each req in quest.requirements}}
+                  {{#each quest.requirements as |req| }}
                       <li class="list-group-item">
                         {{#if req.complete }}
                           <span class="pull-right text-success"><i class="glyphicon glyphicon-ok-circle"></i></span>
@@ -107,7 +107,7 @@
                          {{#if req.isMultiple }}
                            <p class="list-group-item-text">
                              <div class="progress" >
-                              <div role="progressbar" {{bind-attr class=":progress-bar req.complete:progress-bar-success" aria-valuenow=req.completed aria-valuemin="0" aria-valuemax=req.times style=req.progressInCSS }} >
+                              <div role="progressbar" class="progress-bar {{if req.complete 'progress-bar-success'}}" aria-valuenow={{if req.completed}} aria-valuemin="0" aria-valuemax={{req.times}} style={{req.progressInCSS}}>
                                 {{req.completed}}/{{req.times}}
                               </div>
                             </div>
@@ -130,7 +130,7 @@
       {{else}}
          <div class="tab-pane active" id="groups">
             <ul class="list-group">
-            {{#each member in model.memberships}}
+            {{#each model.memberships as |member| }}
               <li class="list-group-item">            
                   <h4 class="list-group-item-heading">
                       <small class="pull-right">
@@ -160,7 +160,7 @@
           <div class="row">
             <h3>Groups</h3>
             <div class="col-md-12">
-                {{#each member in model.memberships }}
+                {{#each model.memberships as |member| }}
                   <button {{action "leave" member }} class="btn btn-primary">Leave {{member.gname}}</button>
                 {{else}}
                  <p>You have yet to Join any group</p>
@@ -188,7 +188,7 @@
           {{/if}}
           {{#if fullErrors }}
             <div class="alert alert-danger">
-              {{#each message in fullErrors }}
+              {{#each fullErrors as |message| }}
                 <p>{{message}}</p>
               {{/each}}
             </div>

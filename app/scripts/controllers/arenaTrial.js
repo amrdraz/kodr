@@ -1,4 +1,4 @@
-module.exports = App.ArenaTryController = Em.ObjectController.extend({
+module.exports = App.ArenaTryController = Em.Controller.extend({
     breadCrumb:'arenas',
     breadCrumbPath:'arenas',
     init: function() {

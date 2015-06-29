@@ -1,7 +1,7 @@
 var toastr = require('toastr');
 var debounce = require('../utils/debounce');
 var ChallengeMixin = require('../mixins/challengeMixin');
-module.exports = Em.ObjectController.extend(ChallengeMixin, {
+module.exports = Em.Controller.extend(ChallengeMixin, {
     isChallengeTrial: function() {
         return App.get('currentPath').split('.').contains('challenge');
     }.property('App.currentPath'),

@@ -1,5 +1,5 @@
 var toastr = require('toastr');
-module.exports = Em.ObjectController.extend(Ember.Validations.Mixin, {
+module.exports = Em.Controller.extend(Ember.Validations.Mixin, {
     // needs: ['group'],
     breadCrumb: 'user',
     breadCrumbPath: 'user',

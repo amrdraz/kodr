@@ -11,9 +11,8 @@
     "esprima": "~1.2.2",
     "underscore": "~1.6.0",
     "structured": "*",
-    "ember": "~1.7.0",
-    "handlebars": "~1.3.0",
-    "ember-data": "1.0.0-beta.9",
+    "ember": "~1.13.0",
+    "ember-data": "~1.13",
     "marked": "~0.3.2",
     "bootstrap-social": "~4.5.1",
     "ember-validations": "*",
@@ -26,18 +25,18 @@
     "jasmine-jsreporter-real": "*",
     "toastr": "~2.0.3",
     "socket.io-client": "~1.0.6",
-    "ember-sockets": "~0.6.10",
     "highcharts": "~4.0.4",
     "chosen_v1.3.0": "https://github.com/harvesthq/chosen/releases/download/v1.3.0/chosen_v1.3.0.zip",
-    "sweetalert": "~0.4.2"
+    "sweetalert": "~0.4.2",
+    "ember-sockets": "~0.7.1",
+    "handlebars": "~3.0.3"
   },
   "devDependencies": {
     "jquery-mockjax": "~1.5.3",
-    "ember-qunit": "~0.1.8",
-    "ember-mocha-adapter": "~0.2.1"
+    "ember-mocha-adapter": "~0.2.1",
+    "ember-qunit": "~0.4.0"
   },
   "resolutions": {
-    "jquery": "~1.11.0",
-    "ember": "~1.7.0"
+    "jquery": "~1.11.0"
   }
 }

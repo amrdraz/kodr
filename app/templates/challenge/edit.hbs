@@ -1,19 +1,19 @@
 <section class="challenge-controlles row">
   <ul class="nav nav-pills pull-right">
-    <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat challenge-reset"></i> Reset</a></li>
+    <li {{action "reset"}} class="{{if canReset '' 'disabled'}}" ><a href="#"><i class="glyphicon glyphicon-repeat challenge-reset"></i> Reset</a></li>
     {{#unless isPublished }}
-    <li {{action "save"}} {{bind-attr class="canSave::disabled :challenge-save"}} ><a href="#">
+    <li {{action "save"}} class="{{if canSave '' 'disabled'}} challenge-save" ><a href="#">
         <i class="glyphicon glyphicon-save"></i> Save</a>
     </li>
     {{/unless}}
     {{#unless isPublished }}
-      <li {{action "publish"}} {{bind-attr class="canPublish::disabled :challenge-publish "}}><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
+      <li {{action "publish"}} class="{{if canPublish '' 'disabled'}} challenge-publish"><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
     {{else}}
-      <li {{action "save"}} {{bind-attr class="canSave::disabled :challenge-unpublish"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
+      <li {{action "save"}} class="{{if canSave '' 'disabled'}} challenge-unpublish"><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
       <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
     {{/unless}}
     <li {{action 'delete' }} class="challenge-delete"><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
-    <li {{action 'validate' }} {{bind-attr class="valid:active :challenge-validate "}}><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
+    <li {{action 'validate' }} class="{{if valid 'active'}} challenge-validate"><a calss="btn btn-default" href="#"><i class="glyphicon glyphicon-ok"></i> Validate</a></li>
   </ul>
 </section>
 <section class="challenge-settings row">
@@ -51,7 +51,7 @@
     <div class="form-group">
     <div class="col-md-6">
       <label for="inputs" class="control-label">Inputs</label>
-      {{#each inp in model.inputs}}
+      {{#each model.inputs as |inp| }}
             {{input value=inp.value class="challenge-name form-control"}}
             <button type="button" {{action "removeInput" inp }} class="close"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
       {{/each}}

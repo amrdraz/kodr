@@ -52,7 +52,7 @@
 <div class="col-md-12">
   <h4>Members</h4>
   <ul class="item-group">
-    {{#each member in model.members}}
+    {{#each model.members as |member| }}
       <li class="list-group-item">
         <a href="#remove" {{action "remove" member }} class="group-member-remove pull-right">
             <i class="glyphicon glyphicon-cross"></i> Remove

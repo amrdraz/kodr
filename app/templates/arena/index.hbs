@@ -16,7 +16,7 @@
 </section>
 <hr>
 <section class="row">
-    {{#each challenge in model.challenges}}
+    {{#each model.challenges as |challenge|}}
     {{#if challenge.isPublished}}
       {{#link-to 'challenge.try' challenge class="btn col-md-4 " }}
           {{challenge.exp}} <i class="glyphicon glyphicon-star"></i>

@@ -7,7 +7,7 @@
 
 {{#if session.atLeastTeacher }}
 <ul class="list-group">
-{{#each arena in model}}
+{{#each model as |arena| }}
         <li class="list-group-item">            
             
             <h4 class="list-group-item-heading">
@@ -37,7 +37,7 @@
 </ul>
 {{else}}
 <div class="list-group">
-{{#each arena in published}}
+{{#each published as |arena| }}
     {{#link-to arenaRoute arena class="arena-name" class="list-group-item"}}     
         <h4 class="list-group-item-heading">
             {{!-- <div class="pull-right">

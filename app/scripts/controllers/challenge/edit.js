@@ -1,7 +1,7 @@
 var toastr = require('toastr');
 var debounce = require('../../utils/debounce');
 var ChallengeMixin = require('../../mixins/challengeMixin');
-module.exports = Em.ObjectController.extend(ChallengeMixin, {
+module.exports = Em.Controller.extend(ChallengeMixin, {
     needs: ['challenge', 'arena'],
     arena: Ember.computed.alias("controllers.arena"),
     breadCrumb: 'edit',

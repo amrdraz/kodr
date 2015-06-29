@@ -1,4 +1,4 @@
-module.exports = Em.ArrayController.extend({
+module.exports = Em.Controller.extend({
 
     actions: {
       remove: function(quest) {

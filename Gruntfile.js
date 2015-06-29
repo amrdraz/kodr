@@ -294,6 +294,8 @@ module.exports = function(grunt) {
         },
         emberTemplates: {
             options: {
+                templateCompilerPath: '<%= config.app %>/lib/ember/ember-template-compiler.js',
+                handlebarsPath: '<%= config.app %>/lib/handlebars/handlebars.js',
                 templateName: function(sourceFile) {
                     var templatePath = config.app + '/templates/';
                     return sourceFile.replace(templatePath, '');
@@ -613,13 +615,13 @@ module.exports = function(grunt) {
         'concat',
         'cssmin',
         'preprocess:js',  // Remove DEBUG code from production builds
+        'preprocess:html',  // Remove DEBUG code from production builds
         'copy:dist',
         'uglify',
         'modernizr',
         'rev',
         'usemin',
         'htmlmin',
-        'preprocess:html',  // Remove DEBUG code from production builds
     ]);
 
     grunt.registerTask('default', [

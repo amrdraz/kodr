@@ -25,7 +25,7 @@
     </div>
 </div>
 <div class="col-lg-6">
-    <a id="run" {{action "run"}} {{bind-attr class=":btn model.complete:btn-success:btn-primary :pull-right model.canSubmit::disabled :challenge-submit" }} >
+    <a id="run" {{action "run"}} class="btn {{if model.complete 'btn-success' 'btn-primary' }} pull-right {{if model.canSubmit '' 'disabled'}} challenge-submit" }} >
       {{#if model.complete}}
         {{#if model.isDirty}}
           Re-Submit <i class="glyphicon glyphicon-play"></i>

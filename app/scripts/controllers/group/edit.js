@@ -1,4 +1,4 @@
-module.exports = Em.ObjectController.extend({
+module.exports = Em.Controller.extend({
     breadCrumb: 'group',
     breadCrumbPath: 'group',
     // needs: ['group'],

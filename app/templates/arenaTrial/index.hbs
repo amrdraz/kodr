@@ -12,9 +12,9 @@
 </section>
 <hr>
 <section class="row">
-    {{#each trial in trials}}
+    {{#each trials as |trial| }}
         {{#if trial.challenge.isPublished}}
-          <button {{action 'try' trial }} {{bind-attr class=":btn  trial.complete:btn-success :col-md-4" }} >
+          <button {{action 'try' trial }} class="btn  {{if trial.complete 'btn-success'}} col-md-4">
               {{trial.challenge.exp}} <i class="glyphicon glyphicon-star"></i>
           </button>
         {{/if}}

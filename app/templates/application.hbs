@@ -13,18 +13,18 @@
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           {{!-- {{#link-to 'index' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn" >
+            <a href="{{view.href}}" class="btn" >
               Home
             </a>
           {{/link-to}} --}}
           {{#link-to 'about' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn" >
+            <a href="{{view.href}}" class="btn" >
               About
             </a>
           {{/link-to}}
           {{#if session.isAuthenticated}}
           {{#link-to 'arenas' tagName="li" href=false}}
-            <a {{bind-attr href="view.href"}} class="btn" >
+            <a href="{{view.href}}" class="btn" >
               Arenas
             </a>
           {{/link-to}}
@@ -32,19 +32,19 @@
 
           {{#if session.atLeastTeacher }}
             {{#link-to 'quests' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn" >
+            <a href="{{view.href}}" class="btn" >
               Quests
             </a>
             {{/link-to}}
           {{/if}}
           {{#if session.isAdmin}}
             {{#link-to 'groups' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn" >
+            <a href="{{view.href}}" class="btn" >
               Groups
             </a>
             {{/link-to}}
             {{#link-to 'users' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn">
+            <a href="{{view.href}}" class="btn">
               Users
             </a>
             {{/link-to}}
@@ -52,7 +52,7 @@
 
           {{#if session.isAuthenticated}}
           {{#link-to 'profile' tagName="li" href=false }}
-            <a {{bind-attr href="view.href"}} class="btn" >
+            <a href="{{view.href}}" class="btn" >
               Profile
             </a>
           {{/link-to}}

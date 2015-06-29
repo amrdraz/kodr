@@ -1,4 +1,4 @@
-module.exports = Em.ArrayController.extend({
+module.exports = Em.Controller.extend({
     
     init: function() {
         this._super();

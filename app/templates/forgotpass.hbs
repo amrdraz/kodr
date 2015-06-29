@@ -11,7 +11,7 @@
     {{/if}}
     {{#if fullErrors }}
       <div class="alert alert-danger">
-        {{#each message in fullErrors }}
+        {{#each fullErrors as |message| }}
           <p>{{message}}</p>
         {{/each}}
       </div>

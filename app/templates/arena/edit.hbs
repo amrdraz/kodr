@@ -1,15 +1,15 @@
 <section class="arean-controlles row">
   <ul class="nav nav-pills pull-right">
-    <li {{action "reset"}} {{bind-attr class="canReset::disabled"}} ><a href="#"><i class="glyphicon glyphicon-repeat arean-reset"></i> Reset</a></li>
+    <li {{action "reset"}} class="{{if canReset '' 'disabled'}}"><a href="#"><i class="glyphicon glyphicon-repeat arean-reset"></i> Reset</a></li>
     {{#unless isPublished }}
-    <li {{action "save"}} {{bind-attr class="canSave::disabled :arean-save"}} ><a href="#">
+    <li {{action "save"}} class="{{if canSave '' 'disabled'}} arean-save" ><a href="#">
         <i class="glyphicon glyphicon-save"></i> Save</a>
     </li>
     {{/unless}}
     {{#unless isPublished }}
-      <li {{action "publish"}} {{bind-attr class="canPublish::disabled :arean-publish "}} title="to publish challenge, you need to at least have one published challenge"><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
+      <li {{action "publish"}} class="{{if canPublish '' 'disabled'}} arean-publish" title="to publish challenge, you need to at least have one published challenge"><a href="#"><i class="glyphicon glyphicon-ok-circle"></i> Publish</a></li>
     {{else}}
-      <li {{action "publish"}} {{bind-attr class="canSave::disabled :arean-unpublish"}}><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
+      <li {{action "publish"}} class="{{if canSave '' 'disabled' arean-unpublish}}"><a href="#"><i class="glyphicon glyphicon-save"></i> Save/Re-Publish</a></li>
       <li {{action "unPublish"}} class=""><a href="#"><i class="glyphicon glyphicon-ban-circle"></i> Un-Publish</a></li>
     {{/unless}}
     <li {{action 'delete' }} class="arean-delete"><a href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
