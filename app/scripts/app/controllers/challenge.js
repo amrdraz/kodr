@@ -1,6 +1,8 @@
-var debounce = require('../utils/debounce');
+import debounce from '/kodr/'../utils/debounce'';
+import Ember from 'ember';
 
-module.exports = Em.Controller.extend({
+
+module.exports = Ember.Controller.extend({
     // needs: [],
     breadCrumb:'arena',
     breadCrumbPath:'arena',
@@ -8,3 +10,5 @@ module.exports = Em.Controller.extend({
         
     }
 });
+
+export default undefined;

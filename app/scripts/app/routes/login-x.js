@@ -1,4 +1,6 @@
-module.exports = App.LoginRoute = Em.Route.extend({
+import Ember from 'ember';
+
+var LoginRoute = Ember.Route.extend({
   // activate: function() {},
   // deactivate: function() {},
   setupController: function(controller, model, queryParams) {
@@ -22,3 +24,5 @@ module.exports = App.LoginRoute = Em.Route.extend({
   //     return ;
   // }
 });
+
+export default LoginRoute;

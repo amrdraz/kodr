@@ -3,6 +3,7 @@
 var config = require('./config/server.js');
 
 var express = require('express');
+var cors = require('cors');
 var app = express();
 // app.https(config.ssl).io();
 // app.http().io();
@@ -27,7 +28,7 @@ var swig = require('swig');
 
 var port = config.port || process.env.PORT || 3000;
 app.set('port', port);
-
+app.use(cors());
 app.use(morgan(process.env.NODE_ENV=='production'?'[:date[clf]] ":method :remote-addr  :url HTTP/:http-version" :status :res[content-length] :req[Authorization] :response-time':'dev')); // log every request to the console
 app.use(compress()); // log every request to the console
 app.use(cookiePraser(config.cookieSecret)); // read cookies

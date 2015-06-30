@@ -1,4 +1,7 @@
-var toastr = require('toastr');
+import toastr from '/kodr/'toastr'';
+import Ember from 'ember';
+
+
 module.exports = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, Ember.Validations.Mixin, {
     authenticator: 'simple-auth-authenticator:oauth2-password-grant',
     validations: {
@@ -14,7 +17,7 @@ module.exports = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, Ember.
 
             var that = this;
             return this.validate().then(function() {
-                Em.$.ajax({
+                Ember.$.ajax({
                     type: 'POST',
                     url: '/api/users/forgotpass',
                     context: that,
@@ -39,3 +42,5 @@ module.exports = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, Ember.
         }
     }
 });
+
+export default undefined;

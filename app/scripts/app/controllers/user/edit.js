@@ -1,5 +1,8 @@
-var toastr = require('toastr');
-module.exports = Em.Controller.extend(Ember.Validations.Mixin, {
+import toastr from '/kodr/'toastr'';
+import Ember from 'ember';
+
+
+module.exports = Ember.Controller.extend(Ember.Validations.Mixin, {
     // needs: ['group'],
     breadCrumb: 'user',
     breadCrumbPath: 'user',
@@ -19,8 +22,8 @@ module.exports = Em.Controller.extend(Ember.Validations.Mixin, {
         }
     },
     isCreating: function() {
-        return App.get('currentPath').split('.').contains('create');
-    }.property('App.currentPath'),
+        return get('currentPath').split('.').contains('create');
+    }.property('currentPath'),
     isCreatingOrNotAdmin:function () {
       return this.get('isCreating') || !this.get('model.isAdmin');
     }.property('isCreating','isAdmin'),
@@ -40,7 +43,7 @@ module.exports = Em.Controller.extend(Ember.Validations.Mixin, {
             }
         },
         activate: function() {
-          Em.$.post('api/users/'+this.get('model.id')+'/verify').done(function (res) {
+          Ember.$.post('api/users/'+this.get('model.id')+'/verify').done(function (res) {
               toastr.success(res.message);
           }).fail(function (xhr) {
               toastr.error(xhr.responseText);
@@ -53,7 +56,7 @@ module.exports = Em.Controller.extend(Ember.Validations.Mixin, {
         changePass: function() {
             var that = this;
             this.validate().then(function() {
-                Em.$.ajax({
+                Ember.$.ajax({
                     type: 'PUT',
                     url: '/api/users/' + that.get('model.id'),
                     context: that,
@@ -84,3 +87,5 @@ module.exports = Em.Controller.extend(Ember.Validations.Mixin, {
         }
     }
 });
+
+export default undefined;

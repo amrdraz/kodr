@@ -1,6 +1,6 @@
-var attr = DS.attr;
+import DS from 'ember-data';
 
-App.JavaInputTransform = App.JavaInputTransform || DS.Transform.extend({
+var JavaInputTransform = JavaInputTransform || DS.Transform.extend({
   deserialize: function(serialized) {
     return serialized.map(function  (req) {
         return Object.create({value:req});
@@ -10,7 +10,7 @@ App.JavaInputTransform = App.JavaInputTransform || DS.Transform.extend({
     return deserialized.mapBy("value");
   }
 });
-
+var attr = DS.attr;
 var ChallengeModel = module.exports = DS.Model.extend({
     name: attr('string', {
         defaultValue: "New Challenge"
@@ -91,3 +91,5 @@ var ChallengeModel = module.exports = DS.Model.extend({
         return !this.get('canSave') && !this.get('isPublished') && this.get('valid');
     }.property('canSave')
 });
+
+export default JavaInputTransform;

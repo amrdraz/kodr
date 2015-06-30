@@ -1,7 +1,10 @@
-App.QuestRequirementTransform = App.QuestRequirementTransform || DS.Transform.extend({
+import DS from 'ember-data';
+import Requirement from '/kodr/requirement';
+
+var QuestRequirementTransform = QuestRequirementTransform || DS.Transform.extend({
   deserialize: function(serialized) {
     return serialized.map(function  (req) {
-        return App.Requirement.create(req);
+        return Requirement.create(req);
     });
   },
   serialize: function(deserialized) {
@@ -11,7 +14,6 @@ App.QuestRequirementTransform = App.QuestRequirementTransform || DS.Transform.ex
     });
   }
 });
-
 module.exports = DS.Model.extend({
     name: DS.attr('string'),
     description: DS.attr('string'),
@@ -30,3 +32,5 @@ module.exports = DS.Model.extend({
         inverse: 'userQuests'
     })
 });
+
+export default QuestRequirementTransform;

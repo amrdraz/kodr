@@ -1,5 +1,9 @@
-var toastr = require('toastr');
-module.exports = Em.Controller.extend({
+import toastr from '/kodr/'toastr'';
+import Ember from 'ember';
+import DS from 'ember-data';
+
+
+module.exports = Ember.Controller.extend({
     breadCrumb: 'quest',
     breadCrumbPath: 'quest',
     // needs: ['quest'],
@@ -12,7 +16,7 @@ module.exports = Em.Controller.extend({
     unassignedUsersOptions: function() {
         var store = this.store;
         return DS.PromiseArray.create({
-            promise: Em.$.getJSON('/api/quests/' + this.get('model.id') + '/unassignedUsersOptions').then(function(res) {
+            promise: Ember.$.getJSON('/api/quests/' + this.get('model.id') + '/unassignedUsersOptions').then(function(res) {
                 return res.map(function(record) {
                     record.id = record._id;
                     return store.push('user', record);
@@ -30,7 +34,7 @@ module.exports = Em.Controller.extend({
             var users = this.get('selected').mapBy('id');
 
             if (groups.length || users.length) {
-                Em.$.ajax({
+                Ember.$.ajax({
                     url: 'api/quests/' + this.get('model.id') + '/assign',
                     type: 'PUT',
                     data: {
@@ -59,7 +63,7 @@ module.exports = Em.Controller.extend({
         },
         remove: function(uq) {
             var that = this;
-            Em.RSVP.all([
+            Ember.RSVP.all([
                 uq.get('user.userQuests'),
                 this.get('model.userQuests')
             ]).then(function(arr) {
@@ -70,3 +74,5 @@ module.exports = Em.Controller.extend({
         }
     }
 });
+
+export default undefined;

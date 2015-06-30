@@ -25,3 +25,5 @@ You can create a table and specify column alignment with one or two colons:\n\
 | Pipe      |    1 USD | 234  |\n\
 May need to work on that ^^; \n\
 ';
+
+export default undefined;

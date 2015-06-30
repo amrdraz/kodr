@@ -1,3 +1,5 @@
+import DS from 'ember-data';
+
 module.exports = DS.Model.extend({
     uniId: DS.attr('string'),
     username: DS.attr('string'),
@@ -32,3 +34,5 @@ module.exports = DS.Model.extend({
         return !this.get('memberships.length') || !this.get('isStudent');
     }.property('memberships.@each','role')
 });
+
+export default undefined;

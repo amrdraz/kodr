@@ -1,5 +1,6 @@
-var attr = DS.attr;
+import DS from 'ember-data';
 
+var attr = DS.attr;
 var ArenaTrialModel = module.exports = DS.Model.extend({
     exp: attr('number'),
     completed: attr('number'),
@@ -8,3 +9,4 @@ var ArenaTrialModel = module.exports = DS.Model.extend({
     trials: DS.hasMany('trials', {async: true, inverse: 'arenaTrial'}),
 });
 
+export default undefined;

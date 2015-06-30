@@ -1,5 +1,5 @@
 module.exports = function(App) {
-    App.Router.map(function() {
+    Router.map(function() {
         this.route('login', {path:'login', queryParams:['email']});
         this.route('forgotpass');
         this.route('logout');
@@ -64,3 +64,5 @@ module.exports = function(App) {
         });
     });
 };
+
+export default undefined;

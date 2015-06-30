@@ -1,4 +1,6 @@
-var toastr = require('toastr');
+import toastr from '/kodr/'toastr'';
+import Ember from 'ember';
+
 
 var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, Ember.Validations.Mixin, {
     authenticator: 'simple-auth-authenticator:oauth2-password-grant',
@@ -42,7 +44,7 @@ var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, E
         },
         verify: function (uid) {
             var that = this;
-            Em.$.post('api/users/'+uid+'/verify').done(function (res) {
+            Ember.$.post('api/users/'+uid+'/verify').done(function (res) {
                   toastr.success(res.message);
                   that.set('fullErrors','');
             }).fail(function (xhr) {
@@ -53,4 +55,4 @@ var LoginController = Ember.Controller.extend(SimpleAuth.LoginControllerMixin, E
     }
 });
 
-module.exports = LoginController;
+export default LoginController;

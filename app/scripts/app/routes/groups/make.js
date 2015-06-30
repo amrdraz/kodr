@@ -1,5 +1,9 @@
-module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
+import Ember from 'ember';
+
+module.exports = Ember.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
   model: function() {
-      return Em.Object.create({name:'', from:0, to:0});
+      return Ember.Object.create({name:'', from:0, to:0});
   }
 });
+
+export default undefined;

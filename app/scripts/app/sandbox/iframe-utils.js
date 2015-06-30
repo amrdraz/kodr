@@ -1,3 +1,11 @@
+// var expect = chai.expect;
+// var assert = chai.assert;
+// mocha.setup({
+//     ui: 'bdd',
+//     reporter: JSONReporter,
+//     // reporter: 'html',
+//     ignoreLeaks: true
+// });
 function generateStackstrace(error, code) {
     var lines = code.split("\n");
     return [
@@ -11,7 +19,6 @@ function generateStackstrace(error, code) {
         "" + [error.lineNumber + 3] + " : " + lines[error.lineNumber + 2]
     ].join("\n");
 }
-
 function rethrow(e, tests, offset) {
     var error = e;
     try {
@@ -45,8 +52,6 @@ function rethrow(e, tests, offset) {
         window.parent.stuffEmit("error", error);
     }
 }
-
-
 // Deep clone that only grabs strings and numbers
 
 function cleanObject(error, depth) {
@@ -73,7 +78,6 @@ function cleanObject(error, depth) {
 
     return response;
 }
-
 // function JSONReporter(runner) {
 //     var self = this;
 //     // Mocha.reporters.Base.call(this, runner);
@@ -138,7 +142,6 @@ function inspect (report) {
     });
     report.passed = !report.failures.length;
 }
-
 function kodrReporter(report) {
 
     report.tests = [];
@@ -149,15 +152,7 @@ function kodrReporter(report) {
 
     window.parent.stuffEmit('test.done', report);
 }
-
 exports.rethrow = rethrow;
-
 exports.KodrReporter = kodrReporter;
-// var expect = chai.expect;
-// var assert = chai.assert;
-// mocha.setup({
-//     ui: 'bdd',
-//     reporter: JSONReporter,
-//     // reporter: 'html',
-//     ignoreLeaks: true
-// });
+
+export default undefined;

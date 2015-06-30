@@ -9,3 +9,5 @@ module.exports = [
 '</body> ',
 '</html> ',
 ].join(' ');
+
+export default undefined;

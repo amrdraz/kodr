@@ -1,5 +1,8 @@
-var toastr = require('toastr');
-module.exports = Em.Mixin.create(Em.Evented, {
+import toastr from '/kodr/'toastr'';
+import Ember from 'ember';
+
+
+module.exports = Ember.Mixin.create(Ember.Evented, {
     evaluates: 'code',
     jshint: function(code, cb, options) {
         options = options || {};
@@ -114,7 +117,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
         return found;
     },
     runInServer: function(code, model, cb) {
-        Em.$.ajax({
+        Ember.$.ajax({
             url: '/api/challenges/run',
             type:'POST',
             data: {
@@ -129,7 +132,7 @@ module.exports = Em.Mixin.create(Em.Evented, {
     testInServer: function(code, challenge, cb) {
         var data = (challenge.getProperties(['language','tests', 'exp']));
         data.inputs = challenge.get('inputs').mapBy("value");
-        Em.$.ajax({
+        Ember.$.ajax({
             url: '/api/challenges/test',
             type:'POST',
             data: {
@@ -173,3 +176,5 @@ module.exports = Em.Mixin.create(Em.Evented, {
         }
     }
 });
+
+export default undefined;

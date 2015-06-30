@@ -1,5 +1,6 @@
-var ProfileRoute = Ember.Route.extend(SimpleAuth.AuthenticatedRouteMixin);
+import Ember from 'ember';
 
+var ProfileRoute = Ember.Route.extend(SimpleAuth.AuthenticatedRouteMixin);
 ProfileRoute.reopen({
     controllerName: 'user.index',
     setupController: function(controller, model) {
@@ -12,7 +13,7 @@ ProfileRoute.reopen({
         this.render('user.index');
     },
     afterModel:function (model) {
-        return Em.RSVP.all([
+        return Ember.RSVP.all([
             model.get('userQuests'),
             model.get('memberships')
         ]); 
@@ -22,4 +23,4 @@ ProfileRoute.reopen({
     }
 });
 
-module.exports = ProfileRoute;
+export default ProfileRoute;

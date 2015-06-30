@@ -1,5 +1,6 @@
-var get = Ember.get;
+import Ember from 'ember';
 
+var get = Ember.get;
 /**
  * Ember select-2 component wrapping the jQuery select2 plugin while
  * respecting Ember data bindings and getter/setter methods on the content.
@@ -300,5 +301,6 @@ var Select2Component = Ember.Component.extend({
     this.valueChanged();
   }, "content.@each")
 });
-
 export default Select2Component;
+
+export default undefined;

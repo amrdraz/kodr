@@ -1,4 +1,6 @@
-module.exports = Em.Component.extend({
+import Ember from 'ember';
+
+module.exports = Ember.Component.extend({
     tagName: 'div',
     classNames: ['highcharts'],
     // series: null,
@@ -11,7 +13,7 @@ module.exports = Em.Component.extend({
         this.initializeChart();
     },
     didInsertElement: function() {
-        Em.$("#"+this.chartId).highcharts({
+        Ember.$("#"+this.chartId).highcharts({
             chart: {
                 type: 'column'
             },
@@ -30,6 +32,8 @@ module.exports = Em.Component.extend({
         });
     },
     willDestroyElement: function () {
-        Em.$("#"+this.chartId).highcharts().destroy();
+        Ember.$("#"+this.chartId).highcharts().destroy();
     }
 });
+
+export default undefined;

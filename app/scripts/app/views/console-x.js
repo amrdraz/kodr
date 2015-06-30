@@ -1,14 +1,15 @@
-module.exports = App.ConsoleView = Em.View.extend({
+import Ember from 'ember';
+import iframeTemplate from '/kodr/'../demo/empty'';
+import stuff from '/kodr/'../../vendor/stuff'';
+
+var ConsoleView = Ember.View.extend({
     // classNames: [],
     didInsertElement: function() {
-
         var controller = this.get('controller');
         var that = this;
         var header = 'This is a console for you to test your code!\n' +
             'You can either run your code in console to see what happens\n' +
             'When you are ready try submitting your code to see the results\n';
-        var iframeTemplate = require('../demo/empty');
-        var stuff = require('../../vendor/stuff');
 
         stuff(window.location.origin + '/iframe.html', this.$()[0], function(context) {
             controller.set('csandbox', context);
@@ -77,3 +78,5 @@ module.exports = App.ConsoleView = Em.View.extend({
         });
     }
 });
+
+export default ConsoleView;

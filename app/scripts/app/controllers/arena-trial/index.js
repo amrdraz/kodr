@@ -1,10 +1,12 @@
-module.exports = Em.Controller.extend({
+import Ember from 'ember';
+
+module.exports = Ember.Controller.extend({
     // breadCrumb:'arena',
     // breadCrumbPath:'arenaTrial',
     needs: ['arenaTrial'],
     arena: Ember.computed.alias("controllers.arenaTrial.model"),
     trials: function() {
-        return Ember.ArrayProxy.createWithMixins(Em.SortableMixin, {
+        return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
             sortProperties: ['order'],
             content: this.get('model.trials')
         });
@@ -34,3 +36,5 @@ module.exports = Em.Controller.extend({
         }
     }
 });
+
+export default undefined;

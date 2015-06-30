@@ -1,4 +1,6 @@
-module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
+import Ember from 'ember';
+
+module.exports = Ember.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
     // activate: function() {},
     // deactivate: function() {},
     // setupController: function(controller, model) {
@@ -15,3 +17,5 @@ module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
     //     return record.save();
     // }
 });
+
+export default undefined;

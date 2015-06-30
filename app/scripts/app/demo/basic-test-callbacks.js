@@ -12,3 +12,5 @@ module.exports = '\
     }\n\
 }\n\
 ';
+
+export default undefined;

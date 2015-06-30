@@ -1,4 +1,8 @@
-var toastr = require('toastr');
+import toastr from '/kodr/'toastr'';
+import Ember from 'ember';
+import DS from 'ember-data';
+
+
 var UserController = Ember.Controller.extend(Ember.Validations.Mixin, {
     validations: {
         password: {
@@ -19,7 +23,7 @@ var UserController = Ember.Controller.extend(Ember.Validations.Mixin, {
     groupOptions: function () {
         var store = this.store;
         var dfd = DS.PromiseArray.create({
-            promise: Em.$.getJSON('api/groups/groupOptions').then(function(response) {
+            promise: Ember.$.getJSON('api/groups/groupOptions').then(function(response) {
                 return response.map(function(record) {
                     record.id = record._id;
                     return store.push('group', record);
@@ -43,7 +47,7 @@ var UserController = Ember.Controller.extend(Ember.Validations.Mixin, {
     actions: {
         join: function (group) {
             var that = this;
-            Em.$.post('api/groups/'+group.id+'/join').done(function (data) {
+            Ember.$.post('api/groups/'+group.id+'/join').done(function (data) {
                 that.store.pushPayload(data);
             }).fail(function (err) {
                 toastr.error(err.statusText);
@@ -51,7 +55,7 @@ var UserController = Ember.Controller.extend(Ember.Validations.Mixin, {
         },
         leave: function (member) {
             var that = this;
-            Em.$.ajax({
+            Ember.$.ajax({
                 method:'DELETE',
                 url:'api/groups/'+member.get('data.group.id')+'/members/'+member.get('data.user.id')
             }).done(function (data) {
@@ -64,7 +68,7 @@ var UserController = Ember.Controller.extend(Ember.Validations.Mixin, {
             var that = this;
             this.validate().then(function() {
                 if (that.get('session.isAdmin')) {
-                    Em.$.ajax({
+                    Ember.$.ajax({
                         type: 'PUT',
                         url: '/api/users/' + that.get('model.id'),
                         context: that,
@@ -82,7 +86,7 @@ var UserController = Ember.Controller.extend(Ember.Validations.Mixin, {
                         toastr.error(xhr.responseText);
                     });
                 } else {
-                    Em.$.ajax({
+                    Ember.$.ajax({
                         type: 'PUT',
                         url: '/profile',
                         context: that,
@@ -114,5 +118,13 @@ var UserController = Ember.Controller.extend(Ember.Validations.Mixin, {
         }
     }
 });
+module.exports = Ember.Controller.extend({
+    // needs: [],
+    breadCrumb:'users',
+    breadCrumbPath:'users',
+    actions: {
+        
+    }
+});
 
-module.exports = UserController;
+export default UserController;

@@ -1,3 +1,5 @@
+import DS from 'ember-data';
+
 module.exports = DS.Model.extend({
     name: DS.attr('string', {
         defaultValue: "new group"
@@ -8,3 +10,5 @@ module.exports = DS.Model.extend({
         inverse: 'group'
     }),
 });
+
+export default undefined;

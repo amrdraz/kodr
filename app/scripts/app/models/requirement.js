@@ -1,4 +1,6 @@
-module.exports = Em.Object.extend({
+import Ember from 'ember';
+
+module.exports = Ember.Object.extend({
     user:null,
     complete:null,
     completed:null,
@@ -41,3 +43,5 @@ module.exports = Em.Object.extend({
         return hash;
     },
 });
+
+export default undefined;

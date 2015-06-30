@@ -53,3 +53,5 @@ module.exports = {
         ].join('\n');
     }
 };
+
+export default undefined;

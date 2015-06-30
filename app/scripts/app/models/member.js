@@ -1,3 +1,5 @@
+import DS from 'ember-data';
+
 var attr = DS.attr;
 module.exports = DS.Model.extend({
     uname: attr('string'),
@@ -24,3 +26,5 @@ module.exports = DS.Model.extend({
         return this.get('role')==='subscriber';
     }
 });
+
+export default undefined;

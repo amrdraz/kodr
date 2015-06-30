@@ -1,4 +1,7 @@
-module.exports = Em.Controller.extend({
+import Ember from 'ember';
+import DS from 'ember-data';
+
+module.exports = Ember.Controller.extend({
     breadCrumb: 'group',
     breadCrumbPath: 'group',
     // needs: ['group'],
@@ -7,12 +10,12 @@ module.exports = Em.Controller.extend({
         this.resetGroupOptions();
     },
     isCreating: function () {
-        return App.get('currentPath').split('.').contains('create');
-    }.property('App.currentPath'),
+        return get('currentPath').split('.').contains('create');
+    }.property('currentPath'),
     getGroupOptionsFor: function(option) {
         var store = this.store;
         var dfd = DS.PromiseArray.create({
-            promise: Em.$.getJSON('api/groups/' + this.get('id') + '/'+option+'Options').then(function(response) {
+            promise: Ember.$.getJSON('api/groups/' + this.get('id') + '/'+option+'Options').then(function(response) {
                 return response.map(function(record) {
                     record.id = record._id;
                     return store.push('user', record);
@@ -36,13 +39,13 @@ module.exports = Em.Controller.extend({
             var that = this;
             if (this.get('model.isDirty')) {
                 this.get('model').save().then(function (g) {
-                    if (App.get('currentPath').split('.').contains('create'))
+                    if (get('currentPath').split('.').contains('create'))
                         that.transitionToRoute('group.edit', g);
                 });
             }
             if (this.get('selectedTeachers').length) {
                 console.log(this.get('selectedTeachers').mapBy('id'));
-                Em.$.ajax({
+                Ember.$.ajax({
                     url: '/api/groups/' + this.get('model.id') + '/members',
                     method:'POST',
                     data: {
@@ -54,7 +57,7 @@ module.exports = Em.Controller.extend({
                 });
             }
             if (this.get('selectedStudents').length) {
-                Em.$.ajax({
+                Ember.$.ajax({
                     url: '/api/groups/' + this.get('model.id') + '/members',
                     method:'POST',
                     data: {
@@ -76,7 +79,7 @@ module.exports = Em.Controller.extend({
         },
         remove: function(member) {
             var that = this;
-            Em.$.ajax({
+            Ember.$.ajax({
                 url: '/api/groups/' + member.get('group.id') + '/members/' + member.get('data.user.id'),
                 type: 'DELETE'
             }).done(function (data) {
@@ -87,3 +90,5 @@ module.exports = Em.Controller.extend({
         }
     }
 });
+
+export default undefined;

@@ -23,3 +23,5 @@ describe("Cow", function() {\n \
   });\n \
 });\n \
 ';
+
+export default undefined;

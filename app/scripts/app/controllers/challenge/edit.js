@@ -1,7 +1,14 @@
-var toastr = require('toastr');
-var debounce = require('../../utils/debounce');
-var ChallengeMixin = require('../../mixins/challengeMixin');
-module.exports = Em.Controller.extend(ChallengeMixin, {
+import toastr from '/kodr/'toastr'';
+import debounce from '/kodr/'../../utils/debounce'';
+import ChallengeMixin from '/kodr/mixins/challenge';
+import Ember from 'ember';
+import Runner from '/kodr/'../../runners/runner'';
+import iframeTemplate from '/kodr/'../../demo/iframe'';
+
+
+
+
+module.exports = Ember.Controller.extend(ChallengeMixin, {
     needs: ['challenge', 'arena'],
     arena: Ember.computed.alias("controllers.arena"),
     breadCrumb: 'edit',
@@ -14,8 +21,8 @@ module.exports = Em.Controller.extend(ChallengeMixin, {
         this._super();
     },
     isCreating: function () {
-        return App.get('currentPath').split('.').contains('create');
-    }.property('App.currentPath'),
+        return get('currentPath').split('.').contains('create');
+    }.property('currentPath'),
     // arenaChange: function() {
     //     var arena = this.get('model.arena');
     //     console.log(arena);
@@ -67,12 +74,9 @@ module.exports = Em.Controller.extend(ChallengeMixin, {
         this.save();
     },
     evaluate: function() {
-
         var model = this.get('model');
         var controller = this;
         var sb = controller.get('sandbox');
-        var Runner = require('../../runners/runner');
-        var iframeTemplate = require('../../demo/iframe');
 
         this.trigger('showConsole');
         controller.jshint(model.get('solution'), function(code, console, sb) {
@@ -198,7 +202,7 @@ module.exports = Em.Controller.extend(ChallengeMixin, {
             var controller = this;
             var model = controller.get('model');
             if(model.get('isJava')) {
-                var ins = model.get("inputs").pushObject(Em.Object.create({value:""}));
+                var ins = model.get("inputs").pushObject(Ember.Object.create({value:""}));
             }
         },
         removeInput: function(inp) {
@@ -211,3 +215,5 @@ module.exports = Em.Controller.extend(ChallengeMixin, {
 
     }
 });
+
+export default undefined;

@@ -1,3 +1,5 @@
+import Ember from 'ember';
+
 var LinkLiComponent = Ember.Component.extend({
   tagName: 'li',
   classNameBindings: ['active'],
@@ -7,4 +9,4 @@ var LinkLiComponent = Ember.Component.extend({
   }.property('childViews.@each.active')
 });
 
-module.exports = LinkLiComponent;
+export default LinkLiComponent;

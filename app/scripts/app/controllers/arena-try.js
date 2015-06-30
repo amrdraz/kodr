@@ -1,4 +1,6 @@
-module.exports = App.ArenaTryController = Em.Controller.extend({
+import Ember from 'ember';
+
+var ArenaTryController = Ember.Controller.extend({
     breadCrumb:'arenas',
     breadCrumbPath:'arenas',
     init: function() {
@@ -23,3 +25,5 @@ module.exports = App.ArenaTryController = Em.Controller.extend({
     actions: {
     }
 });
+
+export default ArenaTryController;

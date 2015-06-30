@@ -1,4 +1,6 @@
-module.exports = Em.Controller.extend({
+import Ember from 'ember';
+
+module.exports = Ember.Controller.extend({
     
     init: function() {
         this._super();
@@ -20,3 +22,5 @@ module.exports = Em.Controller.extend({
       
     }
 });
+
+export default undefined;

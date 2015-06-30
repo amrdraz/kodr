@@ -10,4 +10,6 @@ Cow.prototype = { \n \
     return this.name + " greets " + target; \n \
   } \n \
 }; \n \
-'; 
+';
+
+export default undefined;

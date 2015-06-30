@@ -1,4 +1,7 @@
-module.exports = Em.Controller.extend({
+import Ember from 'ember';
+import Requirement from '/kodr/requirement';
+
+module.exports = Ember.Controller.extend({
     breadCrumb: 'quest',
     breadCrumbPath: 'quest',
     // needs: ['quest'],
@@ -8,11 +11,11 @@ module.exports = Em.Controller.extend({
     modifiers: ['any', 'specific'],
     models: ['Arena', 'Challenge'],
     challenges: function() {
-        var store = App.__container__.lookup('store:main');
+        var store = __container__.lookup('store:main');
         return store.find('challenge');
     }.property(),
     arenas: function() {
-        var store = App.__container__.lookup('store:main');
+        var store = __container__.lookup('store:main');
         return store.find('arena');
     }.property(),
     requirementsChanged:false,
@@ -24,7 +27,7 @@ module.exports = Em.Controller.extend({
             var that = this;
             this.get('model').save().then(function(g) {
                 that.set('requirementsChanged', false);
-                if (App.get('currentPath').split('.').contains('create'))
+                if (get('currentPath').split('.').contains('create'))
                     that.transitionToRoute('quest.edit', g);
             }).catch(function(xhr) {
                 that.set('errorMessage', xhr.responseText);
@@ -48,7 +51,7 @@ module.exports = Em.Controller.extend({
         },
         add: function() {
             this.set('requirementsChanged', true);
-            var reqs = this.get('model.requirements').addObject(App.Requirement.create({
+            var reqs = this.get('model.requirements').addObject(Requirement.create({
                 model1: 'Challenge',
                 id1: null,
                 times: 1,
@@ -61,3 +64,5 @@ module.exports = Em.Controller.extend({
         }
     }
 });
+
+export default undefined;

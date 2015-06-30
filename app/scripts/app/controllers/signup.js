@@ -1,4 +1,7 @@
-var toastr = require('toastr');
+import toastr from '/kodr/'toastr'';
+import Ember from 'ember';
+
+
 var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
     validations:{
       username: {
@@ -65,4 +68,4 @@ var SignupController = Ember.Controller.extend(Ember.Validations.Mixin, {
     }
 });
 
-module.exports = SignupController;
+export default SignupController;

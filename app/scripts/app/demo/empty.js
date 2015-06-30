@@ -8,3 +8,5 @@ module.exports = ' \
 </body> \
 </html> \
 ';
+
+export default undefined;

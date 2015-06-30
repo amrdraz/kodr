@@ -32,6 +32,7 @@
     "connect-mongo": "^0.4.1",
     "connect-redis": "^2.1.0",
     "cookie-parser": "~1.0.0",
+    "cors": "^2.7.1",
     "dockerode": "^2.0.3",
     "eventemitter2": "^0.4.14",
     "express": "~4.0.0",

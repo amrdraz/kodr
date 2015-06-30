@@ -1,4 +1,6 @@
-module.exports = Em.Controller.extend({
+import Ember from 'ember';
+
+module.exports = Ember.Controller.extend({
     // needs: [],
     breadCrumb:'arenas',
     breadCrumbPath:'arenas',
@@ -6,3 +8,5 @@ module.exports = Em.Controller.extend({
         
     }
 });
+
+export default undefined;

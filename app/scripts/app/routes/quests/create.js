@@ -1,4 +1,6 @@
-module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
+import Ember from 'ember';
+
+module.exports = Ember.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
   controllerName: 'quest.edit',
   // activate: function() {},
   deactivate: function() {
@@ -20,3 +22,5 @@ module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
       return this.store.createRecord('quest');
   }
 });
+
+export default undefined;

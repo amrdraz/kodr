@@ -1,4 +1,6 @@
-module.exports = Em.Route.extend({
+import Ember from 'ember';
+
+module.exports = Ember.Route.extend({
     // activate: function() {},
     // deactivate: function() {},
     // setupController: function(controller, model) {},
@@ -10,3 +12,5 @@ module.exports = Em.Route.extend({
         return this.store.findAll('challenge');
     }
 });
+
+export default undefined;

@@ -1,4 +1,6 @@
-module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
+import Ember from 'ember';
+
+module.exports = Ember.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
   controllerName: 'challenge.edit',
   // activate: function() {},
   deactivate: function() {
@@ -23,3 +25,5 @@ module.exports = Em.Route.extend(SimpleAuth.AuthenticatedRouteMixin,{
       });
   }
 });
+
+export default undefined;

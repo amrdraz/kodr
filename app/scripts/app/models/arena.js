@@ -1,5 +1,6 @@
-var attr = DS.attr;
+import DS from 'ember-data';
 
+var attr = DS.attr;
 var ArenaModel = module.exports = DS.Model.extend({
     name: attr('string', {
         defaultValue: "New Arena"
@@ -28,3 +29,5 @@ var ArenaModel = module.exports = DS.Model.extend({
         return !this.get('isDirty') && !this.get('isPublished');
     }.property('isDirty', 'isPublished')
 });
+
+export default undefined;

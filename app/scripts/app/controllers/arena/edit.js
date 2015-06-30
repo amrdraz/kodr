@@ -1,11 +1,14 @@
-var toastr = require('toastr');
-module.exports = Em.Controller.extend({
+import toastr from '/kodr/'toastr'';
+import Ember from 'ember';
+
+
+module.exports = Ember.Controller.extend({
     breadCrumb: 'arena',
     breadCrumbPath: 'arena',
     needs: ['arena'],
     isCreating: function() {
-        return App.get('currentPath').split('.').contains('create');
-    }.property('App.currentPath'),
+        return get('currentPath').split('.').contains('create');
+    }.property('currentPath'),
     canPublish: function() {
         return this.get('model.canPublish') && this.get('model.challenges').filterProperty('isPublished', true).length >= 1;
     }.property('model.challenges.@each.isPublished'),
@@ -67,3 +70,5 @@ module.exports = Em.Controller.extend({
 
     }
 });
+
+export default undefined;

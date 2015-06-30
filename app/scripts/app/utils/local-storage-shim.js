@@ -1,5 +1,5 @@
 if (!window.localStorage) {
-    window.localStorage = {
+    var localStorage = {
         getItem: function(sKey) {
             if (!sKey || !this.hasOwnProperty(sKey)) {
                 return null;
@@ -30,3 +30,5 @@ if (!window.localStorage) {
     };
     window.localStorage.length = (document.cookie.match(/\=/g) || window.localStorage).length;
 }
+
+export default undefined;

@@ -12,3 +12,5 @@ describe("simple", function () {\n\
 })\n\
 //*/\
 ';
+
+export default undefined;

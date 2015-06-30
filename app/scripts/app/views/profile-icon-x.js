@@ -1,4 +1,6 @@
-var ProfileIconView = Em.View.extend({
+import Ember from 'ember';
+
+var ProfileIconView = Ember.View.extend({
   classNames:['profile-icon', 'img-circle', 'img-responsive'],
   tagName:'img',
   didInsertElement: function() {
@@ -14,7 +16,6 @@ var ProfileIconView = Em.View.extend({
     this.$().attr('src',icon);
   }
 });
-
 Ember.Handlebars.helper('profile-icon', ProfileIconView);
 
-module.exports =  ProfileIconView;
+export default ProfileIconView;

@@ -1,7 +1,10 @@
-App.QuestRequirementTransform = DS.Transform.extend({
+import DS from 'ember-data';
+import Requirement from '/kodr/requirement';
+
+var QuestRequirementTransform = DS.Transform.extend({
   deserialize: function(serialized) {
     return serialized.map(function  (req) {
-        return App.Requirement.create(req);
+        return Requirement.create(req);
     });
   },
   serialize: function(deserialized) {
@@ -11,7 +14,6 @@ App.QuestRequirementTransform = DS.Transform.extend({
     });
   }
 });
-
 module.exports = DS.Model.extend({
     name: DS.attr('string', {
         defaultValue: "new Quest"
@@ -40,7 +42,7 @@ module.exports = DS.Model.extend({
     // usersOptions: function() {
     //     var store = this.store;
     //     var dfd = DS.PromiseArray.create({
-    //         promise: Em.$.getJSON('api/quests/' + this.get('id') + '/usersOptions').then(function(response) {
+    //         promise: Ember.$.getJSON('api/quests/' + this.get('id') + '/usersOptions').then(function(response) {
     //             return response.map(function(record) {
     //                 record.id = record._id;
     //                 return store.push('user', record);
@@ -50,3 +52,5 @@ module.exports = DS.Model.extend({
     //     return dfd;
     // }.property('users.@each')
 });
+
+export default QuestRequirementTransform;

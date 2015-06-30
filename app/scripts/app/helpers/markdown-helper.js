@@ -1,3 +1,6 @@
+import Ember from 'ember';
+import marked from '/kodr/'marked'';
+
 function escape(html, encode) {
         return html
             .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
@@ -6,10 +9,7 @@ function escape(html, encode) {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     }
-
 Ember.Handlebars.helper('markdown-helper', function(value, options) {
-
-    var marked = require('marked');
     marked.setOptions({
         renderer: new marked.Renderer(),
         highlight: function(code) {
@@ -25,3 +25,5 @@ Ember.Handlebars.helper('markdown-helper', function(value, options) {
 
     return marked(escape(value));
 });
+
+export default undefined;

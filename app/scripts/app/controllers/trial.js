@@ -1,10 +1,15 @@
-var toastr = require('toastr');
-var debounce = require('../utils/debounce');
-var ChallengeMixin = require('../mixins/challengeMixin');
-module.exports = Em.Controller.extend(ChallengeMixin, {
+import ChallengeMixin from '/kodr/mixins/challenge';
+import Ember from 'ember';
+import Runner from '/kodr/'../runners/runner'';
+import iframeTemplate from '/kodr/'../demo/iframe'';
+
+
+
+
+module.exports = Ember.Controller.extend(ChallengeMixin, {
     isChallengeTrial: function() {
-        return App.get('currentPath').split('.').contains('challenge');
-    }.property('App.currentPath'),
+        return this.get('currentPath').split('.').contains('challenge');
+    }.property('currentPath'),
 
     breadCrumb: function() {
         return this.get('isChallengeTrial') ? 'edit' : 'arena';
@@ -86,8 +91,6 @@ module.exports = Em.Controller.extend(ChallengeMixin, {
             var controller = this;
             if(challenge.get('isJS')) {
                 var sb = controller.get('sandbox');
-                var Runner = require('../runners/runner');
-                var iframeTemplate = require('../demo/iframe');
                 controller.jshint(model.get('code'), function(code, jconsole, sb) {
                     sb.load(iframeTemplate, function() {
                         sb.evaljs(Runner.test(code, challenge.get('tests')));
@@ -113,3 +116,5 @@ module.exports = Em.Controller.extend(ChallengeMixin, {
         })
     }
 });
+
+export default undefined;

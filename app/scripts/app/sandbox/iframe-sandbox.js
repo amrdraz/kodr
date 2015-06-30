@@ -39,8 +39,6 @@ function Sandbox(options) {
         nameSpaceFor(win, nestedKeys)[nestedKeys[nestedKeys.length - 1]] = variables[key];
     });
 }
-
-
 // Used for getting variables under a namespace for redefining
 // ie, console.log
 
@@ -51,7 +49,6 @@ function nameSpaceFor(namespace, keys) {
         return nameSpaceFor(namespace[keys[0]], keys.slice(1, keys.length));
     }
 }
-
 // When we evaluate, we'll need to take into account:
 //   Setup the HTML?
 //   Run the JavaScript
@@ -59,7 +56,6 @@ function nameSpaceFor(namespace, keys) {
 Sandbox.prototype.evaluate = function(code) {
     return this.iframe.contentWindow.eval(code);
 };
-
 Sandbox.prototype.exec = function( /*...*/ ) {
     var context = this.iframe.contentWindow,
         args = [].slice.call(arguments),
@@ -70,20 +66,19 @@ Sandbox.prototype.exec = function( /*...*/ ) {
 
     return functionToExec.apply(context, args);
 };
-
 Sandbox.prototype.get = function(property) {
     var context = this.iframe.contentWindow;
     return context[property];
 };
-
 Sandbox.prototype.set = function(property, value) {
     var context = this.iframe.contentWindow;
     context[property] = value;
 };
-
 Sandbox.prototype.destroy = function() {
     if (this.iframe) {
         this.iframe.parentNode.removeChild(this.iframe);
         this.iframe = null;
     }
 };
+
+export default undefined;

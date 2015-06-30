@@ -1,7 +1,9 @@
-var toastr = require('toastr');
+import Ember from 'ember';
+
+
 var ApplicationController = Ember.Controller.extend({
     updateCurrentPath: function() {
-        App.set('currentPath', this.get('currentPath'));
+        set('currentPath', this.get('currentPath'));
     }.observes('currentPath'),
     sockets: {
         notification: function(user, type, value) {
@@ -24,4 +26,4 @@ var ApplicationController = Ember.Controller.extend({
     }
 });
 
-module.exports = ApplicationController;
+export default ApplicationController;

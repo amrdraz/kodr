@@ -1,3 +1,5 @@
+import DS from 'ember-data';
+
 module.exports = DS.Model.extend({
     code: DS.attr('string'),
     input: DS.attr('string'),
@@ -16,3 +18,5 @@ module.exports = DS.Model.extend({
         return !this.get('complete') || this.get('isDirty');
     }.property('complete', 'isDirty'),
 });
+
+export default undefined;

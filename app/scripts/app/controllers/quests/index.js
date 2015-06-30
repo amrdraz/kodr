@@ -1,4 +1,6 @@
-module.exports = Em.Controller.extend({
+import Ember from 'ember';
+
+module.exports = Ember.Controller.extend({
 
     actions: {
       remove: function(quest) {
@@ -10,3 +12,5 @@ module.exports = Em.Controller.extend({
         }
     }
 });
+
+export default undefined;
