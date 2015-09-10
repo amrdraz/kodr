@@ -38,7 +38,7 @@ module.exports = function(passport) {
     // by default, if there was no name, it would just be called 'local'
 
     passport.use('local-login', new LocalStrategy({
-        usernameField: 'username',
+        usernameField: 'identification',
         passwordField: 'password',
         passReqToCallback: true // allows request in the callback
     }, function(req, identity, password, done) {
@@ -46,7 +46,6 @@ module.exports = function(passport) {
         // make things asynchronus
         // only fire findOne when we have data
         process.nextTick(function() {
-
             User.findByIdentity(identity).then(function(user) {
                 // check if user with this email already exists
                 if (!user) {
@@ -60,6 +59,7 @@ module.exports = function(passport) {
                 });
 
             }, function (err) {
+                console.log(err);
                 done(err);
             });
         });
