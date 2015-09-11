@@ -37,6 +37,7 @@ app.use(bodyParser()); // get req.body from normal html form
 app.use(methodOverride());
 
 var mongoose = require('mongoose');
+mongoose.set('Promise', require('bluebird'));
 var connectDB =  function() {
     mongoose.connect(config.db.url);
 };
@@ -47,12 +48,14 @@ mongoose.connection.on('error',function() {
 });
 connectDB();
 
-var runner = require('java-code-runner');
-runner.server.recompile(function () {
-    runner.watchServer(function(p) {
-        console.log('started java server at http://localhost:' + p);
+if (config.runJava) {
+    var runner = require('java-code-runner');
+    runner.server.recompile(function () {
+        runner.watchServer(function(p) {
+            console.log('started java server at http://localhost:' + p);
+        });
     });
-});
+}
 
 
 //  Setting up template engine

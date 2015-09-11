@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
 var observer = require('../observer');
 
@@ -84,10 +83,10 @@ var ChallengeSchema = new mongoose.Schema({
 
 });
 
-ChallengeSchema.plugin(version, {
-    collection: 'ChallengeVersions',
-    log: true
-});
+// ChallengeSchema.plugin(version, {
+//     collection: 'ChallengeVersions',
+//     log: true
+// });
 ChallengeSchema.plugin(relationship, {
     relationshipPathName: ['arena', 'author']
 });

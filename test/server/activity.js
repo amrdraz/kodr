@@ -92,8 +92,7 @@ describe('Activity', function() {
             request(setup.url)
             .post("/signup")
             .send({
-                username: "amrdr",
-                email: "amr.draz@guc.edu.eg",
+                username: "amr.dr",
                 password: "drazdraz12",
                 passwordConfirmation: "drazdraz12"
             })
@@ -154,7 +153,7 @@ describe('Activity', function() {
                 return request(setup.url)
                     .post("/token")
                     .send({
-                        username: "amrdr",
+                        identification: "amrdr",
                         password: "drazdraz12",
                     })
                     .expect(200);
@@ -188,7 +187,7 @@ describe('Activity', function() {
                 return request(setup.url)
                     .post("/token")
                     .send({
-                        username: "amrdr",
+                        identification: "amrdr",
                         password: "drazdraz12",
                     })
                     .expect(200);

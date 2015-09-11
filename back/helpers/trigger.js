@@ -64,16 +64,6 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
                         });
                     }
                     return req;
-                    // return Requirement.findOneAndUpdate({
-                    //     _id: req._id
-                    // }, {
-                    //     $addToSet: {
-                    //         userQuests: model._id //add model is not already there
-                    //     }
-                    // }, {
-                    //     safe: true,
-                    //     upsert: true
-                    // }).exec();
                 } else {
                     if (req) { // a similar req already exist but differen repat times
                         r.completed = Math.min(req.completed, r.times);

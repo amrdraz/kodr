@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var util = require('util');
-var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
@@ -84,13 +83,13 @@ var TrialSchema = new mongoose.Schema({
 
 });
 
-TrialSchema.plugin(version, {
-    collection: 'TrialVersions',
-    logError: true,
-    suppressVersionIncrement: false,
-    ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge', 'arena', 'order'],
-    strategy: 'array'
-});
+// TrialSchema.plugin(version, {
+//     collection: 'TrialVersions',
+//     logError: true,
+//     suppressVersionIncrement: false,
+//     ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge', 'arena', 'order'],
+//     strategy: 'array'
+// });
 
 TrialSchema.plugin(relationship, {
     relationshipPathName: ['arenaTrial', 'user', 'challenge', 'arena']

@@ -42,7 +42,7 @@
         <label for="passwordConfirmation" class="control-label">Confirm Password</label>
         {{input type="password" class="form-control" value=passwordConfirmation}}
       </div>
-      <button type="submit" class="btn btn-success" disabled="{{if isProcessing}}"><i class="fa fa-rocket"></i> Sign up</button>
+      <button type="submit" class="btn btn-success" disabled={{isProcessing}}><i class="fa fa-rocket"></i> Sign up</button>
     </form>
   </div>
 </div>

@@ -5,6 +5,7 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 var request = require('supertest');
 var setup = require('./setup');
+var config = require('../../back/config/server');
 var Challenge = require('../../back/models/challenge');
 var Arena = require('../../back/models/arena');
 var ArenaTrial = require('../../back/models/arenaTrial');
@@ -34,81 +35,81 @@ describe('Challenge', function() {
     var out = "a - b = 20";
 
     describe('Code', function() {
-        it('should run java', function(done) {
-            Challenge.run(code, testchallenge).spread(function(sterr, stout) {
-                if (sterr) return done(sterr);
-                stout.should.equal(out);
-                done();
-            }).catch(done);
-        });
-        it('should run java and show error', function(done) {
-            Challenge.run(code + '\n x = 3', testchallenge).spread(function(sterr, stout) {
-                sterr.should.exist;
-                // stout.should.equal(out);
-                done();
-            }).catch(done);
-        });
+        if (config.runJava) {
+            it('should run java', function(done) {
+                Challenge.run(code, testchallenge).spread(function(sterr, stout) {
+                    if (sterr) return done(sterr);
+                    stout.should.equal(out);
+                    done();
+                }).catch(done);
+            });
+            it('should run java and show error', function(done) {
+                Challenge.run(code + '\n x = 3', testchallenge).spread(function(sterr, stout) {
+                    sterr.should.exist;
+                    // stout.should.equal(out);
+                    done();
+                }).catch(done);
+            });
 
-        it('should test java', function(done) {
-            Challenge.test(code, testchallenge, testchallenge).spread(function(report, stout, sterr) {
-                if (sterr) return done(sterr);
-                // console.log(stout);
-                expect(report).to.have.property('passed', true);
-                done();
-            }).catch(done);
-        });
+            it('should test java', function(done) {
+                Challenge.test(code, testchallenge, testchallenge).spread(function(report, stout, sterr) {
+                    if (sterr) return done(sterr);
+                    // console.log(stout);
+                    expect(report).to.have.property('passed', true);
+                    done();
+                }).catch(done);
+            });
+        }
     });
+
     describe('Trials', function() {
         var challenge, arenaTrial, trials, user, num = 10;
         beforeEach(function(done) {
-            Promise.fulfilled()
-                .then(function() {
-                    var at = ArenaTrial.create({});
-                    var ch = Challenge.create({});
-                    var ch2 = Challenge.create({});
-                    var usr = User.create({
-                        username: 'testuser',
-                        password: 'testuser12'
+            Promise.fulfilled().then(function() {
+                var at = ArenaTrial.create({});
+                var ch = Challenge.create({});
+                var ch2 = Challenge.create({});
+                var usr = User.create({
+                    username: 'testuser',
+                    password: 'testuser12'
+                });
+                return [at, ch, ch2, usr];
+            }).spread(function(at, ch, ch2, usr) {
+                challenge = ch;
+                arenaTrial = at;
+                user = usr;
+                var arr = Array(num);
+                var chs = Promise.each(arr, function() {
+                    return Trial.create({
+                        challenge: ch._id,
+                        arenaTrial: at._id,
+                        user: usr
                     });
-                    return [at, ch, ch2, usr];
-                })
-                .spread(function(at, ch, ch2, usr) {
-                    challenge = ch;
-                    arenaTrial = at;
-                    user = usr;
-                    var arr = Array(num);
-                    var chs = Promise.each(arr, function() {
-                        return Trial.create({
-                            challenge: ch._id,
-                            arenaTrial: at._id,
-                            user: usr
-                        });
-                    });
-                    var chs2 = Promise.each(arr, function() {
-                        return Trial.create({
-                            challenge: ch2._id,
-                            arenaTrial: at._id,
-                            user: usr
+                });
+                var chs2 = Promise.each(arr, function() {
+                    return Trial.create({
+                        challenge: ch2._id,
+                        arenaTrial: at._id,
+                        user: usr
 
-                        });
                     });
+                });
 
-                    return [chs, chs2];
-                }).spread(function(chs, chs2) {
-                    trials = chs.concat(chs2);
-                    return [
-                        ArenaTrial.findOne({
-                            _id: arenaTrial._id
-                        }).exec(),
-                        Challenge.findOne({
-                            _id: challenge._id
-                        }).exec()
-                    ];
-                }).spread(function(at, ch) {
-                    arenaTrial = at;
-                    challenge = ch;
-                })
-                .finally(done);
+                return [chs, chs2];
+            }).spread(function(chs, chs2) {
+                trials = chs.concat(chs2);
+                return [
+                    ArenaTrial.findOne({
+                        _id: arenaTrial._id
+                    }).exec(),
+                    Challenge.findOne({
+                        _id: challenge._id
+                    }).exec()
+                ];
+            }).spread(function(at, ch) {
+                arenaTrial = at;
+                challenge = ch;
+            }).finally(done);
         });
         afterEach(setup.clearDB);
 
@@ -229,59 +230,60 @@ describe('Challenge', function() {
                     });
 
             });
-
-            it("should run code based on language returning stout and sterr", function(done) {
-                request(api)
-                    .post("/challenges/run")
-                    .set('Authorization', 'Bearer ' + student.token)
-                    .send({
-                        code: code,
-                        language: 'java'
-                    })
-                    .expect(200)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.stout.should.equal(out);
-                        done();
-                    });
-            });
-            it("should run code with inputs", function(done) {
-                request(api)
-                    .post("/challenges/run")
-                    .set('Authorization', 'Bearer ' + student.token)
-                    .send({
-                        code: code,
-                        language: 'java',
-                        inputs: ['int x']
-                    })
-                    .expect(200)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.stout.should.equal(out);
-                        done();
-                    });
-            });
-            it("should test code", function(done) {
-                request(api)
-                    .post("/challenges/test")
-                    .set('Authorization', 'Bearer ' + student.token)
-                    .send({
-                        code: code,
-                        challenge: testchallenge
-                    })
-                    .expect(200)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        // console.log(res.body.report);
-                        // console.log(res.body.stout);
-                        // console.log(res.body.sterr);
-                        res.body.report.passed.should.be.true;
-                        done();
-                    });
-            });
+            if (config.runJava) {
+                it("should run java code based on language returning stout and sterr", function(done) {
+                    request(api)
+                        .post("/challenges/run")
+                        .set('Authorization', 'Bearer ' + student.token)
+                        .send({
+                            code: code,
+                            language: 'java'
+                        })
+                        .expect(200)
+                        .end(function(err, res) {
+                            if (err) return done(err);
+                            res.status.should.equal(200);
+                            res.body.stout.should.equal(out);
+                            done();
+                        });
+                });
+                it("should run java code with inputs", function(done) {
+                    request(api)
+                        .post("/challenges/run")
+                        .set('Authorization', 'Bearer ' + student.token)
+                        .send({
+                            code: code,
+                            language: 'java',
+                            inputs: ['int x']
+                        })
+                        .expect(200)
+                        .end(function(err, res) {
+                            if (err) return done(err);
+                            res.status.should.equal(200);
+                            res.body.stout.should.equal(out);
+                            done();
+                        });
+                });
+                it("should test java code", function(done) {
+                    request(api)
+                        .post("/challenges/test")
+                        .set('Authorization', 'Bearer ' + student.token)
+                        .send({
+                            code: code,
+                            challenge: testchallenge
+                        })
+                        .expect(200)
+                        .end(function(err, res) {
+                            if (err) return done(err);
+                            res.status.should.equal(200);
+                            // console.log(res.body.report);
+                            // console.log(res.body.stout);
+                            // console.log(res.body.sterr);
+                            res.body.report.passed.should.be.true;
+                            done();
+                        });
+                });
+            }
         });
 
         describe("GET", function() {

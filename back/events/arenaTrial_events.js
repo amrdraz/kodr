@@ -14,13 +14,14 @@ exports.model = function(ArenaTrial) {
         if (trial.arenaTrial)
             queue = queue.then(function(model) {
                 return ArenaTrial.findOneAndUpdate({
-                    _id: trial.arenaTrial
+                    _id: trial.arenaTrial,
                 }, {
                     $inc: {
                         completed: 1,
                         exp: trial.exp
                     }
                 }, {
+                    new:true,
                     unset: true
                 }).exec().then(function(arenaTrial) {
                     if (arenaTrial.trials.length === arenaTrial.completed) {

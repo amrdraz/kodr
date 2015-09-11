@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
+var config = require('../config/server.js');
 var observer = require('../observer');
 var javaRunner = require('java-code-runner');
 
@@ -21,14 +22,19 @@ module.exports = function(schema, options) {
                     resolve(['no server js', '']);
                     break;
                 case 'java':
+                    if(!config.runJava) {
+                        return resolve(['no server java', '']);
+                    }
                     javaRunner.run(code, options, function(err, stout, sterr) {
                         if (err && !sterr) return reject(err);
                         return resolve([sterr, stout]);
                     });
                     break;
                 case 'python':
+                    return resolve(['no server java', '']);
                     break;
                 case 'ruby':
+                    return resolve(['no server java', '']);
                     break;
             }
         });

@@ -44,13 +44,6 @@ GroupSchema.plugin(require('../helpers/group'), 'Group');
 
 var Group = mongoose.model('Group', GroupSchema);
 
-// var queue = Promise.fulfilled();
 var timeout;
-// observer.on('user.awarded', function(user, type, value) {
-//     console.log('user awarded now updating group',user, type, value);
-//     if(user && user.group) {
-//         Group.findByIdAndUpdate(user.group, {$inc:{exp:value}});
-//     }
-// });
 
 module.exports = Group;

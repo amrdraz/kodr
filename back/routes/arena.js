@@ -64,7 +64,7 @@ module.exports = function(app, passport) {
      */
 
     app.put('/api/arenas/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
-        Arena.findByIdAndUpdate(req.params.id, req.body.arena, function(err, model) {
+        Arena.findByIdAndUpdate(req.params.id, req.body.arena, {new:true}, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             res.json({
