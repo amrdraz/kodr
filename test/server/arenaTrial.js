@@ -10,18 +10,18 @@ var User = require('../../back/models/user');
 var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
 var Arena = require('../../back/models/arena');
-var ArenaTrial = require('../../back/models/arenaTrial');
+var UserArena = require('../../back/models/userArena');
 var observer = require('../../back/observer');
 
 
 
-describe('ArenaTrial', function() {
+describe('UserArena', function() {
     before(function(done) {
         return setup.clearDB(done);
     });
 
     describe('Integration', function() {
-        var arena, arenaTrial, challenge, challenge2, user;
+        var arena, userArena, challenge, challenge2, user;
         beforeEach(function(done) {
             Promise.fulfilled()
                 .then(function() {
@@ -35,7 +35,7 @@ describe('ArenaTrial', function() {
                 .spread(function(ar, usr) {
                     arena = ar;
                     user = usr;
-                    var at = ArenaTrial.create({
+                    var at = UserArena.create({
                         arena: arena._id,
                         user: user._id
                     });
@@ -52,7 +52,7 @@ describe('ArenaTrial', function() {
                 .spread(function(at, ch1, ch2) {
                     challenge = ch1;
                     challenge2 = ch2;
-                    arenaTrial = at;
+                    userArena = at;
                     done();
                 }).catch(done);
 
@@ -60,38 +60,38 @@ describe('ArenaTrial', function() {
         afterEach(setup.clearDB);
         it('should have trials when user tries a new challenge', function(done) {
             var trial;
-            arenaTrial.trials.length.should.equal(0);
+            userArena.trials.length.should.equal(0);
             Promise.fulfilled()
                 .then(function() {
                     return Trial.create({
                         challenge: challenge._id,
-                        arenaTrial: arenaTrial._id,
+                        userArena: userArena._id,
                         user: user._id
                     });
                 })
                 .then(function() {
-                    return ArenaTrial.findOne({
-                        _id: arenaTrial._id
+                    return UserArena.findOne({
+                        _id: userArena._id
                     }).exec();
                 })
                 .then(function(model) {
-                    arenaTrial = model;
-                    arenaTrial.trials.length.should.equal(1);
+                    userArena = model;
+                    userArena.trials.length.should.equal(1);
                     done();
                 }).catch(done);
         });
         it('should gain exp when trial is complete', function(done) {
             var trial;
-            arenaTrial.trials.length.should.equal(0);
-            observer.once('arenaTrial.trial.awarded', function(arenaTrial) {
-                arenaTrial.exp.should.equal(trial.exp);
+            userArena.trials.length.should.equal(0);
+            observer.once('userArena.trial.awarded', function(userArena) {
+                userArena.exp.should.equal(trial.exp);
                 done();
             });
             Promise.fulfilled()
                 .then(function() {
                     return Trial.create({
                         challenge: challenge._id,
-                        arenaTrial: arenaTrial._id,
+                        userArena: userArena._id,
                         user: user._id,
                         complete: true
                     }).then(function(tr) {
@@ -100,22 +100,22 @@ describe('ArenaTrial', function() {
                 }).catch(done);
         });
         it('should become complete when all challange trials are complete', function(done) {
-            arenaTrial.trials.length.should.equal(0);
-            observer.once('arenaTrial.complete', function(arenaTrial) {
-                arenaTrial.complete.should.be.true;
+            userArena.trials.length.should.equal(0);
+            observer.once('userArena.complete', function(userArena) {
+                userArena.complete.should.be.true;
                 done();
             });
             Promise.fulfilled()
                 .then(function() {
                     var t1 = Trial.create({
                         challenge: challenge._id,
-                        arenaTrial: arenaTrial._id,
+                        userArena: userArena._id,
                         user: user._id,
                         complete: true
                     });
                     var t2 = Trial.create({
                         challenge: challenge2._id,
-                        arenaTrial: arenaTrial._id,
+                        userArena: userArena._id,
                         user: user._id,
                         complete: true
                     });
@@ -123,15 +123,15 @@ describe('ArenaTrial', function() {
                 }).catch(done);
         });
 
-        it('should find or create arenaTrial with trials for user given arena and user', function(done) {
+        it('should find or create userArena with trials for user given arena and user', function(done) {
             Promise.fulfilled().then(function() {
                 var at = {
                     arena: arena._id,
                     user: user._id
                 };
-                return ArenaTrial.findOrCreateWithTrials(at);
+                return UserArena.findOrCreateWithTrials(at);
             }).spread(function(at, trials) {
-                at._id.should.eql(arenaTrial._id);
+                at._id.should.eql(userArena._id);
                 trials.length.should.equal(2);
             }).finally(done);
         });
@@ -186,8 +186,8 @@ describe('ArenaTrial', function() {
                 isPublished: false
             }
         };
-        var arenaTrial = {
-            arenaTrial: {
+        var userArena = {
+            userArena: {
                 code: challenge.setup,
                 complete: false,
                 tests: {},
@@ -214,7 +214,7 @@ describe('ArenaTrial', function() {
                 teacher._id = t._id;
                 accessToken = teacher.token = t.token;
                 arena.id = ar.id;
-                arenaTrial.arenaTrial.arena = arena.id;
+                userArena.userArena.arena = arena.id;
             }).finally(done);
         });
 
@@ -224,22 +224,22 @@ describe('ArenaTrial', function() {
 
             it("should not work without accessToken", function(done) {
                 request(api)
-                    .post("/arenaTrials")
-                    .send(arenaTrial)
+                    .post("/userArenas")
+                    .send(userArena)
                     .expect(401)
                     .end(done);
             });
 
-            it("should create a arenaTrial", function(done) {
+            it("should create a userArena", function(done) {
                 return request(api)
-                    .post("/arenaTrials")
+                    .post("/userArenas")
                     .set('Authorization', 'Bearer ' + accessToken)
-                    .send(arenaTrial)
+                    .send(userArena)
                     .then(function(res) {
                         res.status.should.equal(200);
-                        expect(res.body.arenaTrial).to.exist;
-                        res.body.arenaTrial.trials.length.should.equal(res.body.trials.length);
-                        arenaTrial.id = res.body.arenaTrial._id;
+                        expect(res.body.userArena).to.exist;
+                        res.body.userArena.trials.length.should.equal(res.body.trials.length);
+                        userArena.id = res.body.userArena._id;
                         done();
                     });
             });
@@ -247,33 +247,33 @@ describe('ArenaTrial', function() {
 
         describe("GET", function() {
 
-            it("should return a arenaTrial by id", function(done) {
+            it("should return a userArena by id", function(done) {
                 request(api)
-                    .get("/arenaTrials/" + arenaTrial.id)
+                    .get("/userArenas/" + userArena.id)
                     .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.arenaTrial._id.should.exist;
+                        res.body.userArena._id.should.exist;
                         done();
                     });
             });
 
-            it("should return a list of all arenaTrials", function(done) {
+            it("should return a list of all userArenas", function(done) {
                 request(api)
-                    .get("/arenaTrials")
+                    .get("/userArenas")
                     .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.arenaTrial.length.should.equal(1);
+                        res.body.userArena.length.should.equal(1);
                         done();
                     });
             });
 
-            it("should return an arenaTrial by arena_id", function(done) {
+            it("should return an userArena by arena_id", function(done) {
                 request(api)
-                    .get("/arenaTrials")
+                    .get("/userArenas")
                     .set('Authorization', 'Bearer ' + accessToken)
                     .query({
                         arena: arena.id
@@ -282,7 +282,7 @@ describe('ArenaTrial', function() {
                         if (err) return done(err);
                         // console.log(res.text);
                         res.status.should.equal(200);
-                        expect(res.body.arenaTrial._id).to.exist;
+                        expect(res.body.userArena._id).to.exist;
                         done();
                     });
             });
@@ -293,18 +293,18 @@ describe('ArenaTrial', function() {
 
             it("should not work without accessToken", function(done) {
                 request(api)
-                    .put("/arenaTrials/" + arenaTrial.id)
-                    .send(arenaTrial)
+                    .put("/userArenas/" + userArena.id)
+                    .send(userArena)
                     .expect(401)
                     .end(done);
             });
 
-            it("should not update someone elses arenaTrial", function(done) {
+            it("should not update someone elses userArena", function(done) {
                 request(api)
-                    .put("/arenaTrials/" + arenaTrial.id)
+                    .put("/userArenas/" + userArena.id)
                     .set('Authorization', 'Bearer ' + student.token)
                     .send({
-                        arenaTrial: {
+                        userArena: {
                             complete: true
                         }
                     })
@@ -312,16 +312,16 @@ describe('ArenaTrial', function() {
                     .end(done);
             });
 
-            it("should update own arenaTrial if you're a student", function(done) {
-                ArenaTrial.create({
+            it("should update own userArena if you're a student", function(done) {
+                UserArena.create({
                     user: student._id,
                     arena: arena.id,
                 }).then(function(tr) {
                     request(api)
-                        .put("/arenaTrials/" + tr.id)
+                        .put("/userArenas/" + tr.id)
                         .set('Authorization', 'Bearer ' + student.token)
                         .send({
-                            arenaTrial: {
+                            userArena: {
                                 complete: true
                             }
                         })
@@ -330,20 +330,20 @@ describe('ArenaTrial', function() {
                 });
             });
 
-            it("should update a arenaTrial without user", function(done) {
+            it("should update a userArena without user", function(done) {
                 request(api)
-                    .put("/arenaTrials/" + arenaTrial.id)
+                    .put("/userArenas/" + userArena.id)
                     .set('Authorization', 'Bearer ' + accessToken)
                     .send({
-                        arenaTrial: {
+                        userArena: {
                             complete: true
                         }
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.arenaTrial.complete.should.be.true;
-                        arenaTrial.complete = res.body.arenaTrial.complete;
+                        res.body.userArena.complete.should.be.true;
+                        userArena.complete = res.body.userArena.complete;
                         done();
                     });
             });
@@ -353,27 +353,27 @@ describe('ArenaTrial', function() {
 
             it("should not work without accessToken", function(done) {
                 request(api)
-                    .del("/arenaTrials/" + arenaTrial.id)
+                    .del("/userArenas/" + userArena.id)
                     .expect(401)
                     .end(done);
             });
 
-            it("should not delete someone elses arenaTrial if you're a student", function(done) {
+            it("should not delete someone elses userArena if you're a student", function(done) {
                 request(api)
-                    .del("/arenaTrials/" + arenaTrial.id)
+                    .del("/userArenas/" + userArena.id)
                     .set('Authorization', 'Bearer ' + student.token)
                     .send()
                     .expect(401)
                     .end(done);
             });
 
-            it("should delete own arenaTrial if you're a student", function(done) {
-                ArenaTrial.create({
+            it("should delete own userArena if you're a student", function(done) {
+                UserArena.create({
                     user: student._id,
                     arena: arena.id,
                 }).then(function(tr) {
                     request(api)
-                        .del("/arenaTrials/" + tr.id)
+                        .del("/userArenas/" + tr.id)
                         .set('Authorization', 'Bearer ' + student.token)
                         .send()
                         .expect(200)
@@ -381,18 +381,18 @@ describe('ArenaTrial', function() {
                 });
             });
 
-            it("should delete a arenaTrial if teacher regardless of ownership", function(done) {
-                ArenaTrial.create({
+            it("should delete a userArena if teacher regardless of ownership", function(done) {
+                UserArena.create({
                     user: student._id,
                     arena: arena.id,
-                }).then(function(arenaTrial) {
+                }).then(function(userArena) {
                     request(api)
-                        .del("/arenaTrials/" + arenaTrial.id)
+                        .del("/userArenas/" + userArena.id)
                         .set('Authorization', 'Bearer ' + accessToken)
                         .end(function(err, res) {
                             if (err) return done(err);
                             res.status.should.equal(200);
-                            ArenaTrial.findById(arenaTrial.id, function(err, model) {
+                            UserArena.findById(userArena.id, function(err, model) {
                                 expect(model).to.not.exist;
                                 done();
                             });
@@ -401,9 +401,9 @@ describe('ArenaTrial', function() {
             });
 
             it("should return 404 if already deleted", function(done) {
-                ArenaTrial.findByIdAndRemove(arenaTrial.id).exec().then(function() {
+                UserArena.findByIdAndRemove(userArena.id).exec().then(function() {
                     request(api)
-                        .del("/arenaTrials/" + arenaTrial.id)
+                        .del("/userArenas/" + userArena.id)
                         .set('Authorization', 'Bearer ' + accessToken)
                         .send()
                         .expect(404)

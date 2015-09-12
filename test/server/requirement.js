@@ -11,7 +11,7 @@ var Requirement = require('../../back/models/requirement');
 var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
 var Arena = require('../../back/models/arena');
-var ArenaTrial = require('../../back/models/arenaTrial');
+var UserArena = require('../../back/models/userArena');
 var User = require('../../back/models/user');
 var observer = require('../../back/observer');
 
@@ -117,7 +117,7 @@ describe('UserQuest', function() {
                 req.id1.toString().should.equal(challenges[2].id);
                 done();
             });
-            ArenaTrial.create({
+            UserArena.create({
                 user: student._id,
                 arena: arena._id,
             }).then(function(at) {
@@ -139,14 +139,14 @@ describe('UserQuest', function() {
                 }
             };
             observer.on('requirement.complete', test);
-            ArenaTrial.create({
+            UserArena.create({
                 user: student._id,
                 arena: arena._id,
             }).then(function(at) {
                 _.each(challenges, function(ch) {
                     Trial.create({
                         challenge: ch._id,
-                        arenaTrial: at._id,
+                        userArena: at._id,
                         user: student._id,
                         complete: true
                     });
@@ -169,14 +169,14 @@ describe('UserQuest', function() {
                 }
             };
             observer.on('requirement.complete', test);
-            ArenaTrial.create({
+            UserArena.create({
                 user: student._id,
                 arena: arena._id,
             }).then(function(at) {
                 _.each(challenges, function(ch) {
                     Trial.create({
                         challenge: ch._id,
-                        arenaTrial: at._id,
+                        userArena: at._id,
                         user: student._id,
                         complete: true
                     });

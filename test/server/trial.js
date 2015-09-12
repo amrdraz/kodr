@@ -10,7 +10,7 @@ var Trial = require('../../back/models/trial');
 var User = require('../../back/models/user');
 var Challenge = require('../../back/models/challenge');
 var Arena = require('../../back/models/arena');
-var AreanTrial = require('../../back/models/arenaTrial');
+var AreanTrial = require('../../back/models/userArena');
 var observer = require('../../back/observer');
 
 
@@ -36,7 +36,7 @@ describe('Trial', function() {
                 arena: arena.id
             });
             Trial.findOrCreate({
-                arenaTrial: areanTrial.id,
+                userArena: areanTrial.id,
                 arena: areanTrial.arena,
                 user: areanTrial.user,
                 challenge: challenge.id,
@@ -69,7 +69,7 @@ describe('Trial', function() {
                     // console.log("test trial unit", trial);
                     expect(trial).to.exist;
                     expect(trial.arena).to.exist;
-                    expect(trial.arenaTrial).to.exist;
+                    expect(trial.userArena).to.exist;
                     done();
                 }).catch(done);
             }).catch(done);

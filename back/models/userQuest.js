@@ -3,7 +3,7 @@ var relationship = require("mongoose-relationship");
 var Promise = require('bluebird');
 var _ = require('lodash');
 var Requirement = require('./requirement');
-var ArenaTrial = require('./arenaTrial');
+var UserArena = require('./userArena');
 var Trial = require('./trial');
 var observer = require('../observer');
 var ObjectId = mongoose.Schema.Types.ObjectId;
@@ -89,13 +89,13 @@ UserQuestSchema.methods.toJSON = function() {
 //                     });
 //                 } else { //any challenge
 //                     if (req.id2) { // specific arena
-//                         return ArenaTrial.findOne({
+//                         return UserArena.findOne({
 //                             arena: req.id2,
 //                             user: userId
 //                         }, '_id').exec().then(function(at) {
 //                             if (!at) return false;
 //                             return Trial.find({
-//                                 arenaTrial: at,
+//                                 userArena: at,
 //                                 user: userId,
 //                                 complete: true
 //                             }).exec().then(function(tr) {
@@ -117,7 +117,7 @@ UserQuestSchema.methods.toJSON = function() {
 //                 }
 //             } else {
 //                 if (req.id1) { //specific Arena
-//                     return ArenaTrial.findOne({
+//                     return UserArena.findOne({
 //                         arena: req.id1,
 //                         user: userId,
 //                         complete: true
@@ -126,7 +126,7 @@ UserQuestSchema.methods.toJSON = function() {
 //                         return met && true;
 //                     });
 //                 } else { //any arena
-//                     return ArenaTrial.find({
+//                     return UserArena.find({
 //                         user: userId,
 //                         complete: true
 //                     }).exec().then(function(tr) {

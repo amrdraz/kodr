@@ -4,7 +4,7 @@ var access = require('./access');
 var Challenge = require('../models/challenge');
 var Arena = require('../models/arena');
 var Trial = require('../models/trial');
-var ArenaTrial = require('../models/arenaTrial');
+var UserArena = require('../models/userArena');
 
 module.exports = function(app, passport) {
 

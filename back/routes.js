@@ -17,7 +17,7 @@ module.exports = function(app, passport) {
     // arena routes
     require('./routes/arena')(app, passport);
     // arena trial routes
-    require('./routes/arenaTrial')(app, passport);
+    require('./routes/userArena')(app, passport);
     // user routes
     require('./routes/user')(app, passport);
     // group routes

@@ -20,6 +20,35 @@ var ChallengeSchema = new mongoose.Schema({
         type: String,
         'default': 'New Challenge'
     },
+    type: {
+        type: String,
+        'default': 'code',
+    },
+    content: {
+        type: Mixed,
+        default: {
+            language: {
+                type: String,
+                'default': 'python',
+            },
+            setup: {
+                type: String,
+                'default': ''
+            },
+            solution: {
+                type: String,
+                'default': ''
+            },
+            tests: {
+                type: String,
+                'default': ''
+            },
+            description: {
+                type: String,
+                'default': ''
+            },
+        }
+    },
     language: {
         type: String,
         'default': 'java',

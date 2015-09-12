@@ -24,7 +24,7 @@ var Trial = require("./trial");
  * @exports {mongoose.model}
  */
 
-var ArenaTrialSchema = new mongoose.Schema({
+var UserArenaSchema = new mongoose.Schema({
     exp: {
         type: Number,
         'default': 0,
@@ -61,13 +61,13 @@ var ArenaTrialSchema = new mongoose.Schema({
 
 });
 
-ArenaTrialSchema.plugin(relationship, {
+UserArenaSchema.plugin(relationship, {
     relationshipPathName: ['arena', 'user']
 });
 
-ArenaTrialSchema.plugin(require('../helpers/arenaTrial_helper'), 'ArenaTrial');
+UserArenaSchema.plugin(require('../helpers/userArena_helper'), 'UserArena');
 
 
-var ArenaTrial = module.exports = mongoose.model('ArenaTrial', ArenaTrialSchema);
+var UserArena = module.exports = mongoose.model('UserArena', UserArenaSchema);
 
-require('../events/arenaTrial_events').model(ArenaTrial);
+require('../events/userArena_events').model(UserArena);

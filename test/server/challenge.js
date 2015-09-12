@@ -8,7 +8,7 @@ var setup = require('./setup');
 var config = require('../../back/config/server');
 var Challenge = require('../../back/models/challenge');
 var Arena = require('../../back/models/arena');
-var ArenaTrial = require('../../back/models/arenaTrial');
+var UserArena = require('../../back/models/userArena');
 var Trial = require('../../back/models/trial');
 var User = require('../../back/models/user');
 var observer = require('../../back/observer');
@@ -63,10 +63,10 @@ describe('Challenge', function() {
     });
 
     describe('Trials', function() {
-        var challenge, arenaTrial, trials, user, num = 10;
+        var challenge, userArena, trials, user, num = 10;
         beforeEach(function(done) {
             Promise.fulfilled().then(function() {
-                var at = ArenaTrial.create({});
+                var at = UserArena.create({});
                 var ch = Challenge.create({});
                 var ch2 = Challenge.create({});
                 var usr = User.create({
@@ -76,20 +76,20 @@ describe('Challenge', function() {
                 return [at, ch, ch2, usr];
             }).spread(function(at, ch, ch2, usr) {
                 challenge = ch;
-                arenaTrial = at;
+                userArena = at;
                 user = usr;
                 var arr = Array(num);
                 var chs = Promise.each(arr, function() {
                     return Trial.create({
                         challenge: ch._id,
-                        arenaTrial: at._id,
+                        userArena: at._id,
                         user: usr
                     });
                 });
                 var chs2 = Promise.each(arr, function() {
                     return Trial.create({
                         challenge: ch2._id,
-                        arenaTrial: at._id,
+                        userArena: at._id,
                         user: usr
 
                     });
@@ -99,27 +99,27 @@ describe('Challenge', function() {
             }).spread(function(chs, chs2) {
                 trials = chs.concat(chs2);
                 return [
-                    ArenaTrial.findOne({
-                        _id: arenaTrial._id
+                    UserArena.findOne({
+                        _id: userArena._id
                     }).exec(),
                     Challenge.findOne({
                         _id: challenge._id
                     }).exec()
                 ];
             }).spread(function(at, ch) {
-                arenaTrial = at;
+                userArena = at;
                 challenge = ch;
             }).finally(done);
         });
         afterEach(setup.clearDB);
 
-        it('should remove themselves from their arenaTrial after challenge is removed', function(done) {
+        it('should remove themselves from their userArena after challenge is removed', function(done) {
             trials.length.should.equal(num * 2);
-            arenaTrial.trials.length.should.equal(num * 2);
+            userArena.trials.length.should.equal(num * 2);
             challenge.trials.length.should.equal(num);
 
-            observer.on('test.challenge.trials.removed', function(arenaTrialTrials, challengeTrials) {
-                expect(arenaTrialTrials).to.equal(arenaTrial.trials.length - challengeTrials);
+            observer.on('test.challenge.trials.removed', function(userArenaTrials, challengeTrials) {
+                expect(userArenaTrials).to.equal(userArena.trials.length - challengeTrials);
                 done();
             });
             challenge.remove();

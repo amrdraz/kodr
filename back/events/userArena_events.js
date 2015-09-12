@@ -6,15 +6,15 @@ exports.sockets = function(io) {
 
 };
 
-exports.model = function(ArenaTrial) {
+exports.model = function(UserArena) {
     
     var queue = Promise.fulfilled();
     var timeout;
     observer.on('trial.award', function(trial) {
-        if (trial.arenaTrial)
+        if (trial.userArena)
             queue = queue.then(function(model) {
-                return ArenaTrial.findOneAndUpdate({
-                    _id: trial.arenaTrial,
+                return UserArena.findOneAndUpdate({
+                    _id: trial.userArena,
                 }, {
                     $inc: {
                         completed: 1,
@@ -23,23 +23,23 @@ exports.model = function(ArenaTrial) {
                 }, {
                     new:true,
                     unset: true
-                }).exec().then(function(arenaTrial) {
-                    if (arenaTrial.trials.length === arenaTrial.completed) {
-                        arenaTrial.complete = true;
-                        arenaTrial.completeTime = Date.now();
+                }).exec().then(function(userArena) {
+                    if (userArena.trials.length === userArena.completed) {
+                        userArena.complete = true;
+                        userArena.completeTime = Date.now();
                         return new Promise(function(resolve, reject) {
-                            arenaTrial.save(function(err, model) {
+                            userArena.save(function(err, model) {
                                 if (err) return reject(err);
                                 if (model.complete) {
-                                    observer.emit('arenaTrial.complete', model);
+                                    observer.emit('userArena.complete', model);
                                 }
-                                observer.emit('arenaTrial.trial.awarded', model);
+                                observer.emit('userArena.trial.awarded', model);
                                 resolve(model);
                             });
                         });
                     }
-                    observer.emit('arenaTrial.trial.awarded', arenaTrial);
-                    return arenaTrial;
+                    observer.emit('userArena.trial.awarded', userArena);
+                    return userArena;
                 });
             });
     });

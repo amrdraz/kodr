@@ -50,7 +50,7 @@ var ArenaSchema = new mongoose.Schema({
     },
     users: [{
         type: ObjectId,
-        ref: 'ArenaTrial'
+        ref: 'UserArena'
     }]
 });
 

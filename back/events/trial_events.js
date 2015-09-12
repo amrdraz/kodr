@@ -11,32 +11,32 @@ exports.model = function (Trial) {
             .then(function() {
                 return Trial.findOne({
                     challenge: challenge._id
-                }).populate('arenaTrial').exec();
+                }).populate('userArena').exec();
             })
             .then(function(trial) {
                 if (!trial) return Promise.resolve(true); // if challenge doesn't have any trials
-                var arenaTrial = trial.arenaTrial;
+                var userArena = trial.userArena;
                 Trial.update({
                     challenge: challenge._id
                 }, {
                     challenge: null,
-                    arenaTrial: null
+                    userArena: null
                 }, {
                     multi: true
                 }, function(err, numAffected) {
                     if (err) throw err;
                     Trial.find({
-                        arenaTrial: arenaTrial._id
+                        userArena: userArena._id
                     }).exec().then(function(trials) {
-                        arenaTrial.trials = _.map(trials, '_id');
-                        arenaTrial.save(function(err, at) {
+                        userArena.trials = _.map(trials, '_id');
+                        userArena.save(function(err, at) {
                             //for testing
                             if(process.env.NODE_ENV ==='test') {
                                 observer.emit('test.challenge.trials.removed', at.trials.length, challenge.trials.length);
                             }
                         });
                     });
-                    // arenaTrial.trials = _.filter(arenaTrial.trials, function (id) {
+                    // userArena.trials = _.filter(userArena.trials, function (id) {
                     //     return _.remove(challenge.trials, function (oid) {
                     //         return oid.equals(id);
                     //     });

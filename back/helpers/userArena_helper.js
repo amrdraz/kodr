@@ -11,7 +11,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         var Trial = mongoose.model('Trial');
         return Promise.fulfilled().then(function() {
             return Trial.find({
-                arenaTrial: this._id,
+                userArena: this._id,
                 complete: true
             }).exec();
         });
@@ -32,22 +32,22 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
     };
 
     /**
-     * Find or create an ArenaTrial along with it's associated Trials
-     * @param  {hash} arenaTrial arena trial to create requires arena and user
+     * Find or create an UserArena along with it's associated Trials
+     * @param  {hash} userArena arena trial to create requires arena and user
      * @param  {boolean} withoutTrials wether to create trials along with this arena trial
-     * @return {Promise} array contianing arenaTrial as first element and trials as second unless withoutTrials is true
+     * @return {Promise} array contianing userArena as first element and trials as second unless withoutTrials is true
      */
-    schema.statics.findOrCreateWithTrials = function(arenaTrial) {
-        var ArenaTrial = mongoose.model('ArenaTrial');
+    schema.statics.findOrCreateWithTrials = function(userArena) {
+        var UserArena = mongoose.model('UserArena');
         var Trial = mongoose.model('Trial');
 
-        return ArenaTrial.getOneByQueryOrCreate({
-            user: arenaTrial.user,
-            arena: arenaTrial.arena
-        }, arenaTrial).then(function(model) {
+        return UserArena.getOneByQueryOrCreate({
+            user: userArena.user,
+            arena: userArena.arena
+        }, userArena).then(function(model) {
             var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
                 return Trial.findOrCreate({
-                    arenaTrial: model._id,
+                    userArena: model._id,
                     arena: model.arena,
                     user: model.user,
                     challenge: challenge._id,
@@ -57,7 +57,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
                 });
             });
             var at = trials.then(function(mods) {
-                return ArenaTrial.getById(model.id);
+                return UserArena.getById(model.id);
             });
             return [at, trials];
         });

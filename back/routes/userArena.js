@@ -1,42 +1,42 @@
 var User = require('../models/user');
 var access = require('./access');
 var Challenge = require('../models/challenge');
-var ArenaTrial = require('../models/arenaTrial');
+var UserArena = require('../models/userArena');
 
 module.exports = function(app, passport) {
 
 
     /**
-     * Find arenaTrial by id.
+     * Find userArena by id.
      *
      * @param {string} id
-     * @returns {object} arenaTrial
+     * @returns {object} userArena
      */
 
-    app.get('/api/arenaTrials/:id', access.requireRole(), function(req, res, next) {
-        ArenaTrial.findById(req.params.id, function(err, model) {
+    app.get('/api/userArenas/:id', access.requireRole(), function(req, res, next) {
+        UserArena.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             res.json({
-                arenaTrial: model
+                userArena: model
             });
         });
     });
 
     /**
-     * get all arenaTrials.
+     * get all userArenas.
      *
      * @param range
-     * @returns {object} arenaTrials
+     * @returns {object} userArenas
      */
 
-    app.get('/api/arenaTrials', access.requireRole(), function(req, res, next) {
+    app.get('/api/userArenas', access.requireRole(), function(req, res, next) {
         var arena = req.query.arena;
         if (arena) {
-            ArenaTrial.findOrCreateWithTrials({user:req.user.id,arena:arena})
+            UserArena.findOrCreateWithTrials({user:req.user.id,arena:arena})
                 .spread(function(model, trials) {
                     res.json({
-                        arenaTrial: model,
+                        userArena: model,
                         trials: trials
                     });
                 }).catch(next);
@@ -45,75 +45,75 @@ module.exports = function(app, passport) {
                 req.query._id = {$in:req.query.ids};
                 delete req.query.ids;
             }
-            ArenaTrial.find(req.query, function(err, model) {
+            UserArena.find(req.query, function(err, model) {
                 if (err) return next(err);
                 if (!model) return res.send(404, "Not Found");
                 res.json({
-                    arenaTrial: model
+                    userArena: model
                 });
             });
         }
     });
 
     /**
-     * Create new arenaTrials.
+     * Create new userArenas.
      *
      * @param range
-     * @returns {object} arenaTrial
+     * @returns {object} userArena
      */
 
-    app.post('/api/arenaTrials', access.requireRole(), function(req, res, next) {
-        req.body.arenaTrial.user = req.user.id;
-        ArenaTrial.findOrCreateWithTrials(req.body.arenaTrial)
+    app.post('/api/userArenas', access.requireRole(), function(req, res, next) {
+        req.body.userArena.user = req.user.id;
+        UserArena.findOrCreateWithTrials(req.body.userArena)
             .spread(function(model, trials) {
                 res.json({
-                    arenaTrial: model,
+                    userArena: model,
                     trials: trials
                 });
             }).catch(next);
     });
 
     /**
-     * Update new arenaTrials.
+     * Update new userArenas.
      *
      * @param range
-     * @returns {object} arenaTrial
+     * @returns {object} userArena
      */
 
-    app.put('/api/arenaTrials/:id',  access.requireRole({roles:[
+    app.put('/api/userArenas/:id',  access.requireRole({roles:[
         {role:'student', in:'arenasTried'},
         {role:'teacher', all:true},
         {role:'admin', all:true},
     ]}), function(req, res, next) {
-        var arenaTrial = req.body.arenaTrial;
-        arenaTrial.time = Date.now();
-        arenaTrial.times = (arenaTrial.times || 0) + 1;
-        ArenaTrial.findById(req.params.id, function(err, model) {
+        var userArena = req.body.userArena;
+        userArena.time = Date.now();
+        userArena.times = (userArena.times || 0) + 1;
+        UserArena.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
-            model.set(arenaTrial);
+            model.set(userArena);
             model.save(function(err, model) {
                 if (err) return next(err);
                 res.json({
-                    arenaTrial: model
+                    userArena: model
                 });
             });
         });
     });
 
     /**
-     * Delete arenaTrial.
+     * Delete userArena.
      *
      * @param range
      * @returns {status} 200
      */
 
-    app.del('/api/arenaTrials/:id',  access.requireRole({roles:[
+    app.del('/api/userArenas/:id',  access.requireRole({roles:[
         {role:'student', in:'arenasTried'},
         {role:'teacher', all:true},
         {role:'admin', all:true},
     ]}), function(req, res, next) {
-        ArenaTrial.findById(req.params.id, function(err, model) {
+        UserArena.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if(!model) return res.send(404);
             model.remove(function(err, model) {

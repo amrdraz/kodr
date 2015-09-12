@@ -36,7 +36,7 @@ var ADMIN = 'admin';
  * @attribute rp            Number          indicates the amount of reward points the user accumilated
  * @attribute challenges    [Challenge]     challanges the user created
  * @attribute trials        [Trial]         trials the user started/passed
- * @attribute arenasTried   [ArenaTrial]    arneas the user entered/passed
+ * @attribute arenasTried   [UserArena]    arneas the user entered/passed
  * @attribute groups        [Group]         groups owned by the user
  * @attribute group         Group           group he is a member of
  *
@@ -110,7 +110,7 @@ var userSchema = new mongoose.Schema({
     }],
     arenasTried: [{
         type: ObjectId,
-        ref: 'ArenaTrial'
+        ref: 'UserArena'
     }],
     memberships: [{
         type: ObjectId,

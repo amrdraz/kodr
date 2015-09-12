@@ -8,7 +8,7 @@ var setup = require('./setup');
 var User = require('../../back/models/user');
 var ExpiringToken = require('../../back/models/expiringToken');
 var Arena = require('../../back/models/arena');
-var ArenaTrial = require('../../back/models/arenaTrial');
+var UserArena = require('../../back/models/userArena');
 var Trial = require('../../back/models/trial');
 var Challenge = require('../../back/models/challenge');
 var Group = require('../../back/models/group');
@@ -107,7 +107,7 @@ describe('User', function() {
             }).spread(function(ar, usr, t, st, st2) {
                 arena = ar;
                 user = usr;
-                var at = ArenaTrial.create({
+                var at = UserArena.create({
                     arena: arena._id,
                     user: user._id
                 });
@@ -539,6 +539,18 @@ describe('User', function() {
             it("should send a verification email if not admin", function(done) {
                 request(api)
                     .post("/users/" + student._id + "/verify")
+                    .send()
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        done();
+                    });
+            });
+
+            it("should activate user if admin", function(done) {
+                request(api)
+                    .put("/users/" + student._id + "/activate")
+                    .set('Authorization', 'Bearer ' + admin.token)
                     .send()
                     .end(function(err, res) {
                         if (err) return done(err);

@@ -122,7 +122,7 @@ module.exports = function(app, passport) {
      * @returns {object} user
      */
 
-    app.post('/api/users/:id/verify', access.requireRole(['admin', 'teacher']),function(req, res, next) {
+    app.post('/api/users/:id/verify',function(req, res, next) {
         var user;
         var token;
         User.getById(req.params.id).then(function(usr) {
@@ -265,7 +265,9 @@ module.exports = function(app, passport) {
         });
     });
 
-
+    /**
+     * Activate User manually
+     */
     app.put('/api/users/:id/activate', access.requireRole(['admin']),function(req, res, next) {
         User.findByIdAndUpdate(req.params.id, {activated:true}, {new:true}, function (user) {
             res.send({

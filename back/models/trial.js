@@ -4,7 +4,7 @@ var util = require('util');
 var relationship = require("mongoose-relationship");
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
-// var ArenaTrial = require('./arenaTrial'); // used bellow in findOrCreate to avoid circulare reference
+// var UserArena = require('./userArena'); // used bellow in findOrCreate to avoid circulare reference
 
 
 /**
@@ -68,9 +68,9 @@ var TrialSchema = new mongoose.Schema({
         childPath: "trials",
         // required: true,
     },
-    arenaTrial: {
+    userArena: {
         type: ObjectId,
-        ref: 'ArenaTrial',
+        ref: 'UserArena',
         childPath: "trials",
         // required: true
     },
@@ -87,12 +87,12 @@ var TrialSchema = new mongoose.Schema({
 //     collection: 'TrialVersions',
 //     logError: true,
 //     suppressVersionIncrement: false,
-//     ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge', 'arena', 'order'],
+//     ignorePaths: ['times', 'exp', 'user', 'userArena', 'challenge', 'arena', 'order'],
 //     strategy: 'array'
 // });
 
 TrialSchema.plugin(relationship, {
-    relationshipPathName: ['arenaTrial', 'user', 'challenge', 'arena']
+    relationshipPathName: ['userArena', 'user', 'challenge', 'arena']
 });
 
 

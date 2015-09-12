@@ -21,13 +21,13 @@ observer.on('trial.complete', function(trial) {
     });
 });
 
-observer.on('arenaTrial.complete', function(arenaTrial) {
+observer.on('userArena.complete', function(userArena) {
     Activity.new({
-        subjectId:arenaTrial.user,
+        subjectId:userArena.user,
         subjectModel:'User',
         action:'complete',
         verb:'completed',
-        object:arenaTrial
+        object:userArena
     });
 });
 
