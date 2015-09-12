@@ -122,14 +122,10 @@ module.exports = function(app, passport) {
      * @returns {object} user
      */
 
-    app.post('/api/users/:id/verify', function(req, res, next) {
+    app.post('/api/users/:id/verify', access.requireRole(['admin', 'teacher']),function(req, res, next) {
         var user;
         var token;
-        Promise.fulfilled().then(function() {
-            return User.findOne({
-                _id: req.params.id
-            }).exec();
-        }).then(function(usr) {
+        User.getById(req.params.id).then(function(usr) {
             if (!usr) {
                 throw {
                     http_code: 404,
@@ -266,6 +262,15 @@ module.exports = function(app, passport) {
                 return res.send(err.http_code, err.message);
             }
             next(err);
+        });
+    });
+
+
+    app.put('/api/users/:id/activate', access.requireRole(['admin']),function(req, res, next) {
+        User.findByIdAndUpdate(req.params.id, {activated:true}, {new:true}, function (user) {
+            res.send({
+                user:user
+            });
         });
     });
 
