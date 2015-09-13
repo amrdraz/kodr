@@ -81,7 +81,7 @@ module.exports = function(app, passport) {
      */
 
     app.put('/api/userArenas/:id',  access.requireRole({roles:[
-        {role:'student', in:'arenasTried'},
+        {role:'student', in:'userArenas'},
         {role:'teacher', all:true},
         {role:'admin', all:true},
     ]}), function(req, res, next) {
@@ -109,7 +109,7 @@ module.exports = function(app, passport) {
      */
 
     app.del('/api/userArenas/:id',  access.requireRole({roles:[
-        {role:'student', in:'arenasTried'},
+        {role:'student', in:'userArenas'},
         {role:'teacher', all:true},
         {role:'admin', all:true},
     ]}), function(req, res, next) {

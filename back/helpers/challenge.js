@@ -17,7 +17,7 @@ module.exports = function(schema, options) {
 
     schema.statics.run = function(code, options) {
         return new Promise(function(resolve, reject) {
-            switch (options.language) {
+            switch (options.type) {
                 case 'javascript':
                     resolve(['no server js', '']);
                     break;
@@ -48,7 +48,7 @@ module.exports = function(schema, options) {
 
     schema.statics.test = function(code, challenge) {
         return new Promise(function(resolve, reject) {
-            switch (challenge.language) {
+            switch (challenge.type) {
                 case 'javascript':
                     resolve({}, ['no server js', '']);
                     break;

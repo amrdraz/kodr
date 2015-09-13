@@ -22,31 +22,17 @@ var ChallengeSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        'default': 'code',
+        'default': 'python',
     },
-    content: {
+    // blueprint: [{name:String, type:String}],
+    blueprint: {
         type: Mixed,
         default: {
-            language: {
-                type: String,
-                'default': 'python',
-            },
-            setup: {
-                type: String,
-                'default': ''
-            },
-            solution: {
-                type: String,
-                'default': ''
-            },
-            tests: {
-                type: String,
-                'default': ''
-            },
-            description: {
-                type: String,
-                'default': ''
-            },
+            language: 'python',
+            setup: '',
+            solution: '',
+            tests: '',
+            description: '',
         }
     },
     language: {

@@ -56,7 +56,7 @@ var UserArenaSchema = new mongoose.Schema({
     user: {
         type: ObjectId,
         ref: 'User',
-        childPath: "arenasTried"
+        childPath: "userArenas"
     },
 
 });
