@@ -35,28 +35,42 @@ var ChallengeSchema = new mongoose.Schema({
             description: '',
         }
     },
-    language: {
-        type: String,
-        'default': 'java',
-        enum: ['javascript', 'java', 'python']
+    exp: {
+        type: Number,
+        'default': 1,
+        min: 0
     },
-    inputs: [String],
-    setup: {
-        type: String,
-        'default': '// Starting Code leave blank if you want Student to start from scratch\n'
+    order: {
+        type: Number,
+        'default': 0,
+        min: 0
     },
-    solution: {
+    group: {
         type: String,
-        'default': '// Challenge Solution goes here\n'
+        'default': null,
     },
-    tests: {
-        type: String,
-        'default': '// Challenge Tests go here\n'
-    },
-    description: {
-        type: String,
-        'default': 'A new Challenge'
-    },
+    // language: {
+    //     type: String,
+    //     'default': 'java',
+    //     enum: ['javascript', 'java', 'python']
+    // },
+    // inputs: [String],
+    // setup: {
+    //     type: String,
+    //     'default': '// Starting Code leave blank if you want Student to start from scratch\n'
+    // },
+    // solution: {
+    //     type: String,
+    //     'default': '// Challenge Solution goes here\n'
+    // },
+    // tests: {
+    //     type: String,
+    //     'default': '// Challenge Tests go here\n'
+    // },
+    // description: {
+    //     type: String,
+    //     'default': 'A new Challenge'
+    // },
     // the current state of a cahllenge
     status: {
         type: String,
@@ -70,16 +84,6 @@ var ChallengeSchema = new mongoose.Schema({
     valid: {
         type: Boolean,
         'default': false
-    },
-    exp: {
-        type: Number,
-        'default': 1,
-        min: 0
-    },
-    order: {
-        type: Number,
-        'default': 0,
-        min: 0
     },
     author: {
         type: ObjectId,

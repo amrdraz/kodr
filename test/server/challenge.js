@@ -390,11 +390,11 @@ describe('Challenge', function() {
                     .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
-                        res.status.should.equal(200);
+                        res.status.should.equal(204);
                         Challenge.findOne({
                             _id: challenge.id
                         }).exec().then(function(model) {
-                            expect(model).to.not.exist;
+                            should.not.exist(model);
                         }, done).then(function() {
                             Arena.findById(challenge.challenge.arena, function(err, arena) {
                                 arena.challenges.length.should.equal(0);

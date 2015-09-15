@@ -27,10 +27,7 @@ var TrialSchema = new mongoose.Schema({
     code: {
         type: String,
     },
-    times: {
-        type: Number,
-        'default': 0
-    },
+    blueprint: Mixed,
     exp: {
         type: Number,
         'default': 0
@@ -38,6 +35,10 @@ var TrialSchema = new mongoose.Schema({
     order: {
         type: Number,
         'default': 0
+    },
+    group: {
+        type: String,
+        'default': null
     },
     started: {
         type: Boolean,
@@ -52,10 +53,18 @@ var TrialSchema = new mongoose.Schema({
         'default': 0
     },
     report: Mixed,
-    time: {
-        type: Date,
-        'default': Date.now
+
+    startTime: {
+        type: Date
     },
+    endTime: {
+        type: Date
+    },
+
+    activities: [{
+        type: ObjectId,
+        ref: 'Activity',
+    }],
     challenge: {
         type: ObjectId,
         ref: 'Challenge',

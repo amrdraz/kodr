@@ -96,7 +96,9 @@ module.exports = function(app, passport) {
 
     app.put('/api/challenges/:id', access.requireRole(['teacher', 'admin']), function(req, res, next) {
         Challenge.getById_404(req.params.id).then(function(model) {
+            console.log(model, req.body.challenge);
             model.set(req.body.challenge);
+            console.log(model);
             model.save(function(err, model) {
                 res.json({
                     challenge: model
@@ -116,7 +118,7 @@ module.exports = function(app, passport) {
         Challenge.getById_404(req.params.id).then(function(model) {
             model.remove(function(err, model) {
                 if (err) return next(err);
-                res.send(200);
+                res.send(204);
             });
         }).catch(next);
     });

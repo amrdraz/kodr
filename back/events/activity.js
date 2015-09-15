@@ -21,6 +21,22 @@ observer.on('trial.complete', function(trial) {
     });
 });
 
+/**
+ * Event listner for when a trial is complete
+ * @param  {Trial} trial trial that was just complete for the first time
+ * @return {[type]}       [description]
+ */
+observer.on('trial.event', function(event) {
+    var trial = event.trial;
+    Activity.new({
+        subjectId:trial.user,
+        subjectModel:'User',
+        action:'complete',
+        verb:'completed',
+        object:trial
+    });
+});
+
 observer.on('userArena.complete', function(userArena) {
     Activity.new({
         subjectId:userArena.user,
