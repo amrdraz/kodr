@@ -13,7 +13,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * versions of the trial are maintained for analysing the user's preformance
  * experiance is tipically granted on completion but would be intresting if the challenge awards exp in  adifferent way
  *
- * @attribute code      String      Users's code submittion
+ * @attribute work      Mixed       Users's wrok in this trial
  * @attribute exp       Number      the experiance he gained in this trial
  * @attribute completed Boolean     Whether the user passes or not
  * @attribute report    Mixed       The result of the tests run on the code
@@ -24,9 +24,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
  */
 
 var TrialSchema = new mongoose.Schema({
-    code: {
-        type: String,
-    },
+    work: Mixed,
     blueprint: Mixed,
     exp: {
         type: Number,
