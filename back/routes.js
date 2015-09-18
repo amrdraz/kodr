@@ -43,7 +43,6 @@ module.exports = function(app, passport) {
     app.post('/token', function(req, res, next) {
         passport.authenticate('local-login', function(err, user) {
             if (err) return next(err);
-            console.log(user);
             if (user) {
                 if (!user.activated) return res.send(400, {
                     message: 'This account is not Verified',
@@ -154,7 +153,6 @@ module.exports = function(app, passport) {
             .spread(createIfNewUser)
             .then(emitAndRespond(res))
             .catch(function(err) {
-                console.log(err.stack);
                 if (err.http_code) {
                     return res.send(err.http_code, err.message);
                 }

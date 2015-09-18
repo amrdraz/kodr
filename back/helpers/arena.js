@@ -35,7 +35,9 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         var UserArena = this.db.model('UserArena');
         return Promise.fulfilled().then(function (arena) {
             var obj = {arena:id, user:userId};
-            return [Arena.getById_404(id), UserArena.getOneByQueryOrCreate(obj, obj)]; 
+            return UserArena.getOneByQueryOrCreate(obj, obj); 
+        }).then(function (ua) {
+            return [Arena.getById_404(id), ua];
         });
     };
 };
