@@ -199,7 +199,7 @@ describe('Arena', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        res.body.arena._id.should.exist;
+                        should.exist(res.body.arena);
                         res.body.challenges.length.should.equal(0);
                         done();
                     });
@@ -212,6 +212,19 @@ describe('Arena', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.arena.length.should.equal(1);
+                        done();
+                    });
+            });
+
+            it("should return a arena and userArena", function(done) {
+                request(api)
+                    .get("/arenas/"+arena.id+"/userArena")
+                    .set('Authorization', 'Bearer ' + student.token)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        should.exist(res.body.arena);
+                        should.exist(res.body.userArena);
                         done();
                     });
             });

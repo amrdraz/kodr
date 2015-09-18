@@ -56,4 +56,33 @@ describe('Group Helper', function() {
         }).catch(done);
     });
 
+    it('should get user arena belonging to an arean and a user', function(done) {
+        var arena, user;
+        Promise.fulfilled().then(function() {
+            return [Arena.create({}), User.create({username:'jblkjb', email:'qwerfcnk@asdasd.com'})];
+        }).spread(function(a, u) {
+            arena = a;
+            user = u;
+            return arena.getUserArenaByUserId(user.id);
+        }).then(function(ua) {
+            should.exist(ua);
+            done();
+        }).catch(done);
+    });
+
+    it('should get arena and userarena  using arean and a user ids', function(done) {
+        var arena, user;
+        Promise.fulfilled().then(function() {
+            return [Arena.create({}), User.create({username:'jblkjb', email:'qwerfcnk@asdasd.com'})];
+        }).spread(function(a, u) {
+            arena = a;
+            user = u;
+            return Arena.getArenaWithUserArenaByUserId(arena.id, user.id);
+        }).spread(function(a, ua) {
+            should.exist(a);
+            should.exist(ua);
+            done();
+        }).catch(done);
+    });
+
 });

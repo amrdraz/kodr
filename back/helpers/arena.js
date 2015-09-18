@@ -21,4 +21,21 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
            return [Arena.getById_404(id), Arena.getByIdChallenges(id)]; 
         });
     };
+
+    schema.methods.getUserArenaByUserId = function (userId) {
+        var arena = this;
+        var UserArena = this.db.model('UserArena');
+        return Promise.fulfilled().then(function () {
+            var obj = {arena:arena.id, user:userId};
+            return UserArena.getOneByQueryOrCreate(obj, obj); 
+        });
+    };
+    schema.statics.getArenaWithUserArenaByUserId = function (id, userId) {
+        var Arena = this.db.model(Model);
+        var UserArena = this.db.model('UserArena');
+        return Promise.fulfilled().then(function (arena) {
+            var obj = {arena:id, user:userId};
+            return [Arena.getById_404(id), UserArena.getOneByQueryOrCreate(obj, obj)]; 
+        });
+    };
 };
