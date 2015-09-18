@@ -172,7 +172,8 @@ describe('UserArena', function() {
         var arena = {
             arena: {
                 name: 'Basic Arena',
-                description: 'An arean for some challenges that are basic'
+                description: 'An arean for some challenges that are basic',
+                isPublished:true,
             }
         };
         var challenge = {
@@ -267,6 +268,7 @@ describe('UserArena', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         res.body.userArena.length.should.equal(1);
+                        expect(res.body.userArena[0]).to.not.equal(null);
                         done();
                     });
             });

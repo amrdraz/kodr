@@ -31,6 +31,21 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
+    function getInitialWorkObj(challenge, user) {
+        var work = {};
+        switch(challenge.type) {
+        case "python":
+            work = {
+                solution:challenge.setup
+            };
+            if(user.flags && user.flags.no_setup) {
+                work.solution = "";
+            }
+            break;
+        }
+        return work;
+    }
+
     /**
      * Find or create an UserArena along with it's associated Trials
      * @param  {hash} userArena arena trial to create requires arena and user
@@ -51,6 +66,9 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
                     arena: model.arena,
                     user: model.user,
                     challenge: challenge._id,
+                    work: getInitialWorkObj(challenge, userArena.user),
+                    blueprint: challenge.blueprint,
+                    group: challenge.group,
                     order: challenge.order,
                     code: challenge.setup,
                     completed: 0

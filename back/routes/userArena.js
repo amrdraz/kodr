@@ -1,7 +1,10 @@
+var Promise = require('bluebird');
+var _ = require('lodash');
 var User = require('../models/user');
 var access = require('./access');
 var Challenge = require('../models/challenge');
 var UserArena = require('../models/userArena');
+var Arena = require('../models/arena');
 
 module.exports = function(app, passport) {
 
@@ -40,11 +43,9 @@ module.exports = function(app, passport) {
                         trials: trials
                     });
                 }).catch(next);
-        } else {
-            if(req.query.ids) {
-                req.query._id = {$in:req.query.ids};
-                delete req.query.ids;
-            }
+        } else if(req.query.ids) {
+            req.query._id = {$in:req.query.ids};
+            delete req.query.ids;
             UserArena.find(req.query, function(err, model) {
                 if (err) return next(err);
                 if (!model) return res.send(404, "Not Found");
@@ -52,11 +53,33 @@ module.exports = function(app, passport) {
                     userArena: model
                 });
             });
+        } else {
+            Promise.fulfilled().then(function () {
+                return Arena.find({}).exec();
+            }).then(function (arenas) {
+                return [
+                    arenas,
+                    Promise.map(arenas, function (arena) {
+                        if(arena.isPublished) {
+                            var obj = {arena:arena.id, user:req.user.id};
+                            return UserArena.getOneByQueryOrCreate(obj, obj);
+                        }
+                    })
+                ];
+            }).spread(function (arenas, userArenas) {
+                res.json({
+                    userArena: _.filter(userArenas, null),
+                    arena: arenas
+                });
+            }).catch(function (err) {
+                console.log(err);
+                next(err);
+            });
         }
     });
 
     /**
-     * Create new userArenas.
+     * Create new userArena.
      *
      * @param range
      * @returns {object} userArena

@@ -24,8 +24,14 @@ var Mixed = mongoose.Schema.Types.Mixed;
  */
 
 var TrialSchema = new mongoose.Schema({
-    work: Mixed,
-    blueprint: Mixed,
+    work: {
+        type:Mixed,
+        default:{}
+    },
+    blueprint: {
+        type:Mixed,
+        default:{}
+    },
     exp: {
         type: Number,
         'default': 0
