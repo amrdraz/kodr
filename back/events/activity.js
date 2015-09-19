@@ -35,14 +35,13 @@ observer.on('trial.event', function(event) {
         action:event.action,
         event:event.event,
         verb:event.verb || event.action+'ed',
-        objectId:object.id || object._id,
+        objectId:object.id || object._id || object,
         objectModel:'Trial',
         objectMeta: event.meta
     }).then(function (act) {
         if (process.env.NODE_ENV==='test') {
             observer.emit('test.socket.respond', {sid:event.socket_id, event:'test.trial.event.response', response:act});
         }
-        console.log(act);
         return act;
     }).catch(function (err) {
         console.log(err);

@@ -132,7 +132,6 @@ module.exports = function(app, passport) {
     }), function(req, res, next) {
         var trial = req.body.trial;
         trial.time = Date.now();
-        trial.times = (trial.times || 0) + 1;
         Trial.findOne({
             _id: req.params.id
         }).exec().then(function(model) {
