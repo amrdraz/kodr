@@ -6114,7 +6114,7 @@ throw _b_.KeyError(rank)}}
 var $JSObject_iterator=$B.$iterator_class('JS object iterator')
 $JSObjectDict.__iter__=function(self){if(window.Symbol && self.js[Symbol.iterator]!==undefined){
 var items=[]
-for(var item of self.js){items.push(jsobj2pyobj(item))}
+for(var item in self.js){ if( self.js.hasOwnProperty( item ) ) { items.push(jsobj2pyobj(item))} }
 return $B.$iterator(items,$JSObject_iterator)}
 return $B.$iterator(self.js,$JSObject_iterator)}
 $JSObjectDict.__len__=function(self){try{return getattr(self.js,'__len__')()}
