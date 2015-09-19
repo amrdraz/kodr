@@ -134,7 +134,7 @@ describe('Activity', function() {
             }).catch(done);
         });
 
-        it('should log when a user verifies account', function(done) {
+        it('should log when a user logs in', function(done) {
             request(setup.url)
             .post("/signup")
             .send({

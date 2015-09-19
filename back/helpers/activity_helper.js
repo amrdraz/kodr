@@ -48,6 +48,15 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
+    schema.statics.findByEvent = function(event) {
+        var Model = this.db.model('Activity');
+        return Promise.fulfilled().then(function() {
+            return Model.find({
+                event: event
+            }).exec();
+        });
+    };
+
     schema.statics.new = function(obj) {
         var Model = this.db.model('Activity');
         return Promise.fulfilled().then(function() {

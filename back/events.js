@@ -21,6 +21,7 @@ module.exports = function(io) {
         });
 
         client.on('trial.event', function (event) {
+            event.socket_id = client.id;
             observer.emit('trial.event', event);
         });
 

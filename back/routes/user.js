@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var _ = require('lodash');
 var passGen = require('random-password-generator');
 var User = require('../models/user');
 var UserQuest = require('../models/userQuest');
@@ -107,10 +108,22 @@ module.exports = function(app, passport) {
     app.post('/api/users', access.requireRole(['admin']), function(req, res, next) {
         var user = req.body.user;
         user.password = user.tempPassword = passGen.generate();
-        User.create(user, function(err, model) {
-            if (err) return next(err);
-            res.json({
-                user: model,
+        return Promise.fullfilled().then(function() {
+            return User.find({}).count().exec();
+        }).then(function(count) {
+            var flags = {};
+            flags.no_setup = flags.is_experiment = (count % 2 === 0);
+            flags.is_control = !flags.is_experiment;
+            if(user.flags) {
+                _.merge(flags, user.flags);
+            } else {
+                user.flags = flags;
+            }
+            User.create(user, function(err, model) {
+                if (err) return next(err);
+                res.json({
+                    user: model,
+                });
             });
         });
     });
@@ -122,7 +135,7 @@ module.exports = function(app, passport) {
      * @returns {object} user
      */
 
-    app.post('/api/users/:id/verify',function(req, res, next) {
+    app.post('/api/users/:id/verify', function(req, res, next) {
         var user;
         var token;
         User.getById(req.params.id).then(function(usr) {
@@ -268,10 +281,14 @@ module.exports = function(app, passport) {
     /**
      * Activate User manually
      */
-    app.put('/api/users/:id/activate', access.requireRole(['admin']),function(req, res, next) {
-        User.findByIdAndUpdate(req.params.id, {activated:true}, {new:true}, function (user) {
+    app.put('/api/users/:id/activate', access.requireRole(['admin']), function(req, res, next) {
+        User.findByIdAndUpdate(req.params.id, {
+            activated: true
+        }, {
+            new: true
+        }, function(user) {
             res.send({
-                user:user
+                user: user
             });
         });
     });

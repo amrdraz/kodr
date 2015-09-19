@@ -27,13 +27,24 @@ observer.on('trial.complete', function(trial) {
  * @return {[type]}       [description]
  */
 observer.on('trial.event', function(event) {
-    var trial = event.trial;
+    var object = event.trial;
+    var uid = event.user || object.user;
     Activity.new({
-        subjectId:trial.user,
+        subjectId:uid,
         subjectModel:'User',
-        action:'complete',
-        verb:'completed',
-        object:trial
+        action:event.action,
+        event:event.event,
+        verb:event.verb || event.action+'ed',
+        objectId:object.id || object._id,
+        objectModel:'Trial',
+        objectMeta: event.meta
+    }).then(function (act) {
+        if (process.env.NODE_ENV==='test') {
+            observer.emit('test.socket.respond', {sid:event.socket_id, event:'test.trial.event.response', response:act});
+        }
+        return act;
+    }).catch(function (err) {
+        console.log(err);
     });
 });
 
@@ -185,6 +196,7 @@ observer.on('user.disconnect', function(id) {
         if (process.env.NODE_ENV==='test') {
             // observer.emit('test.disconnect.response', act);
         }
+        return act;
     });
 });
 

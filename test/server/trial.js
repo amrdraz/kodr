@@ -268,6 +268,7 @@ describe('Trial', function() {
 
                 request(api)
                     .get("/trials/" + trial.id)
+                    .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -284,6 +285,7 @@ describe('Trial', function() {
                 //     trials[0]._id.toString().shoul.equal(trial.id);
                 request(api)
                     .get("/trials")
+                    .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);

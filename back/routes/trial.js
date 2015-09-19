@@ -37,7 +37,7 @@ module.exports = function(app, passport) {
         if(req.query.ids) {
             req.query._id = {$in:req.query.ids};
             delete req.query.ids;
-            promise = Trial.getByQuery(req.query, function(model) {
+            promise = Trial.getByQuery(req.query).then(function(model) {
                 res.json({
                     trial: model
                 });
@@ -83,7 +83,7 @@ module.exports = function(app, passport) {
                 });
             });
         } else {
-            promise = Trial.getByQuery(req.query, function(model) {
+            promise = Trial.getByQuery(req.query).then(function(model) {
                 res.json({
                     trial: model
                 });

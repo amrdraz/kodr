@@ -211,7 +211,9 @@ module.exports = function(app, passport) {
         }
 
         function findUser(req) {
-            return [req, User.findOne({
+            return [
+            req,
+            User.findOne({
                 $or: [{
                     'username': req.body.username
                 }, {
@@ -228,16 +230,24 @@ module.exports = function(app, passport) {
                 };
             }
             var role = getRoleByEmail(req.body.email);
-
-            return User.create({
-                username: req.body.username,
-                email: req.body.email,
-                uniId: req.body.uniId,
-                lectureGroup: req.body.lectureGroup,
-                labGroup: req.body.labGroup,
-                password: req.body.password,
-                role: role,
-                activated: false
+            var flags = {};
+            return Promise.fulfilled().then(function () {
+                return User.find({}).count({}).exec();
+            }).then(function (count) {
+                console.log(req.body);
+                flags.no_setup = flags.is_experiment = (count%2===0);
+                flags.is_control = !flags.is_experiment;
+                return User.create({
+                    username: req.body.username,
+                    email: req.body.email,
+                    uniId: req.body.uniId,
+                    lectureGroup: req.body.lectureGroup,
+                    labGroup: req.body.labGroup,
+                    password: req.body.password,
+                    role: role,
+                    flags:flags,
+                    activated: false
+                });
             });
         }
 
