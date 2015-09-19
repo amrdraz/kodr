@@ -68,4 +68,14 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         });
     };
 
+    schema.statics.getOneByQueryOrCreateOrUpdate = function(query, update) {
+        var model = this.db.model(Model);
+        return new Promise(function(resolve, reject) {
+          model.findOneAndUpdate(query, update, {upsert:true, new:true}, function (err, model) {
+              if(err) return reject(err);
+              resolve(model);
+          });
+        });
+    };
+
 };
