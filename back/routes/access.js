@@ -30,7 +30,8 @@ function fullfilesRole(roles, user, params){
     // console.log(role);
     if(!role) return false;
     if(role.all) return true;
-    return _.find(user[role.in], function(id){ return id.toString()===params.id;});
+    console.log(user[role.in], params.id);
+    return _.some(user[role.in], function(id){ return id.toString()===params.id;});
 }
 
 // requiering a role will also require that a user is logged in

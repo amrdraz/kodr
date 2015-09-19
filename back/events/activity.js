@@ -42,6 +42,7 @@ observer.on('trial.event', function(event) {
         if (process.env.NODE_ENV==='test') {
             observer.emit('test.socket.respond', {sid:event.socket_id, event:'test.trial.event.response', response:act});
         }
+        console.log(act);
         return act;
     }).catch(function (err) {
         console.log(err);

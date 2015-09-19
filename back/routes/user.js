@@ -108,7 +108,7 @@ module.exports = function(app, passport) {
     app.post('/api/users', access.requireRole(['admin']), function(req, res, next) {
         var user = req.body.user;
         user.password = user.tempPassword = passGen.generate();
-        return Promise.fullfilled().then(function() {
+        return Promise.fulfilled().then(function() {
             return User.find({}).count().exec();
         }).then(function(count) {
             var flags = {};

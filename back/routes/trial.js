@@ -120,7 +120,8 @@ module.exports = function(app, passport) {
     app.put('/api/trials/:id', access.requireRole({
         roles: [{
             role: 'student',
-            in : 'trials'
+            // in : 'trials',
+            all:true
         }, {
             role: 'teacher',
             all: true
