@@ -99,12 +99,7 @@ app.use(passport.initialize());
 app.use(passport.session()); // presistent login sessions
 app.use(flash()); // use conect flash to flash message stored in session
 
-if (process.env.NODE_ENV !== 'production') {
-    app.use(express.static(path.join(__dirname, '../app')));
-    app.use('/', express.static(path.join(__dirname, '../.tmp')));
-} else {
-    app.use(express.static(path.join(__dirname, '../dist')));
-}
+app.use(express.static(path.join(__dirname, '../app')));
 
 require('./routes')(app, passport);
 
