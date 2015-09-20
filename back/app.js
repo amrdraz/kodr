@@ -3,6 +3,7 @@
 var config = require('./config/server.js');
 
 var express = require('express');
+var cors = require('cors');
 var app = express();
 // app.https(config.ssl).io();
 // app.http().io();
@@ -27,7 +28,7 @@ var swig = require('swig');
 
 var port = config.port || process.env.PORT || 3000;
 app.set('port', port);
-
+app.use(cors());
 app.use(morgan(process.env.NODE_ENV=='production'?'[:date[clf]] ":method :remote-addr  :url HTTP/:http-version" :status :res[content-length] :req[Authorization] :response-time':'dev')); // log every request to the console
 app.use(compress()); // log every request to the console
 app.use(cookiePraser(config.cookieSecret)); // read cookies
@@ -36,6 +37,7 @@ app.use(bodyParser()); // get req.body from normal html form
 app.use(methodOverride());
 
 var mongoose = require('mongoose');
+mongoose.set('Promise', require('bluebird'));
 var connectDB =  function() {
     mongoose.connect(config.db.url);
 };
@@ -46,12 +48,14 @@ mongoose.connection.on('error',function() {
 });
 connectDB();
 
-var runner = require('java-code-runner');
-runner.server.recompile(function () {
-    runner.watchServer(function(p) {
-        console.log('started java server at http://localhost:' + p);
+if (config.runJava) {
+    var runner = require('java-code-runner');
+    runner.server.recompile(function () {
+        runner.watchServer(function(p) {
+            console.log('started java server at http://localhost:' + p);
+        });
     });
-});
+}
 
 
 //  Setting up template engine
@@ -95,14 +99,13 @@ app.use(passport.initialize());
 app.use(passport.session()); // presistent login sessions
 app.use(flash()); // use conect flash to flash message stored in session
 
-if (process.env.NODE_ENV !== 'production') {
-    app.use(express.static(path.join(__dirname, '../app')));
-    app.use('/', express.static(path.join(__dirname, '../.tmp')));
-} else {
-    app.use(express.static(path.join(__dirname, '../dist')));
-}
+app.use(express.static(path.join(__dirname, '../app')));
 
 require('./routes')(app, passport);
+
+app.get('/*', function (req, res, next) {
+    res.redirect('/');
+});
 
 
 /// catch 404 and forward to error handler

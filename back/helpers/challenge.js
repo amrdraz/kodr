@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
+var config = require('../config/server.js');
 var observer = require('../observer');
 var javaRunner = require('java-code-runner');
 
@@ -16,19 +17,24 @@ module.exports = function(schema, options) {
 
     schema.statics.run = function(code, options) {
         return new Promise(function(resolve, reject) {
-            switch (options.language) {
+            switch (options.type) {
                 case 'javascript':
                     resolve(['no server js', '']);
                     break;
                 case 'java':
+                    if(!config.runJava) {
+                        return resolve(['no server java', '']);
+                    }
                     javaRunner.run(code, options, function(err, stout, sterr) {
                         if (err && !sterr) return reject(err);
                         return resolve([sterr, stout]);
                     });
                     break;
                 case 'python':
+                    return resolve(['no server java', '']);
                     break;
                 case 'ruby':
+                    return resolve(['no server java', '']);
                     break;
             }
         });
@@ -42,7 +48,7 @@ module.exports = function(schema, options) {
 
     schema.statics.test = function(code, challenge) {
         return new Promise(function(resolve, reject) {
-            switch (challenge.language) {
+            switch (challenge.type) {
                 case 'javascript':
                     resolve({}, ['no server js', '']);
                     break;

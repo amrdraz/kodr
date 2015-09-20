@@ -1,10 +1,11 @@
 var Promise = require('bluebird');
+var _ = require('lodash');
 var User = require('../models/user');
 var access = require('./access');
 var Challenge = require('../models/challenge');
 var Arena = require('../models/arena');
 var Trial = require('../models/trial');
-var ArenaTrial = require('../models/arenaTrial');
+var UserArena = require('../models/userArena');
 
 module.exports = function(app, passport) {
 
@@ -16,7 +17,7 @@ module.exports = function(app, passport) {
      * @returns {object} trial
      */
 
-    app.get('/api/trials/:id', function(req, res, next) {
+    app.get('/api/trials/:id', access.requireRole(), function(req, res, next) {
         Trial.getById(req.params.id).then(function(model) {
             res.json({
                 trial: model
@@ -31,12 +32,64 @@ module.exports = function(app, passport) {
      * @returns {object} trials
      */
 
-    app.get('/api/trials', function(req, res, next) {
-        Trial.getByQuery(req.query).then(function (model) {
-            res.json({
-                trial: model
+    app.get('/api/trials', access.requireRole(), function(req, res, next) {
+        var promise;
+        if(req.query.ids) {
+            req.query._id = {$in:req.query.ids};
+            delete req.query.ids;
+            promise = Trial.getByQuery(req.query).then(function(model) {
+                res.json({
+                    trial: model
+                });
             });
-        }).catch(next);
+        } else if(req.query.arena || req.query.userArena) {
+            var userId;
+            if(req.user.isStudent) {
+                userId = req.user.id;
+            } else {
+                userId = req.query.user || req.user.id;
+            }
+            promise = Promise.fulfilled().then(function () {
+                if(!req.query.arena) {
+                    return Arena.getByQuery({users: {$in:[req.query.userArena]}});
+                } else {
+                    return {id:req.query.arena};
+                }            
+            }).then(function (arena) {
+                var userarena = {};
+                if(req.query.userArena) {
+                    userarena.id = req.query.userArena;
+                } else {
+                    var obj = {arena:arena.id, user:userId};
+                    userarena = UserArena.getOneByQueryOrCreate(obj, obj);
+                }
+                return [Challenge.getByQuery({arena:arena.id}), userarena, arena];
+            }).spread(function (challenges, ua, arena) {
+                challenges = _.filter(challenges, 'isPublished');
+                return [
+                    challenges,
+                    Promise.map(challenges, function (ch) {
+                        var obj = {arena:arena.id, userArena:ua.id, challenge:ch.id, user:userId};
+                        var update = _.clone(obj);
+                        update.order = ch.order;
+                        update.group = ch.group;
+                        return Trial.getOneByQueryOrCreateOrUpdate(obj, update);
+                    })
+                ];
+            }).spread(function (challenges, trials) {
+                res.json({
+                    challenge:challenges,
+                    trial: _.filter(trials, null)
+                });
+            });
+        } else {
+            promise = Trial.getByQuery(req.query).then(function(model) {
+                res.json({
+                    trial: model
+                });
+            });
+        }
+        promise.catch(next);
     });
 
     /**
@@ -67,7 +120,8 @@ module.exports = function(app, passport) {
     app.put('/api/trials/:id', access.requireRole({
         roles: [{
             role: 'student',
-            in : 'trials'
+            // in : 'trials',
+            all:true
         }, {
             role: 'teacher',
             all: true
@@ -78,7 +132,6 @@ module.exports = function(app, passport) {
     }), function(req, res, next) {
         var trial = req.body.trial;
         trial.time = Date.now();
-        trial.times = (trial.times || 0) + 1;
         Trial.findOne({
             _id: req.params.id
         }).exec().then(function(model) {

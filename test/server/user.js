@@ -8,7 +8,7 @@ var setup = require('./setup');
 var User = require('../../back/models/user');
 var ExpiringToken = require('../../back/models/expiringToken');
 var Arena = require('../../back/models/arena');
-var ArenaTrial = require('../../back/models/arenaTrial');
+var UserArena = require('../../back/models/userArena');
 var Trial = require('../../back/models/trial');
 var Challenge = require('../../back/models/challenge');
 var Group = require('../../back/models/group');
@@ -107,7 +107,7 @@ describe('User', function() {
             }).spread(function(ar, usr, t, st, st2) {
                 arena = ar;
                 user = usr;
-                var at = ArenaTrial.create({
+                var at = UserArena.create({
                     arena: arena._id,
                     user: user._id
                 });
@@ -275,25 +275,12 @@ describe('User', function() {
     describe("Auth", function() {
         var url = 'http://localhost:3000';
         var user = {
-                username: "amrd",
-                email: "amr.deraz@guc.edu.eg",
-
+                username: "amr.draz",
+                labGroup: "CS1",
+                lectureGroup: "1",
                 uniId: '13-56575',
                 password: "drazdraz12",
                 passwordConfirmation: "drazdraz12"
-            },
-            teacher = {
-                username: 'teacher',
-                email: 't.t@guc.edu.eg',
-                password: 'testmodel12',
-                passwordConfirmation: 'testmodel12'
-            },
-            student = {
-                username: 'student',
-                uniId: '13-56574',
-                email: 's.s@student.guc.edu.eg',
-                password: 'testmodel12',
-                passwordConfirmation: 'testmodel12'
             };
         var accessToken, activationToken;
 
@@ -301,92 +288,95 @@ describe('User', function() {
 
         describe("Signup", function() {
 
-            it("should add new user by username email and password", function(done) {
+            it("should add new user by username and password", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send({
+                        username: "draz.ious",
+                        uniId: "13-4345",
+                        labGroup: "CS1",
+                        lectureGroup: "1",
+                        password: "drazdraz12",
+                        passwordConfirmation: "drazdraz12"
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        should.exist(res.body.user.username);
+                        should.exist(res.body.user.email);
+                        should.exist(res.body.user.uniId);
+                        done();
+                    });
+            });
+
+            it("on sign up, eamil should be infered", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send({
+                        username: "amr.dr",
+                        password: "drazdraz12",
+                        labGroup: user.labGroup,
+                        lectureGroup: user.lectureGroup,
+                        passwordConfirmation: "drazdraz12"
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        expect(res.body.user.email).to.equal("amr.dr@student.guc.edu.eg");
+                        done();
+                    });
+            });
+
+            //  it("when none guc emails should work", function(done) {
+            //     request(url)
+            //         .post("/signup")
+            //         .send({
+            //             username: "amrdrz",
+            //             email: "amr.m.draz@gmail.com",
+            //             uniId: user.uniId,
+            //             labGroup: user.labGroup,
+            //             lectureGroup: user.lectureGroup,
+            //             password: "drazdraz12",
+            //             passwordConfirmation: "drazdraz12"
+            //         })
+            //         .end(function(err, res) {
+            //             if (err) return done(err);
+            //             res.status.should.equal(200);
+            //             should.exist(res.body.user.username);
+            //             should.exist(res.body.user.email);
+            //             should.exist(res.body.user.uniId);
+            //             done();
+            //         });
+            // });
+            
+            // currently all signup is that of a student
+            // it("should assign role student based on email", function(done) {
+            //     request(url)
+            //         .post("/signup")
+            //         .send(student)
+            //         .end(function(err, res) {
+            //             if (err) return done(err);
+            //             res.status.should.equal(200);
+            //             res.body.user.role.should.equal('student');
+            //             done();
+            //         });
+            // });
+            // it("should assign role teacher based on email", function(done) {
+            //     request(url)
+            //         .post("/signup")
+            //         .send(teacher)
+            //         .end(function(err, res) {
+            //             if (err) return done(err);
+            //             res.status.should.equal(200);
+            //             res.body.user.role.should.equal('teacher');
+            //             done();
+            //         });
+            // });
+
+            it("should send and email when a user signs up", function(done) {
                 request(url)
                     .post("/signup")
                     .send(user)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        should.exist(res.body.user.username);
-                        should.exist(res.body.user.email);
-                        expect(res.body.user.uniId).to.exist();
-                        done();
-                    });
-            });
-
-            it("when adding a user, uniId should not matter during sign up", function(done) {
-                request(url)
-                    .post("/signup")
-                    .send({
-                        username: "amrdr",
-                        email: "amr.drazz@guc.edu.eg",
-                        uniId: user.uniId,
-                        password: "drazdraz12",
-                        passwordConfirmation: "drazdraz12"
-                    })
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        should.exist(res.body.user.username);
-                        should.exist(res.body.user.email);
-                        expect(res.body.user.uniId).to.exist();
-                        done();
-                    });
-            });
-
-             it("when none guc emails shoudl work", function(done) {
-                request(url)
-                    .post("/signup")
-                    .send({
-                        username: "amrdrz",
-                        email: "amr.m.draz@gmail.com",
-                        uniId: user.uniId,
-                        password: "drazdraz12",
-                        passwordConfirmation: "drazdraz12"
-                    })
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        should.exist(res.body.user.username);
-                        should.exist(res.body.user.email);
-                        expect(res.body.user.uniId).to.exist();
-                        done();
-                    });
-            });
-
-            it("should assign role student based on email", function(done) {
-                request(url)
-                    .post("/signup")
-                    .send(student)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.user.role.should.equal('student');
-                        done();
-                    });
-            });
-            it("should assign role teacher based on email", function(done) {
-                request(url)
-                    .post("/signup")
-                    .send(teacher)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        res.status.should.equal(200);
-                        res.body.user.role.should.equal('teacher');
-                        done();
-                    });
-            });
-
-            it("should send and email when a teacher signs up", function(done) {
-                request(url)
-                    .post("/signup")
-                    .send({
-                        username: "drazious",
-                        email: "amr.draz@guc.edu.eg",
-                        password: "drazdraz12",
-                        passwordConfirmation: "drazdraz12"
-                    })
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -399,12 +389,12 @@ describe('User', function() {
 
         describe("Login", function() {
 
-            it("should not be able to login as a teacher until activation", function(done) {
+            it("should not be able to login as a student until activation", function(done) {
                 request(url)
                     .post("/token")
                     .send({
-                        username: "drazious",
-                        password: "drazdraz12",
+                        identification: user.username,
+                        password: user.password,
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -419,10 +409,16 @@ describe('User', function() {
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
-                        ExpiringToken.findById(activationToken, function(err, exp) {
-                            if (err) return done(err);
+                        Promise.fulfilled().then(function () {
+                          return ExpiringToken.findOne({_id:activationToken}).exec();  
+                        }).then(function(exp) {
                             exp.used.should.be.true;
+                            return User.getById(exp.user);
+                        }).then(function (user) {
+                            user.activated.should.be.true;
                             done();
+                        }).catch(function (err) {
+                            done(err);
                         });
                     });
             });
@@ -431,8 +427,8 @@ describe('User', function() {
                 request(url)
                     .post("/token")
                     .send({
-                        username: "drazious",
-                        password: "drazdraz12",
+                        identification: user.username,
+                        password: user.password,
                     })
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -445,8 +441,8 @@ describe('User', function() {
                 request(url)
                     .post("/token")
                     .send({
-                        username: "drazious",
-                        password: "drazdraz12",
+                        identification: user.username,
+                        password: user.password,
                     })
                     .expect(200)
                     // .expect('Content-Type', /json/)
@@ -543,6 +539,18 @@ describe('User', function() {
             it("should send a verification email if not admin", function(done) {
                 request(api)
                     .post("/users/" + student._id + "/verify")
+                    .send()
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        done();
+                    });
+            });
+
+            it("should activate user if admin", function(done) {
+                request(api)
+                    .put("/users/" + student._id + "/activate")
+                    .set('Authorization', 'Bearer ' + admin.token)
                     .send()
                     .end(function(err, res) {
                         if (err) return done(err);

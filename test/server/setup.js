@@ -12,7 +12,7 @@ var User = require('../../back/models/user');
 var Challenge = require('../../back/models/challenge');
 var Trial = require('../../back/models/trial');
 var Arena = require('../../back/models/arena');
-var ArenaTrial = require('../../back/models/arenaTrial');
+var UserArena = require('../../back/models/userArena');
 var observer = require('../../back/observer');
 
 var url = 'http://localhost:3000';
@@ -95,7 +95,7 @@ module.exports = {
             var user = db.user = db.teacher = usr;
             db.student = std;
             db.student2 = std2;
-            var at = ArenaTrial.create({
+            var at = UserArena.create({
                 arena: arena._id,
                 user: user._id
             });
@@ -115,7 +115,7 @@ module.exports = {
 
             db.challenge = ch1;
             db.challenge2 = ch2;
-            db.arenaTrial = at;
+            db.userArena = at;
             return [at, ch1, ch2];
         }).spread(function(ch1, ch2) {
             var tr = Trial.create({

@@ -30,9 +30,9 @@ var ArenaSchema = new mongoose.Schema({
     requires: {
         type: [ObjectId], ref: 'Requirement'
     },
-    fllow:  {
+    flow:  {
         type: String,
-        default:'any',
+        default:'sequencial',
         enum: ['any', 'sequencial']
     },
     challenges: [{
@@ -50,7 +50,7 @@ var ArenaSchema = new mongoose.Schema({
     },
     users: [{
         type: ObjectId,
-        ref: 'ArenaTrial'
+        ref: 'UserArena'
     }]
 });
 

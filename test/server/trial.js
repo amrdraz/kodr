@@ -10,7 +10,7 @@ var Trial = require('../../back/models/trial');
 var User = require('../../back/models/user');
 var Challenge = require('../../back/models/challenge');
 var Arena = require('../../back/models/arena');
-var AreanTrial = require('../../back/models/arenaTrial');
+var AreanTrial = require('../../back/models/userArena');
 var observer = require('../../back/observer');
 
 
@@ -36,7 +36,7 @@ describe('Trial', function() {
                 arena: arena.id
             });
             Trial.findOrCreate({
-                arenaTrial: areanTrial.id,
+                userArena: areanTrial.id,
                 arena: areanTrial.arena,
                 user: areanTrial.user,
                 challenge: challenge.id,
@@ -69,7 +69,7 @@ describe('Trial', function() {
                     // console.log("test trial unit", trial);
                     expect(trial).to.exist;
                     expect(trial.arena).to.exist;
-                    expect(trial.arenaTrial).to.exist;
+                    expect(trial.userArena).to.exist;
                     done();
                 }).catch(done);
             }).catch(done);
@@ -192,7 +192,7 @@ describe('Trial', function() {
                 tests: "",
                 description: "create a variable and assign to it the value 20",
                 exp: 2,
-                isPublished: false
+                isPublished: true
             }
         };
         var trial = {
@@ -222,8 +222,10 @@ describe('Trial', function() {
                 admin.token = ad.token;
                 teacher._id = t._id;
                 accessToken = teacher.token = t.token;
+                challenge.arena = ar.id;
                 return Challenge.create({
-                    arena: ar.id
+                    arena: ar.id,
+                    isPublished:true
                 });
             }).then(function(ch) {
                 challenge.id = ch.id;
@@ -268,6 +270,7 @@ describe('Trial', function() {
 
                 request(api)
                     .get("/trials/" + trial.id)
+                    .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -284,6 +287,7 @@ describe('Trial', function() {
                 //     trials[0]._id.toString().shoul.equal(trial.id);
                 request(api)
                     .get("/trials")
+                    .set('Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -293,6 +297,24 @@ describe('Trial', function() {
                 // }).catch(done);
             });
 
+            it("should return a list of all trials for arena", function(done) {
+                // Promise.fulfilled().then(function() {
+                //     return Trial.find().exec();
+                // }).then(function(trials) {
+                //     trials.length.should.equal(2);
+                //     trials[0]._id.toString().shoul.equal(trial.id);
+                request(api)
+                    .get("/trials")
+                    .query({arena:challenge.arena})
+                    .set('Authorization', 'Bearer ' + accessToken)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        res.body.trial.length.should.equal(1);
+                        done();
+                    });
+                // }).catch(done);
+            });
         });
 
         describe("PUT", function() {

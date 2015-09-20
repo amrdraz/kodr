@@ -42,9 +42,9 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         // console.log('trial create',trial);
         var Trial = mongoose.model('Trial');
         var Challenge = mongoose.model('Challenge');
-        var ArenaTrial = mongoose.model('ArenaTrial');
+        var UserArena = mongoose.model('UserArena');
 
-        if (trial.arena && trial.arenaTrial) {
+        if (trial.arena && trial.userArena) {
             return Trial.getOneByQueryOrCreate({
                 user: trial.user,
                 challenge: trial.challenge
@@ -58,19 +58,19 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
             return challenge;
         });
 
-        if (trial.arenaTrial) {
+        if (trial.userArena) {
             return promise.then(function(challenge) {
                 return Trial.findOrCreate(trial);
             });
         } else {
             return promise.then(function(challenge) {
-                var arenaTrial = {
+                var userArena = {
                     arena: challenge.arena,
                     user: trial.user
                 };
-                return ArenaTrial.getOneByQueryOrCreate(arenaTrial,arenaTrial);
+                return UserArena.getOneByQueryOrCreate(userArena,userArena);
             }).then(function(at) {
-                trial.arenaTrial = at.id;
+                trial.userArena = at.id;
                 // console.log("trial findOrCreate",trial);
                 return Trial.findOrCreate(trial);
             });

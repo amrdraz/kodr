@@ -1,11 +1,10 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var util = require('util');
-var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
-// var ArenaTrial = require('./arenaTrial'); // used bellow in findOrCreate to avoid circulare reference
+// var UserArena = require('./userArena'); // used bellow in findOrCreate to avoid circulare reference
 
 
 /**
@@ -14,7 +13,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * versions of the trial are maintained for analysing the user's preformance
  * experiance is tipically granted on completion but would be intresting if the challenge awards exp in  adifferent way
  *
- * @attribute code      String      Users's code submittion
+ * @attribute work      Mixed       Users's wrok in this trial
  * @attribute exp       Number      the experiance he gained in this trial
  * @attribute completed Boolean     Whether the user passes or not
  * @attribute report    Mixed       The result of the tests run on the code
@@ -25,12 +24,13 @@ var Mixed = mongoose.Schema.Types.Mixed;
  */
 
 var TrialSchema = new mongoose.Schema({
-    code: {
-        type: String,
+    work: {
+        type:Mixed,
+        default:{}
     },
-    times: {
-        type: Number,
-        'default': 0
+    blueprint: {
+        type:Mixed,
+        default:{}
     },
     exp: {
         type: Number,
@@ -39,6 +39,10 @@ var TrialSchema = new mongoose.Schema({
     order: {
         type: Number,
         'default': 0
+    },
+    group: {
+        type: String,
+        'default': null
     },
     started: {
         type: Boolean,
@@ -53,10 +57,18 @@ var TrialSchema = new mongoose.Schema({
         'default': 0
     },
     report: Mixed,
-    time: {
-        type: Date,
-        'default': Date.now
+
+    startTime: {
+        type: Date
     },
+    endTime: {
+        type: Date
+    },
+
+    activities: [{
+        type: ObjectId,
+        ref: 'Activity',
+    }],
     challenge: {
         type: ObjectId,
         ref: 'Challenge',
@@ -69,9 +81,9 @@ var TrialSchema = new mongoose.Schema({
         childPath: "trials",
         // required: true,
     },
-    arenaTrial: {
+    userArena: {
         type: ObjectId,
-        ref: 'ArenaTrial',
+        ref: 'UserArena',
         childPath: "trials",
         // required: true
     },
@@ -84,16 +96,16 @@ var TrialSchema = new mongoose.Schema({
 
 });
 
-TrialSchema.plugin(version, {
-    collection: 'TrialVersions',
-    logError: true,
-    suppressVersionIncrement: false,
-    ignorePaths: ['times', 'exp', 'user', 'arenaTrial', 'challenge', 'arena', 'order'],
-    strategy: 'array'
-});
+// TrialSchema.plugin(version, {
+//     collection: 'TrialVersions',
+//     logError: true,
+//     suppressVersionIncrement: false,
+//     ignorePaths: ['times', 'exp', 'user', 'userArena', 'challenge', 'arena', 'order'],
+//     strategy: 'array'
+// });
 
 TrialSchema.plugin(relationship, {
-    relationshipPathName: ['arenaTrial', 'user', 'challenge', 'arena']
+    relationshipPathName: ['userArena', 'user', 'challenge', 'arena']
 });
 
 

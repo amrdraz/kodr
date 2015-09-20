@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var ObjectId = mongoose.Schema.ObjectId;
-var Mixed = mongoose.Schema.Mixed;
+var ObjectId = mongoose.Schema.Types.ObjectId;
+var Mixed = mongoose.Schema.Types.Mixed;
 
 /**
  * Log Schema.

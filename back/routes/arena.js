@@ -2,6 +2,7 @@ var Promise = require('bluebird');
 var User = require('../models/user');
 var access = require('./access');
 var Arena = require('../models/arena');
+var UserArena = require('../models/userArena');
 var Challenge = require('../models/challenge');
 
 module.exports = function(app, passport) {
@@ -40,6 +41,22 @@ module.exports = function(app, passport) {
     });
 
     /**
+     * get a user Arena from arena.
+     *
+     * @param range
+     * @returns {object} person
+     */
+
+    app.get('/api/arenas/:id/userArena', access.requireRole(), function(req, res, next) {
+        Arena.getArenaWithUserArenaByUserId(req.params.id, req.user.id).spread(function (arena, userArena) {
+            res.send({
+                arena:arena,
+                userArena:userArena
+            });
+        }).catch(next);
+    });
+
+    /**
      * Create new arenas.
      *
      * @param range
@@ -64,7 +81,7 @@ module.exports = function(app, passport) {
      */
 
     app.put('/api/arenas/:id', access.requireRole(['teacher','admin']), function(req, res, next) {
-        Arena.findByIdAndUpdate(req.params.id, req.body.arena, function(err, model) {
+        Arena.findByIdAndUpdate(req.params.id, req.body.arena, {new:true}, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             res.json({

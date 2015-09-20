@@ -30,47 +30,12 @@ module.exports = function(grunt) {
 
         // Watches files for changes and runs tasks based on the changed files
         watch: {
-            bower: {
-                files: ['bower.json'],
-                tasks: ['bowerInstall']
-            },
-            // js: {
-            //     files: ['<%= config.app %>/scripts/{,*/}*.js'],
-            //     tasks: ['jshint'],
-            //     options: {
-            //         livereload: true
-            //     }
-            // },
-            emberTemplates: {
-                files: ['<%= config.app %>/templates/{,*/}*.hbs'],
-                tasks: ['emberTemplates'],
-                options: {
-                    livereload: true
-                }
-            },
-            jstest: {
-                files: ['test/spec/{,*/}*.js'],
-                tasks: ['test:watch']
-            },
-            browserify: {
-                files: ['<%= config.app %>/scripts/{,*,*/*}/*.js'],
-                tasks: ['browserify'],
-                options: {
-                    spawn: false,
-                    interrupt: true,
-                    livereload: true
-                }
-            },
             gruntfile: {
                 files: ['Gruntfile.js']
             },
-            sass: {
-                files: ['<%= config.app %>/styles/{,*/}*.{scss,sass}'],
-                tasks: ['sass:server', 'autoprefixer']
-            },
             styles: {
-                files: ['<%= config.app %>/styles/{,*/}*.css'],
-                tasks: ['newer:copy:styles', 'autoprefixer']
+                files: ['<%= config.app %>/assets/{,*/}*.css'],
+                tasks: ['autoprefixer']
             },
             livereload: {
                 options: {
@@ -100,14 +65,6 @@ module.exports = function(grunt) {
                 options: {
                     script: 'server.js',
                     node_env: 'production'
-                }
-            },
-            test: {
-                options: {
-                    script: 'test-server.js',
-                    node_env: 'test',
-                    hostname: 'localhost',
-                    port: 3000
                 }
             }
         },
@@ -150,40 +107,6 @@ module.exports = function(grunt) {
                         });
                     }
                 }
-            },
-            test: {
-                script: 'test-server.js',
-                options: {
-                    watch: ['<%= config.server %>'],
-                    ext: 'js,coffee,jade',
-                    env: {
-                        PORT: '3000',
-                        NODE_ENV:'test'
-                    },
-                    // omit this property if you aren't serving HTML files and 
-                    // don't want to open a browser tab on start
-                    callback: function(nodemon) {
-                        nodemon.on('log', function(event) {
-                            console.log(event.colour);
-                        });
-
-                        // opens browser on initial server start
-                        nodemon.on('config:update', function() {
-                            // Delay before server listens on port
-                            setTimeout(function() {
-                                // require('open')('http://localhost:3000');
-                            }, 1000);
-                        });
-
-                        // refreshes browser when server reboots
-                        nodemon.on('restart', function() {
-                            // Delay before server listens on port
-                            setTimeout(function() {
-                                require('fs').writeFileSync('.rebooted', 'rebooted');
-                            }, 1000);
-                        });
-                    }
-                }
             }
         },
         // The actual grunt server settings
@@ -206,20 +129,6 @@ module.exports = function(grunt) {
                     }
                 }
             },
-            test: {
-                options: {
-                    open: false,
-                    port: 9001,
-                    middleware: function(connect) {
-                        return [
-                            connect.static('.tmp'),
-                            connect.static('test'),
-                            connect().use('/app/lib', connect.static('./app/lib')),
-                            connect.static(config.app)
-                        ];
-                    }
-                }
-            },
             dist: {
                 options: {
                     base: '<%= config.dist %>',
@@ -236,28 +145,8 @@ module.exports = function(grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= config.app %>/scripts/{,*/}*.js',
-                '!<%= config.app %>/vendor/*',
-                'test/spec/{,*/}*.js'
+                '<%= config.app %>/assets/{,*/}*.js',
             ]
-        },
-
-        karma: {
-            unit: {
-                configFile: 'karma.conf.js',
-                // autoWatch: true
-                background: true
-            }
-        },
-
-        // Mocha testing framework configuration options
-        mocha: {
-            all: {
-                options: {
-                    run: true,
-                    urls: ['http://<%= express.test.options.hostname %>:<%= express.test.options.port %>/index.html']
-                }
-            }
         },
 
 
@@ -267,67 +156,8 @@ module.exports = function(grunt) {
                 files: [{
                     dot: true,
                     src: [
-                        '.tmp',
                         '<%= config.dist %>/*',
-                        '!<%= config.dist %>/.git*'
                     ]
-                }]
-            },
-            server: '.tmp'
-        },
-
-        browserify: {
-            options: {
-                alias:[
-                    "./app/lib/toastr/toastr.js:toastr"
-                ],
-                // external:['jquery']
-            },
-            main: {
-                src: '<%= config.app %>/scripts/main.js',
-                dest: '.tmp/scripts/build.js'
-            },
-            iframe: {
-                src: '<%= config.app %>/scripts/iframe-main.js',
-                dest: '.tmp/iframe/main.js'
-            }
-        },
-        emberTemplates: {
-            options: {
-                templateName: function(sourceFile) {
-                    var templatePath = config.app + '/templates/';
-                    return sourceFile.replace(templatePath, '');
-                }
-            },
-            dist: {
-                files: {
-                    '.tmp/scripts/templates.js': '<%= config.app %>/templates/**/*.hbs'
-                }
-            }
-        },
-        // Compiles Sass to CSS and generates necessary files if requested
-        sass: {
-            options: {
-                includePaths: [
-                    'app/lib'
-                ]
-            },
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.app %>/styles',
-                    src: ['*.scss'],
-                    dest: '.tmp/styles',
-                    ext: '.css'
-                }]
-            },
-            server: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.app %>/styles',
-                    src: ['*.scss'],
-                    dest: '.tmp/styles',
-                    ext: '.css'
                 }]
             }
         },
@@ -340,31 +170,21 @@ module.exports = function(grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: '.tmp/styles/',
+                    cwd: '<%= config.app %>/assets/',
                     src: '{,*/}*.css',
-                    dest: '.tmp/styles/'
+                    dest: '<%= config.app %>/assets/'
                 }]
             }
         },
 
-        // Automatically inject Bower components into the HTML file
-        bowerInstall: {
-            app: {
-                src: ['<%= config.app %>/index.html'],
-                exclude: ['app/lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap.js']
-            },
-            sass: {
-                src: ['<%= config.app %>/styles/{,*/}*.{scss,sass}']
-            }
-        },
 
         // Renames files for browser caching purposes
         rev: {
             dist: {
                 files: {
                     src: [
-                        '<%= config.dist %>/scripts/{,*/}*.js',
-                        '<%= config.dist %>/styles/{,*/}*.css',
+                        '<%= config.dist %>/assets/{,*/}*.js',
+                        '<%= config.dist %>/assets/{,*/}*.css',
                         '<%= config.dist %>/images/{,*/}*.*',
                         // '<%= config.dist %>/styles/fonts/{,*/}*.*',
                         '<%= config.dist %>/*.{ico,png}'
@@ -396,7 +216,7 @@ module.exports = function(grunt) {
                 ]
             },
             js : {
-                src: ['.tmp/scripts/*.js', '.tmp/iframe/*.js']
+                src: ['<%= config.app %>/assets/*.js']
             }
         },
         // Performs rewrites based on rev and the useminPrepare configuration
@@ -414,7 +234,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: '<%= config.app %>/images',
-                    src: '{,*/}*.{gif,jpeg,jpg,png}',
+                    src: '{,*/,**/}*.{gif,jpeg,jpg,png}',
                     dest: '<%= config.dist %>/images'
                 }]
             }
@@ -425,7 +245,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: '<%= config.app %>/images',
-                    src: '{,*/}*.svg',
+                    src: '{,*/,**/}*.svg',
                     dest: '<%= config.dist %>/images'
                 }]
             }
@@ -446,30 +266,16 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: '<%= config.dist %>',
-                    src: '{,*/}*.html',
+                    src: '{,*/,**/}*.html',
                     dest: '<%= config.dist %>'
                 }]
             }
         },
-
-        // By default, your `index.html`'s <!-- Usemin block --> will take care of
-        // minification. These next options are pre-configured if you do not wish
-        // to use the Usemin blocks.
-        // cssmin: {
-        //     dist: {
-        //         files: {
-        //             '<%= config.dist %>/styles/main.css': [
-        //                 '.tmp/styles/{,*/}*.css',
-        //                 '<%= config.app %>/styles/{,*/}*.css'
-        //             ]
-        //         }
-        //     }
-        // },
         uglify: {
             dist: {
                 files: {
-                    '<%= config.dist %>/ifrmae/main.js': [
-                        '.tmp/iframe/main.js'
+                    '<%= config.dist %>/{,*/,**/,}*.js': [
+                        '<%= config.app %>/{,*/,**/,}*.js'
                     ]
                 }
             }
@@ -491,7 +297,7 @@ module.exports = function(grunt) {
                         '.htaccess',
                         'images/{,*/}*',
                         '{,*/}*.html',
-                        'styles/fonts/{,*/}*.*',
+                        '{,*/,**/}*.*',
                         // 'vendor/MathJax/**'
                     ]
                 }, {
@@ -507,30 +313,6 @@ module.exports = function(grunt) {
                     src:['main.js'],
                     dest:'<%= config.dist %>/iframe/'
                 }]
-            },
-            styles: {
-                expand: true,
-                dot: true,
-                cwd: '<%= config.app %>/styles',
-                dest: '.tmp/styles/',
-                src: '{,*/}*.css'
-            }
-        },
-
-        // Generates a custom Modernizr build that includes only the tests you
-        // reference in your app
-        modernizr: {
-            dist: {
-                devFile: 'app/lib/modernizr/modernizr.js',
-                outputFile: '<%= config.dist %>/scripts/vendor/modernizr.js',
-                files: {
-                    src: [
-                        '<%= config.dist %>/scripts/{,*/}*.js',
-                        '<%= config.dist %>/styles/{,*/}*.css',
-                        '!<%= config.dist %>/scripts/vendor/*'
-                    ]
-                },
-                uglify: true
             }
         },
 
@@ -543,32 +325,11 @@ module.exports = function(grunt) {
                     logConcurrentOutput: true
                 }
             },
-            watchtest: {
-                tasks: ['nodemon:test', 'watch'],
-                options: {
-                    logConcurrentOutput: true
-                }
-            },
-            server: [
-                'sass:server',
-                'browserify',
-                'emberTemplates',
-                'copy:styles'
-            ],
-            test: [
-
-                'browserify',
-                'emberTemplates',
-                'copy:styles'
-            ],
-            dist: [
-                'sass',
-                'copy:styles',
-                'browserify',
-                'emberTemplates',
-                // 'imagemin',
-                'svgmin'
-            ]
+            // dist: [
+            //     'copy',
+            //     // 'imagemin',
+            //     'svgmin'
+            // ]
         }
     });
 
@@ -579,8 +340,6 @@ module.exports = function(grunt) {
         }
 
         grunt.task.run([
-            'clean:server',
-            'concurrent:server',
             'autoprefixer',
             'concurrent:watch'
         ]);
@@ -590,41 +349,24 @@ module.exports = function(grunt) {
         grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
         grunt.task.run([target ? ('serve:' + target) : 'serve']);
     });
-
-    grunt.registerTask('test', function(target) {
-        if (target !== 'watch') {
-            grunt.task.run([
-                'clean:server',
-                'concurrent:test',
-                'autoprefixer',
-            ]);
-        }
-
-        grunt.task.run([
-            'concurrent:watchtest'
-        ]);
-    });
     
     grunt.registerTask('build', [
         'clean:dist',
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
-        'concat',
         'cssmin',
         'preprocess:js',  // Remove DEBUG code from production builds
-        'copy:dist',
+        'preprocess:html',  // Remove DEBUG code from production builds
+        'copy',
         'uglify',
-        'modernizr',
         'rev',
         'usemin',
         'htmlmin',
-        'preprocess:html',  // Remove DEBUG code from production builds
     ]);
 
     grunt.registerTask('default', [
         'newer:jshint',
-        'test',
         'build'
     ]);
 };

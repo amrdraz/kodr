@@ -21,13 +21,40 @@ observer.on('trial.complete', function(trial) {
     });
 });
 
-observer.on('arenaTrial.complete', function(arenaTrial) {
+/**
+ * Event listner for when a trial is complete
+ * @param  {Trial} trial trial that was just complete for the first time
+ * @return {[type]}       [description]
+ */
+observer.on('trial.event', function(event) {
+    var object = event.trial;
+    var uid = event.user || object.user;
     Activity.new({
-        subjectId:arenaTrial.user,
+        subjectId:uid,
+        subjectModel:'User',
+        action:event.action,
+        event:event.event,
+        verb:event.verb || event.action+'ed',
+        objectId:object.id || object._id || object,
+        objectModel:'Trial',
+        objectMeta: event.meta
+    }).then(function (act) {
+        if (process.env.NODE_ENV==='test') {
+            observer.emit('test.socket.respond', {sid:event.socket_id, event:'test.trial.event.response', response:act});
+        }
+        return act;
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+observer.on('userArena.complete', function(userArena) {
+    Activity.new({
+        subjectId:userArena.user,
         subjectModel:'User',
         action:'complete',
         verb:'completed',
-        object:arenaTrial
+        object:userArena
     });
 });
 
@@ -169,6 +196,7 @@ observer.on('user.disconnect', function(id) {
         if (process.env.NODE_ENV==='test') {
             // observer.emit('test.disconnect.response', act);
         }
+        return act;
     });
 });
 

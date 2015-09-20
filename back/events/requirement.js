@@ -40,7 +40,7 @@ observer.on('trial.award', function(trial) {
 });
 
 // every time a challenge in a specific arena is complete
-observer.on('arenaTrial.trial.awarded', function(arenaTrial) {
+observer.on('userArena.trial.awarded', function(userArena) {
     Promise.fulfilled().then(function() {
         return Requirement.find({
             model1: 'Challenge',
@@ -48,13 +48,13 @@ observer.on('arenaTrial.trial.awarded', function(arenaTrial) {
                 $exists: false
             },
             model2: 'Arena',
-            id2: arenaTrial.arena,
+            id2: userArena.arena,
             complete: false,
-            user: arenaTrial.user
+            user: userArena.user
         }).exec();
     }).then(function(reqs) {
         return _.map(reqs, function(req) {
-            req.completed = arenaTrial.completed;
+            req.completed = userArena.completed;
             if (req.completed === req.times) {
                 req.complete = true;
             }
@@ -70,7 +70,7 @@ observer.on('arenaTrial.trial.awarded', function(arenaTrial) {
 });
 
 // whenever any or a specific arena is complete
-observer.on('arenaTrial.complete', function(arenaTrial) {
+observer.on('userArena.complete', function(userArena) {
     Promise.fulfilled().then(function() {
         return Requirement.find({
             model1: 'Arena',
@@ -79,10 +79,10 @@ observer.on('arenaTrial.complete', function(arenaTrial) {
                     $exists: false
                 }
             }, {
-                id1: arenaTrial.arena
+                id1: userArena.arena
             }],
             complete: false,
-            user: arenaTrial.user
+            user: userArena.user
         }).exec();
     }).then(function (reqs) {
         return _.map(reqs, function (req) {

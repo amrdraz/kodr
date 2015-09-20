@@ -20,6 +20,11 @@ module.exports = function(io) {
             observer.emit('user.connect', {user_id:id, socket_id:client.id});
         });
 
+        client.on('trial.event', function (event) {
+            event.socket_id = client.id;
+            observer.emit('trial.event', event);
+        });
+
         client.on('disconnect', function() {
             clients.splice(clients.indexOf(client), 1);
             observer.emit('user.disconnect', client.id);

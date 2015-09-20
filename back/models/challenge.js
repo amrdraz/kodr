@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var version = require('mongoose-version');
 var relationship = require("mongoose-relationship");
 var observer = require('../observer');
 
@@ -21,28 +20,57 @@ var ChallengeSchema = new mongoose.Schema({
         type: String,
         'default': 'New Challenge'
     },
-    language: {
+    type: {
         type: String,
-        'default': 'java',
-        enum: ['javascript', 'java', 'python']
+        'default': 'python',
     },
-    inputs: [String],
-    setup: {
+    // blueprint: [{name:String, type:String}],
+    blueprint: {
+        type: Mixed,
+        default: {
+            language: 'python',
+            setup: '',
+            solution: '',
+            tests: '',
+            description: '',
+        }
+    },
+    exp: {
+        type: Number,
+        'default': 1,
+        min: 0
+    },
+    order: {
+        type: Number,
+        'default': 0,
+        min: 0
+    },
+    group: {
         type: String,
-        'default': '// Starting Code leave blank if you want Student to start from scratch\n'
+        'default': null,
     },
-    solution: {
-        type: String,
-        'default': '// Challenge Solution goes here\n'
-    },
-    tests: {
-        type: String,
-        'default': '// Challenge Tests go here\n'
-    },
-    description: {
-        type: String,
-        'default': 'A new Challenge'
-    },
+    // language: {
+    //     type: String,
+    //     'default': 'java',
+    //     enum: ['javascript', 'java', 'python']
+    // },
+    // inputs: [String],
+    // setup: {
+    //     type: String,
+    //     'default': '// Starting Code leave blank if you want Student to start from scratch\n'
+    // },
+    // solution: {
+    //     type: String,
+    //     'default': '// Challenge Solution goes here\n'
+    // },
+    // tests: {
+    //     type: String,
+    //     'default': '// Challenge Tests go here\n'
+    // },
+    // description: {
+    //     type: String,
+    //     'default': 'A new Challenge'
+    // },
     // the current state of a cahllenge
     status: {
         type: String,
@@ -56,16 +84,6 @@ var ChallengeSchema = new mongoose.Schema({
     valid: {
         type: Boolean,
         'default': false
-    },
-    exp: {
-        type: Number,
-        'default': 1,
-        min: 0
-    },
-    order: {
-        type: Number,
-        'default': 0,
-        min: 0
     },
     author: {
         type: ObjectId,
@@ -84,10 +102,10 @@ var ChallengeSchema = new mongoose.Schema({
 
 });
 
-ChallengeSchema.plugin(version, {
-    collection: 'ChallengeVersions',
-    log: true
-});
+// ChallengeSchema.plugin(version, {
+//     collection: 'ChallengeVersions',
+//     log: true
+// });
 ChallengeSchema.plugin(relationship, {
     relationshipPathName: ['arena', 'author']
 });

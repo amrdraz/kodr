@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var _ = require('lodash');
 var log = require('util').log;
 var observer = require('./observer');
 var User = require('./models/user');
@@ -16,7 +17,7 @@ module.exports = function(app, passport) {
     // arena routes
     require('./routes/arena')(app, passport);
     // arena trial routes
-    require('./routes/arenaTrial')(app, passport);
+    require('./routes/userArena')(app, passport);
     // user routes
     require('./routes/user')(app, passport);
     // group routes
@@ -40,42 +41,23 @@ module.exports = function(app, passport) {
      */
 
     app.post('/token', function(req, res, next) {
-        if (process.env.NODE_ENV === "development") {
-            User.findByIdentity(req.body.username).then(function(user) {
-                if (user) {
-                    if (!user.activated) return res.send(400, {
-                        message: 'This account is not Verified',
-                        id: user.id,
-                        email: user.email
-                    });
-                    observer.emit('user.login', user);
-                    res.send({
-                        access_token: user.token,
-                        user_id: user._id
-                    });
-                } else res.send(403, {
-                    message: 'Incorrect username or password.'
+        passport.authenticate('local-login', function(err, user) {
+            if (err) return next(err);
+            if (user) {
+                if (!user.activated) return res.send(400, {
+                    message: 'This account is not Verified',
+                    id: user.id,
+                    email: user.email
                 });
+                observer.emit('user.login', user);
+                res.send({
+                    access_token: user.token,
+                    user_id: user._id
+                });
+            } else res.send(403, {
+                message: 'Incorrect username or password.'
             });
-        } else {
-            passport.authenticate('local-login', function(err, user) {
-                if (err) return next(err);
-                if (user) {
-                    if (!user.activated) return res.send(400, {
-                        message: 'This account is not Verified',
-                        id: user.id,
-                        email: user.email
-                    });
-                    observer.emit('user.login', user);
-                    res.send({
-                        access_token: user.token,
-                        user_id: user._id
-                    });
-                } else res.send(403, {
-                    message: 'Incorrect username or password.'
-                });
-            })(req, res, next);
-        }
+        })(req, res, next);
     });
 
     // logout
@@ -166,11 +148,11 @@ module.exports = function(app, passport) {
     app.post('/signup', function(req, res, next) {
         Promise.fulfilled()
             .then(validateRequestBody(req))
-            .then(findUser(req))
-            .then(createIfNewUser(req))
-            .then(emitAndRespond(req, res))
+            .then(processFields)
+            .then(findUser)
+            .spread(createIfNewUser)
+            .then(emitAndRespond(res))
             .catch(function(err) {
-                console.log(err.stack);
                 if (err.http_code) {
                     return res.send(err.http_code, err.message);
                 }
@@ -191,12 +173,12 @@ module.exports = function(app, passport) {
                         message: 'Invalid Uni ID'
                     };
                 }
-                if (!req.body.email) {
-                    throw {
-                        http_code: 400,
-                        message: 'Email cannot be blank.'
-                    };
-                }
+                // if (!req.body.email) {
+                //     throw {
+                //         http_code: 400,
+                //         message: 'Email cannot be blank.'
+                //     };
+                // }
                 if (!req.body.password) {
                     throw {
                         http_code: 400,
@@ -210,48 +192,63 @@ module.exports = function(app, passport) {
                         message: 'Passwords do not match.'
                     };
                 }
-
-                if (!(/^.+@.+\..+$/.test(req.body.email) || /^\S+\.\S+@guc\.edu\.eg$/.test(req.body.email) || /^\S+\.\S+@student\.guc\.edu\.eg$/.test(req.body.email))) {
-                    throw {
-                        http_code: 401,
-                        message: 'Invalid Email'
-                    };
-                }
+                // if (!(/^.+@.+\..+$/.test(req.body.email) || /^\S+\.\S+@guc\.edu\.eg$/.test(req.body.email) || /^\S+\.\S+@student\.guc\.edu\.eg$/.test(req.body.email))) {
+                //     throw {
+                //         http_code: 401,
+                //         message: 'Invalid Email'
+                //     };
+                // }
+                return req;
             };
+        }
+
+        function processFields(req) {
+            req.body.username = _.trim(req.body.username);
+            if(!req.body.email) {
+                req.body.email = req.body.username+"@student.guc.edu.eg";
+            }
+            return req;
         }
 
         function findUser(req) {
-            return function() {
-                return User.findOne({
-                    $or: [{
-                        'username': req.body.username
-                    }, {
-                        'email': req.body.email,
-                    }]
-                }).exec();
-            };
+            return [
+            req,
+            User.findOne({
+                $or: [{
+                    'username': req.body.username
+                }, {
+                    'email': req.body.email,
+                }]
+            }).exec()];
         }
 
-        function createIfNewUser(req) {
-            return function(user) {
-                if (user) {
-                    throw {
-                        http_code: 400,
-                        message: 'User already exists'
-                    };
-                }
-
-                var role = getRoleByEmail(req.body.email);
-
+        function createIfNewUser(req, user) {
+            if (user) {
+                throw {
+                    http_code: 400,
+                    message: 'User already exists'
+                };
+            }
+            var role = getRoleByEmail(req.body.email);
+            var flags = {};
+            return Promise.fulfilled().then(function () {
+                return User.find({}).count({}).exec();
+            }).then(function (count) {
+                console.log(req.body);
+                flags.no_setup = flags.is_experiment = (count%2===0);
+                flags.is_control = !flags.is_experiment;
                 return User.create({
                     username: req.body.username,
                     email: req.body.email,
                     uniId: req.body.uniId,
+                    lectureGroup: req.body.lectureGroup,
+                    labGroup: req.body.labGroup,
                     password: req.body.password,
                     role: role,
+                    flags:flags,
                     activated: false
                 });
-            };
+            });
         }
 
 
@@ -264,7 +261,7 @@ module.exports = function(app, passport) {
             return 'student';
         }
 
-        function emitAndRespond(req, res) {
+        function emitAndRespond(res) {
             if (process.env.NODE_ENV === 'test') {
                 return function(user) {
                     observer.emit('user.signup', user);

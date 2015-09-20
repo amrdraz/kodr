@@ -29,6 +29,7 @@ var ActivitySchema = new mongoose.Schema({
     objectModel: String,
     objectId: ObjectId,
     objectMeta:Mixed,
+    event:{ type:String, default:'system'},
     time: {
         type:Date,
         default: Date.now

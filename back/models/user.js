@@ -11,8 +11,8 @@ var ExpiringToken = require('../models/expiringToken');
 var Challenge = require('../models/challenge');
 var mail = require('../config/mail');
 
-var ObjectId = mongoose.Schema.ObjectId;
-var Mixed = mongoose.Schema.Mixed;
+var ObjectId = mongoose.Schema.Types.ObjectId;
+var Mixed = mongoose.Schema.Types.Mixed;
 
 var TEACHER = 'teacher';
 var STUDENT = 'student';
@@ -24,15 +24,19 @@ var ADMIN = 'admin';
  *
  * @attribute username      String          username used to login
  * @attribute email         String          email belonging to the user
+ * @attribute uniId         String          university ID belonging to the user
+ * @attribute lectureGroup  String          lecture group used for segmentation (should probably abstract these data later)
+ * @attribute labGroup      String          lab group used for segmentation (should probably abstract these data later)
  * @attribute password      String          password used to login
  * @attribute activated     Boolean         whther this user was activated or not
  * @attribute token         String          used for login and accessing api
+ * @attribute flags         Object          an object containing flags that enable and disbale features
  * @attribute role          String          can be student, teacher, or admin
  * @attribute exp           Number          indicates the amount of experiance the user poseses
  * @attribute rp            Number          indicates the amount of reward points the user accumilated
  * @attribute challenges    [Challenge]     challanges the user created
  * @attribute trials        [Trial]         trials the user started/passed
- * @attribute arenasTried   [ArenaTrial]    arneas the user entered/passed
+ * @attribute userArenas   [UserArena]    arneas the user entered/passed
  * @attribute groups        [Group]         groups owned by the user
  * @attribute group         Group           group he is a member of
  *
@@ -70,6 +74,12 @@ var userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    flags: {
+        type:Mixed,
+        default: function () {
+            {}
+        }
+    },
     token: String,
     role: {
         type: String,
@@ -79,12 +89,12 @@ var userSchema = new mongoose.Schema({
     exp: {
         type: Number,
         'default': 0,
-        min:0
+        min: 0
     }, // experience points
     rp: {
         type: Number,
         'default': 0,
-        min:0
+        min: 0
     }, // reputation points
     challenges: {
         type: [ObjectId],
@@ -98,9 +108,9 @@ var userSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Trial'
     }],
-    arenasTried: [{
+    userArenas: [{
         type: ObjectId,
-        ref: 'ArenaTrial'
+        ref: 'UserArena'
     }],
     memberships: [{
         type: ObjectId,
@@ -110,9 +120,9 @@ var userSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'UserQuest'
     }],
-    activities:[{
+    activities: [{
         type: ObjectId,
-        ref:'Activity'
+        ref: 'Activity'
     }]
 });
 
@@ -226,37 +236,45 @@ userSchema.methods.award = function(type, value, obj) {
         $inc: {}
     };
     update.$inc[type] = value;
-    Model.findByIdAndUpdate(this.id, update, function(err, user) {
-        if (err) throw err;
+    Model.findByIdAndUpdate(this.id, update, {new:true}, function(err, user) {
+        if(err) return err;
         // console.log('sending', err,user, obj);
         observer.emit('user.awarded', user, type, value);
     });
 };
 
 
-userSchema.statics.findByIdentity = function (identity) {
+userSchema.statics.findByIdentity = function(identity) {
     var Model = this.db.model('User');
     return Model.findOne({
-                $or: [{
-                    'username': identity
-                }, {
-                    'email': identity,
-                }, {
-                    'uniId': identity,
-                }]
-            }).exec();
+        $or: [{
+            'username': identity
+        }, {
+            'email': identity,
+        }, {
+            'uniId': identity,
+        }]
+    }).exec();
 };
 
-userSchema.statics.setSocketId = function (uid, sid) {
+userSchema.statics.setSocketId = function(uid, sid) {
     var Model = this.db.model('User');
-    return Promise.fulfilled().then(function () {
-        return Model.update({_id:uid}, { $set: { socketId: sid }}).exec();
+    return Promise.fulfilled().then(function() {
+        return Model.update({
+            _id: uid
+        }, {
+            $set: {
+                socketId: sid
+            }
+        }).exec();
     });
 };
-userSchema.statics.getUserBySocketId = function (sid) {
+userSchema.statics.getUserBySocketId = function(sid) {
     var Model = this.db.model('User');
-    return Promise.fulfilled().then(function () {
-        return Model.findOne({ socketId: sid }).exec();
+    return Promise.fulfilled().then(function() {
+        return Model.findOne({
+            socketId: sid
+        }).exec();
     });
 };
 
@@ -265,4 +283,3 @@ var User = mongoose.model('User', userSchema);
 require('../events/user').model(User);
 
 module.exports = User;
-
