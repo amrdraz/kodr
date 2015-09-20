@@ -103,11 +103,6 @@ app.use(express.static(path.join(__dirname, '../app')));
 
 require('./routes')(app, passport);
 
-app.get('/*', function (req, res, next) {
-    res.redirect('/');
-});
-
-
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
