@@ -9,7 +9,6 @@ back/config/dev.js
 data
 design
 bin
-lib
 run
 haraka
 *.rdb
