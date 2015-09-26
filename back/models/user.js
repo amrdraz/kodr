@@ -55,6 +55,8 @@ var userSchema = new mongoose.Schema({
         type: String,
         match: /^\d+\-\d{3,5}$/,
     },
+    lectureGroup:String,
+    labGroup:String,
     email: {
         type: String,
         unique: true,
