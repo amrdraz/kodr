@@ -33,6 +33,28 @@ module.exports = function(app, passport) {
         app.get('/seed_db', require('./seed_db'));
     }
 
+     app.get('/pull/master', access.requireRole('admin') ,function(req, res) {
+        var exec = require('child_process').exec;
+        exec('./pull.sh', {
+            cwd: __dirname + '/..',
+            env: process.env
+        }, function(err, stout, sterr) {
+            if (err) {
+                log("failed to complete pull request");
+                log(err);
+                log(stout);
+                log(sterr);
+                return res.send(500);
+            }
+            if (sterr) {
+                log(sterr);
+                return res.send(500);
+            }
+            log("pull complete");
+            return res.send(200);
+        });
+    });
+
     /**
      * POST /token
      * Sign in using identification and password.
@@ -41,6 +63,7 @@ module.exports = function(app, passport) {
      */
 
     app.post('/token', function(req, res, next) {
+        req = processFields(req);
         passport.authenticate('local-login', function(err, user) {
             if (err) return next(err);
             if (user) {
@@ -158,62 +181,68 @@ module.exports = function(app, passport) {
                 }
                 res.send(500, err.message);
             });
+    });
 
-        function validateRequestBody(req) {
-            return function() {
-                if (!req.body.username) {
-                    throw {
-                        http_code: 400,
-                        message: 'Username cannot be blank.'
-                    };
-                }
-                if (req.body.uniId && !/^\d+\-\d{3,5}$/.test(req.body.uniId)) {
-                    throw {
-                        http_code: 400,
-                        message: 'Invalid Uni ID'
-                    };
-                }
-                // if (!req.body.email) {
-                //     throw {
-                //         http_code: 400,
-                //         message: 'Email cannot be blank.'
-                //     };
-                // }
-                if (!req.body.password) {
-                    throw {
-                        http_code: 400,
-                        message: 'Password cannot be blank.'
-                    };
-                }
-
-                if (req.body.password !== req.body.passwordConfirmation) {
-                    throw {
-                        http_code: 400,
-                        message: 'Passwords do not match.'
-                    };
-                }
-                // if (!(/^.+@.+\..+$/.test(req.body.email) || /^\S+\.\S+@guc\.edu\.eg$/.test(req.body.email) || /^\S+\.\S+@student\.guc\.edu\.eg$/.test(req.body.email))) {
-                //     throw {
-                //         http_code: 401,
-                //         message: 'Invalid Email'
-                //     };
-                // }
-                return req;
-            };
-        }
-
-        function processFields(req) {
-            req.body.username = _.trim(req.body.username).toLowerCase();
-            if(!req.body.email) {
-                req.body.email = req.body.username+"@student.guc.edu.eg";
-            } else {
-                req.body.email = req.body.email.toLowerCase();
+    function validateRequestBody(req) {
+        return function() {
+            if (!req.body.username) {
+                throw {
+                    http_code: 400,
+                    message: 'Username cannot be blank.'
+                };
             }
-            return req;
-        }
+            if (req.body.uniId && !/^\d+\-\d{3,5}$/.test(req.body.uniId)) {
+                throw {
+                    http_code: 400,
+                    message: 'Invalid Uni ID'
+                };
+            }
+            // if (!req.body.email) {
+            //     throw {
+            //         http_code: 400,
+            //         message: 'Email cannot be blank.'
+            //     };
+            // }
+            if (!req.body.password) {
+                throw {
+                    http_code: 400,
+                    message: 'Password cannot be blank.'
+                };
+            }
 
-        function findUser(req) {
-            return [
+            if (req.body.password !== req.body.passwordConfirmation) {
+                throw {
+                    http_code: 400,
+                    message: 'Passwords do not match.'
+                };
+            }
+            // if (!(/^.+@.+\..+$/.test(req.body.email) || /^\S+\.\S+@guc\.edu\.eg$/.test(req.body.email) || /^\S+\.\S+@student\.guc\.edu\.eg$/.test(req.body.email))) {
+            //     throw {
+            //         http_code: 401,
+            //         message: 'Invalid Email'
+            //     };
+            // }
+            return req;
+        };
+    }
+
+    function processFields(req) {
+        if (req.body.identification) {
+            req.body.identification = _.trim(req.body.identification).toLowerCase();
+        }
+        if (req.body.username) {
+            req.body.username = _.trim(req.body.username).toLowerCase();
+        }
+        if (!req.body.email && req.body.username) {
+            req.body.email = req.body.username + "@student.guc.edu.eg";
+        } else if(req.body.email) {
+            req.body.email = req.body.email.toLowerCase();
+        }
+        return req;
+    }
+
+    function findUser(req) {
+        return [
             req,
             User.findOne({
                 $or: [{
@@ -221,84 +250,61 @@ module.exports = function(app, passport) {
                 }, {
                     'email': req.body.email,
                 }]
-            }).exec()];
-        }
+            }).exec()
+        ];
+    }
 
-        function createIfNewUser(req, user) {
-            if (user) {
-                throw {
-                    http_code: 400,
-                    message: 'User already exists'
-                };
-            }
-            var role = getRoleByEmail(req.body.email);
-            var flags = {};
-            return Promise.fulfilled().then(function () {
-                return User.find({}).count({}).exec();
-            }).then(function (count) {
-                console.log(req.body);
-                flags.no_setup = flags.is_experiment = (count%2===0);
-                flags.is_control = !flags.is_experiment;
-                return User.create({
-                    username: req.body.username,
-                    email: req.body.email,
-                    uniId: req.body.uniId,
-                    lectureGroup: req.body.lectureGroup,
-                    labGroup: req.body.labGroup,
-                    password: req.body.password,
-                    role: role,
-                    flags:flags,
-                    activated: false
-                });
+    function createIfNewUser(req, user) {
+        if (user) {
+            throw {
+                http_code: 400,
+                message: 'User already exists'
+            };
+        }
+        var role = getRoleByEmail(req.body.email);
+        var flags = {};
+        return Promise.fulfilled().then(function() {
+            return User.find({}).count({}).exec();
+        }).then(function(count) {
+            flags.no_setup = flags.is_experiment = (count % 2 === 0);
+            flags.is_control = !flags.is_experiment;
+            return User.create({
+                username: req.body.username,
+                email: req.body.email,
+                uniId: req.body.uniId,
+                lectureGroup: req.body.lectureGroup,
+                labGroup: req.body.labGroup,
+                password: req.body.password,
+                role: role,
+                flags: flags,
+                activated: false
             });
-        }
+        });
+    }
 
 
-        function getRoleByEmail(email) {
-            if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
-                return 'teacher';
-            } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
-                return 'student';
-            }
+    function getRoleByEmail(email) {
+        if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
+            return 'teacher';
+        } else if (/^\S+\.\S+@student\.guc\.edu\.eg$/.test(email)) {
             return 'student';
         }
+        return 'student';
+    }
 
-        function emitAndRespond(res) {
-            if (process.env.NODE_ENV === 'test') {
-                return function(user) {
-                    observer.emit('user.signup', user);
-                    observer.once('test.user.signup.response', function(body) {
-                        res.send(body);
-                    });
-                };
-            } else {
-                return function(user) {
-                    observer.emit('user.signup', user);
-                    res.send(200, "Check your email for verification");
-                };
-            }
+    function emitAndRespond(res) {
+        if (process.env.NODE_ENV === 'test') {
+            return function(user) {
+                observer.emit('user.signup', user);
+                observer.once('test.user.signup.response', function(body) {
+                    res.send(body);
+                });
+            };
+        } else {
+            return function(user) {
+                observer.emit('user.signup', user);
+                res.send(200, "Check your email for verification");
+            };
         }
-    });
-
-    app.get('/pull/master', function(req,res) {
-        var exec = require('child_process').exec;
-        exec('./pull.sh', {
-            cwd: __dirname + '/..',
-            env: process.env
-        }, function (err, stout,sterr) {
-            if(err) {
-                log("failed to complete pull request");
-                log(err);
-                log(stout);
-                log(sterr);
-                return res.send(500);
-            }
-            if (sterr) {
-                log(sterr);
-                return res.send(500);
-            }
-            log("pull complete");
-            return res.send(200);
-        });
-    });
+    }
 };
