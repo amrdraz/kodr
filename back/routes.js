@@ -203,9 +203,11 @@ module.exports = function(app, passport) {
         }
 
         function processFields(req) {
-            req.body.username = _.trim(req.body.username);
+            req.body.username = _.trim(req.body.username).toLowerCase();
             if(!req.body.email) {
                 req.body.email = req.body.username+"@student.guc.edu.eg";
+            } else {
+                req.body.email = req.body.email.toLowerCase();
             }
             return req;
         }
