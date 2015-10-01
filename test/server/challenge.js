@@ -206,7 +206,7 @@ describe('Challenge', function() {
             it("should not create a challenge if student", function(done) {
                 request(api)
                     .post("/challenges")
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(challenge)
                     .expect(401)
                     .end(done);
@@ -216,7 +216,7 @@ describe('Challenge', function() {
             it("should create a challenge only if teacher", function(done) {
                 request(api)
                     .post("/challenges")
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .send(challenge)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -234,7 +234,7 @@ describe('Challenge', function() {
                 it("should run java code based on language returning stout and sterr", function(done) {
                     request(api)
                         .post("/challenges/run")
-                        .set('Authorization', 'Bearer ' + student.token)
+                        .set('X-K-Authorization', 'Bearer ' + student.token)
                         .send({
                             code: code,
                             language: 'java'
@@ -250,7 +250,7 @@ describe('Challenge', function() {
                 it("should run java code with inputs", function(done) {
                     request(api)
                         .post("/challenges/run")
-                        .set('Authorization', 'Bearer ' + student.token)
+                        .set('X-K-Authorization', 'Bearer ' + student.token)
                         .send({
                             code: code,
                             language: 'java',
@@ -267,7 +267,7 @@ describe('Challenge', function() {
                 it("should test java code", function(done) {
                     request(api)
                         .post("/challenges/test")
-                        .set('Authorization', 'Bearer ' + student.token)
+                        .set('X-K-Authorization', 'Bearer ' + student.token)
                         .send({
                             code: code,
                             challenge: testchallenge
@@ -335,7 +335,7 @@ describe('Challenge', function() {
             it("should not create a challenge if student", function(done) {
                 request(api)
                     .put("/challenges/" + challenge.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send({
                         challenge: {
                             isPublished: true
@@ -349,7 +349,7 @@ describe('Challenge', function() {
             it("should update a challenge only if teacher", function(done) {
                 request(api)
                     .put("/challenges/" + challenge.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .send({
                         challenge: {
                             isPublished: true
@@ -377,7 +377,7 @@ describe('Challenge', function() {
             it("should not delete a challenge if student", function(done) {
                 request(api)
                     .del("/challenges/" + challenge.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send()
                     .expect(401)
                     .end(done);
@@ -387,7 +387,7 @@ describe('Challenge', function() {
             it("should delete a challenge removing it from it's arena", function(done) {
                 request(api)
                     .del("/challenges/" + challenge.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(204);

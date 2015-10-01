@@ -250,7 +250,7 @@ describe('Trial', function() {
             it("should create a trial", function(done) {
                 request(api)
                     .post("/trials")
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .send(trial)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -270,7 +270,7 @@ describe('Trial', function() {
 
                 request(api)
                     .get("/trials/" + trial.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -287,7 +287,7 @@ describe('Trial', function() {
                 //     trials[0]._id.toString().shoul.equal(trial.id);
                 request(api)
                     .get("/trials")
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -306,7 +306,7 @@ describe('Trial', function() {
                 request(api)
                     .get("/trials")
                     .query({arena:challenge.arena})
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -330,7 +330,7 @@ describe('Trial', function() {
             // it("should not update someone elses trial", function(done) {
             //     request(api)
             //         .put("/trials/" + trial.id)
-            //         .set('Authorization', 'Bearer ' + student.token)
+            //         .set('X-K-Authorization', 'Bearer ' + student.token)
             //         .send({
             //             trial: {
             //                 complete: true
@@ -347,7 +347,7 @@ describe('Trial', function() {
                 }).then(function(tr) {
                     request(api)
                         .put("/trials/" + tr.id)
-                        .set('Authorization', 'Bearer ' + student.token)
+                        .set('X-K-Authorization', 'Bearer ' + student.token)
                         .send({
                             trial: {
                                 complete: true
@@ -370,7 +370,7 @@ describe('Trial', function() {
             //     }).then(function(tr){
             //         request(api)
             //         .put("/trials/" + tr.id+"/run")
-            //         .set('Authorization', 'Bearer ' + student.token)
+            //         .set('X-K-Authorization', 'Bearer ' + student.token)
             //         .send(trial)
             //         .expect(200)
             //         .end(done);
@@ -384,7 +384,7 @@ describe('Trial', function() {
             //     }).then(function(tr){
             //         request(api)
             //         .put("/trials/" + tr.id+"/submit")
-            //         .set('Authorization', 'Bearer ' + student.token)
+            //         .set('X-K-Authorization', 'Bearer ' + student.token)
             //         .send(trial)
             //         .expect(200)
             //         .end(done);
@@ -394,7 +394,7 @@ describe('Trial', function() {
             it("should update a trial if teacher regardless of ownership", function(done) {
                 request(api)
                     .put("/trials/" + trial.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .send({
                         trial: {
                             complete: false
@@ -422,7 +422,7 @@ describe('Trial', function() {
             it("should not delete someone elses trial if you're a student", function(done) {
                 request(api)
                     .del("/trials/" + trial.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send()
                     .expect(401)
                     .end(done);
@@ -435,7 +435,7 @@ describe('Trial', function() {
                 }).then(function(tr) {
                     request(api)
                         .del("/trials/" + tr.id)
-                        .set('Authorization', 'Bearer ' + student.token)
+                        .set('X-K-Authorization', 'Bearer ' + student.token)
                         .send()
                         .expect(200)
                         .end(done);
@@ -446,7 +446,7 @@ describe('Trial', function() {
 
                 request(api)
                     .del("/trials/" + trial.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);

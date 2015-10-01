@@ -269,7 +269,7 @@ describe('UserQuest', function() {
             it("should not create a userQuest if student", function(done) {
                 request(api)
                     .post("/userQuests")
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(userQuest)
                     .expect(401)
                     .end(done);
@@ -278,7 +278,7 @@ describe('UserQuest', function() {
             it("should create a userQuest if teacher", function(done) {
                 request(api)
                     .post("/userQuests")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(userQuest)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -305,7 +305,7 @@ describe('UserQuest', function() {
             it("should return a userQuest", function(done) {
                 request(api)
                     .get("/userQuests/" + userQuest.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -325,7 +325,7 @@ describe('UserQuest', function() {
             it("should return a list of all userQuests on if teacher", function(done) {
                 request(api)
                     .get("/userQuests")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -359,7 +359,7 @@ describe('UserQuest', function() {
                 };
                 request(api)
                     .put("/userQuests/" + userQuest.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(update)
                     .expect(401)
                     .end(done);
@@ -373,7 +373,7 @@ describe('UserQuest', function() {
                 };
                 request(api)
                     .put("/userQuests/" + userQuest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -397,7 +397,7 @@ describe('UserQuest', function() {
             it("should not delete a userQuest if student", function(done) {
                 request(api)
                     .del("/userQuests/" + userQuest.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .expect(401)
                     .end(done);
             });
@@ -405,7 +405,7 @@ describe('UserQuest', function() {
             it("should delete a userQuest if teacher", function(done) {
                 request(api)
                     .del("/userQuests/" + userQuest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .expect(200)
                     .end(done);
             });
@@ -413,7 +413,7 @@ describe('UserQuest', function() {
             it("should not delete throw an error if userQuest already deleted", function(done) {
                 request(api)
                     .del("/userQuests/" + userQuest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .expect(404)
                     .end(done);
             });

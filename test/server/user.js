@@ -527,7 +527,7 @@ describe('User', function() {
             it("should not create as a student if student", function(done) {
                 request(api)
                     .post("/users")
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(user)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -550,7 +550,7 @@ describe('User', function() {
             it("should activate user if admin", function(done) {
                 request(api)
                     .put("/users/" + student._id + "/activate")
-                    .set('Authorization', 'Bearer ' + admin.token)
+                    .set('X-K-Authorization', 'Bearer ' + admin.token)
                     .send()
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -624,7 +624,7 @@ describe('User', function() {
             it("should create a user via post if admin", function(done) {
                 request(api)
                     .post("/users")
-                    .set('Authorization', 'Bearer ' + admin.token)
+                    .set('X-K-Authorization', 'Bearer ' + admin.token)
                     .send({
                         user: user
                     })
@@ -643,7 +643,7 @@ describe('User', function() {
             it("should return a user by id", function(done) {
                 request(api)
                     .get("/users/" + user.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -655,7 +655,7 @@ describe('User', function() {
             it("should return a list of all users", function(done) {
                 return request(api)
                     .get("/users")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .then(function(res) {
                         res.status.should.equal(200);
                         res.body.user.length.should.equal(3);
@@ -678,7 +678,7 @@ describe('User', function() {
             it("should not update a user if student", function(done) {
                 return request(api)
                     .put("/users/" + user.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send({
                         user: {
                             email: 'user@mail.com'
@@ -693,7 +693,7 @@ describe('User', function() {
             it("should update a user if teacher", function(done) {
                 return request(api)
                     .put("/users/" + user.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send({
                         user: {
                             email: 'user@mail.com'
@@ -708,7 +708,7 @@ describe('User', function() {
             it("should update a user if updating himself", function(done) {
                 return request(api)
                     .put("/users/" + student._id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send({
                         user: {
                             email: 'student@email.com'
@@ -734,7 +734,7 @@ describe('User', function() {
             it("should not work if not teacher", function(done) {
                 request(api)
                     .del("/users/" + user.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .end(function(err, res) {
                         if (err) done(err);
                         res.status.should.equal(401);
@@ -745,7 +745,7 @@ describe('User', function() {
             it("should delete a user if teacher", function(done) {
                 request(api)
                     .del("/users/" + user.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);

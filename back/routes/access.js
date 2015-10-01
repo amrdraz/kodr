@@ -3,11 +3,11 @@ var User = require('../models/user');
 
 exports.hasToken = function(req, res, next) {
 
-    if (!req.get('Authorization')) {
+    if (!req.get('X-K-Authorization')) {
         res.send(401, "Unauthorized");
         return;
     }
-    var token = req.get('Authorization');
+    var token = req.get('X-K-Authorization');
 
     User.findOne({
         token: token.replace('Bearer ', '')
@@ -39,11 +39,11 @@ exports.requireRole = function(roles) {
     return function(req, res, next) {
         if (req.user && _.contains(roles, req.user.role))
             next();
-        else if (!req.get('Authorization')) {
+        else if (!req.get('X-K-Authorization')) {
             res.send(401, "Unauthorized");
             return;
         }
-        var token = req.get('Authorization');
+        var token = req.get('X-K-Authorization');
 
         User.findOne({
             token: token.replace('Bearer ', '')

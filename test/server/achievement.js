@@ -176,7 +176,7 @@ describe('Achievement', function() {
             it("should not create a group if student", function(done) {
                 request(api)
                     .post("/groups")
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(group)
                     .expect(401)
                     .end(done);
@@ -185,7 +185,7 @@ describe('Achievement', function() {
             it("should create a group if teacher", function(done) {
                 request(api)
                     .post("/groups")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(group)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -214,7 +214,7 @@ describe('Achievement', function() {
             it("should return a group by id with its users only if teacher", function(done) {
                 request(api)
                     .get("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -235,7 +235,7 @@ describe('Achievement', function() {
             it("should return a list of all groups on if teacher", function(done) {
                 request(api)
                     .get("/groups")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -269,7 +269,7 @@ describe('Achievement', function() {
                 };
                 request(api)
                     .put("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(update)
                     .expect(401)
                     .end(done);
@@ -283,7 +283,7 @@ describe('Achievement', function() {
                 };
                 request(api)
                     .put("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -301,7 +301,7 @@ describe('Achievement', function() {
                 };
                 request(api)
                     .put("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -320,7 +320,7 @@ describe('Achievement', function() {
             //     };
             //     request(api)
             //         .put("/groups/" + group.id)
-            //         .set('Authorization', 'Bearer ' + teacher.token)
+            //         .set('X-K-Authorization', 'Bearer ' + teacher.token)
             //         .send(update)
             //         .end(function(err, res) {
             //             if (err) return done(err);
@@ -344,7 +344,7 @@ describe('Achievement', function() {
             it("should not delete a group if student", function(done) {
                 request(api)
                     .del("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .expect(401)
                     .end(done);
             });
@@ -352,7 +352,7 @@ describe('Achievement', function() {
             it("should delete a group if teacher", function(done) {
                 request(api)
                     .del("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .expect(200)
                     .end(done);
             });
@@ -360,7 +360,7 @@ describe('Achievement', function() {
             it("should not delete throw an error if group already deleted", function(done) {
                 request(api)
                     .del("/groups/" + group.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .expect(404)
                     .end(done);
             });

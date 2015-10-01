@@ -167,7 +167,7 @@ describe('Arena', function() {
             it("should not create an arean if student", function(done) {
                 request(api)
                     .post("/arenas")
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(arena)
                     .expect(401)
                     .end(done);
@@ -176,7 +176,7 @@ describe('Arena', function() {
             it("should create an arean if teacher", function(done) {
                 request(api)
                     .post("/arenas")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(arena)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -219,7 +219,7 @@ describe('Arena', function() {
             it("should return a arena and userArena", function(done) {
                 request(api)
                     .get("/arenas/"+arena.id+"/userArena")
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -249,7 +249,7 @@ describe('Arena', function() {
                 };
                 request(api)
                     .put("/arenas/" + arena.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(update)
                     .expect(401)
                     .end(done);
@@ -263,7 +263,7 @@ describe('Arena', function() {
                 };
                 request(api)
                     .put("/arenas/" + arena.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -286,7 +286,7 @@ describe('Arena', function() {
             it("should delete an arena if student", function(done) {
                 request(api)
                     .del("/arenas/" + arena.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .expect(401)
                     .end(done);
             });
@@ -294,7 +294,7 @@ describe('Arena', function() {
             it("should delete an arena if teacher", function(done) {
                 request(api)
                     .del("/arenas/" + arena.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -308,7 +308,7 @@ describe('Arena', function() {
             it("should not delete throw an error if arena already deleted", function(done) {
                 request(api)
                     .del("/arenas/" + arena.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .expect(404)
                     .end(done);
             });

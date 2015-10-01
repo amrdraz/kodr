@@ -234,7 +234,7 @@ describe('UserArena', function() {
             it("should create a userArena", function(done) {
                 return request(api)
                     .post("/userArenas")
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .send(userArena)
                     .then(function(res) {
                         res.status.should.equal(200);
@@ -251,7 +251,7 @@ describe('UserArena', function() {
             it("should return a userArena by id", function(done) {
                 request(api)
                     .get("/userArenas/" + userArena.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -263,7 +263,7 @@ describe('UserArena', function() {
             it("should return a list of all userArenas", function(done) {
                 request(api)
                     .get("/userArenas")
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -276,7 +276,7 @@ describe('UserArena', function() {
             it("should return an userArena by arena_id", function(done) {
                 request(api)
                     .get("/userArenas")
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .query({
                         arena: arena.id
                     })
@@ -304,7 +304,7 @@ describe('UserArena', function() {
             it("should not update someone elses userArena", function(done) {
                 request(api)
                     .put("/userArenas/" + userArena.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send({
                         userArena: {
                             complete: true
@@ -321,7 +321,7 @@ describe('UserArena', function() {
                 }).then(function(tr) {
                     request(api)
                         .put("/userArenas/" + tr.id)
-                        .set('Authorization', 'Bearer ' + student.token)
+                        .set('X-K-Authorization', 'Bearer ' + student.token)
                         .send({
                             userArena: {
                                 complete: true
@@ -335,7 +335,7 @@ describe('UserArena', function() {
             it("should update a userArena without user", function(done) {
                 request(api)
                     .put("/userArenas/" + userArena.id)
-                    .set('Authorization', 'Bearer ' + accessToken)
+                    .set('X-K-Authorization', 'Bearer ' + accessToken)
                     .send({
                         userArena: {
                             complete: true
@@ -363,7 +363,7 @@ describe('UserArena', function() {
             it("should not delete someone elses userArena if you're a student", function(done) {
                 request(api)
                     .del("/userArenas/" + userArena.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send()
                     .expect(401)
                     .end(done);
@@ -376,7 +376,7 @@ describe('UserArena', function() {
                 }).then(function(tr) {
                     request(api)
                         .del("/userArenas/" + tr.id)
-                        .set('Authorization', 'Bearer ' + student.token)
+                        .set('X-K-Authorization', 'Bearer ' + student.token)
                         .send()
                         .expect(200)
                         .end(done);
@@ -390,7 +390,7 @@ describe('UserArena', function() {
                 }).then(function(userArena) {
                     request(api)
                         .del("/userArenas/" + userArena.id)
-                        .set('Authorization', 'Bearer ' + accessToken)
+                        .set('X-K-Authorization', 'Bearer ' + accessToken)
                         .end(function(err, res) {
                             if (err) return done(err);
                             res.status.should.equal(200);
@@ -406,7 +406,7 @@ describe('UserArena', function() {
                 UserArena.findByIdAndRemove(userArena.id).exec().then(function() {
                     request(api)
                         .del("/userArenas/" + userArena.id)
-                        .set('Authorization', 'Bearer ' + accessToken)
+                        .set('X-K-Authorization', 'Bearer ' + accessToken)
                         .send()
                         .expect(404)
                         .end(done);

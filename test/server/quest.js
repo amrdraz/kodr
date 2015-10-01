@@ -240,7 +240,7 @@ describe('Quest', function() {
             it("should not create a quest if student", function(done) {
                 request(api)
                     .post("/quests")
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(quest)
                     .expect(401)
                     .end(done);
@@ -249,7 +249,7 @@ describe('Quest', function() {
             it("should create a quest if teacher", function(done) {
                 request(api)
                     .post("/quests")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(quest)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -276,7 +276,7 @@ describe('Quest', function() {
             it("should return a quest by id without its users if student", function(done) {
                 request(api)
                     .get("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -289,7 +289,7 @@ describe('Quest', function() {
             it("should return a quest by id with its users only if teacher", function(done) {
                 request(api)
                     .get("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -311,7 +311,7 @@ describe('Quest', function() {
             it("should return a list of all quests on if teacher", function(done) {
                 request(api)
                     .get("/quests")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -323,7 +323,7 @@ describe('Quest', function() {
             it("should return a list of all users that can be assigned to a quest", function(done) {
                 request(api)
                     .get("/quests/" + quest.id + "/unassignedUsersOptions")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -357,7 +357,7 @@ describe('Quest', function() {
                 };
                 request(api)
                     .put("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(update)
                     .expect(401)
                     .end(done);
@@ -371,7 +371,7 @@ describe('Quest', function() {
                 };
                 request(api)
                     .put("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -388,7 +388,7 @@ describe('Quest', function() {
                 };
                 request(api)
                     .put("/quests/" + quest.id + "/assign")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -405,7 +405,7 @@ describe('Quest', function() {
                 };
                 request(api)
                     .put("/quests/" + quest.id + "/assign")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -428,7 +428,7 @@ describe('Quest', function() {
             it("should not delete a quest if student", function(done) {
                 request(api)
                     .del("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .expect(401)
                     .end(done);
             });
@@ -436,7 +436,7 @@ describe('Quest', function() {
             it("should delete a quest if teacher", function(done) {
                 request(api)
                     .del("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .expect(200)
                     .end(done);
             });
@@ -444,7 +444,7 @@ describe('Quest', function() {
             it("should not delete throw an error if quest already deleted", function(done) {
                 request(api)
                     .del("/quests/" + quest.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .expect(404)
                     .end(done);
             });

@@ -194,7 +194,7 @@ describe('Activity', function() {
             }).then(function (res) {
                 return request(setup.url)
                     .del("/logout")
-                    .set('Authorization', 'Bearer ' + res.body.access_token)
+                    .set('X-K-Authorization', 'Bearer ' + res.body.access_token)
                     .expect(204);
             }).then(function (res) {
                 return Activity.findByVerb('logedout'); 

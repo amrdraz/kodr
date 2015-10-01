@@ -109,7 +109,7 @@ describe('Member', function() {
             it("should not create a member if student", function(done) {
                 request(api)
                     .post("/members")
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(member)
                     .expect(401)
                     .end(done);
@@ -118,7 +118,7 @@ describe('Member', function() {
             it("should not create a member if teacher", function(done) {
                 request(api)
                     .post("/members")
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(member)
                     .expect(401)
                     .end(done);
@@ -127,7 +127,7 @@ describe('Member', function() {
             it("should create a member if admin", function(done) {
                 request(api)
                     .post("/members")
-                    .set('Authorization', 'Bearer ' + admin.token)
+                    .set('X-K-Authorization', 'Bearer ' + admin.token)
                     .send({member:{group:group.id, user:user.student}})
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -155,7 +155,7 @@ describe('Member', function() {
             it("should return a member by id with its members if teacher", function(done) {
                 request(api)
                     .get("/members/" + member.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -175,7 +175,7 @@ describe('Member', function() {
             it("should return a list of all members on if admin", function(done) {
                 request(api)
                     .get("/members")
-                    .set('Authorization', 'Bearer ' + admin.token)
+                    .set('X-K-Authorization', 'Bearer ' + admin.token)
                     .end(function(err, res) {
                         if (err) return done(err);
                         res.status.should.equal(200);
@@ -209,7 +209,7 @@ describe('Member', function() {
                 };
                 request(api)
                     .put("/members/" + member.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .send(update)
                     .expect(401)
                     .end(done);
@@ -223,7 +223,7 @@ describe('Member', function() {
                 };
                 request(api)
                     .put("/members/" + member.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .send(update)
                     .end(function(err, res) {
                         if (err) return done(err);
@@ -247,7 +247,7 @@ describe('Member', function() {
             it("should not delete a member if student", function(done) {
                 request(api)
                     .del("/members/" + member.id)
-                    .set('Authorization', 'Bearer ' + student.token)
+                    .set('X-K-Authorization', 'Bearer ' + student.token)
                     .expect(401)
                     .end(done);
             });
@@ -255,7 +255,7 @@ describe('Member', function() {
             it("should not delete a member if teacher", function(done) {
                 request(api)
                     .del("/members/" + member.id)
-                    .set('Authorization', 'Bearer ' + teacher.token)
+                    .set('X-K-Authorization', 'Bearer ' + teacher.token)
                     .expect(401)
                     .end(done);
             });
@@ -263,7 +263,7 @@ describe('Member', function() {
             it("should not delete a member if teacher", function(done) {
                 request(api)
                     .del("/members/" + member.id)
-                    .set('Authorization', 'Bearer ' + admin.token)
+                    .set('X-K-Authorization', 'Bearer ' + admin.token)
                     .expect(204)
                     .end(done);
             });
@@ -271,7 +271,7 @@ describe('Member', function() {
             it("should not delete and throw an error if member already deleted", function(done) {
                 request(api)
                     .del("/members/" + member.id)
-                    .set('Authorization', 'Bearer ' + admin.token)
+                    .set('X-K-Authorization', 'Bearer ' + admin.token)
                     .expect(404)
                     .end(done);
             });
