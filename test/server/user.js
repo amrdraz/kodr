@@ -276,7 +276,7 @@ describe('User', function() {
         var url = 'http://localhost:3000';
         var user = {
                 username: "amr.draz",
-                labGroup: "CS1",
+                labGroup: "EN 6",
                 lectureGroup: "1",
                 uniId: '13-56575',
                 password: "drazdraz12",
@@ -294,7 +294,7 @@ describe('User', function() {
                     .send({
                         username: "draz.ious",
                         uniId: "13-4345",
-                        labGroup: "CS1",
+                        labGroup: "EN 6",
                         lectureGroup: "1",
                         password: "drazdraz12",
                         passwordConfirmation: "drazdraz12"
@@ -305,6 +305,7 @@ describe('User', function() {
                         should.exist(res.body.user.username);
                         should.exist(res.body.user.email);
                         should.exist(res.body.user.uniId);
+                        expect(res.body.user.flags.is_experiment).to.be.false;
                         done();
                     });
             });
@@ -323,6 +324,44 @@ describe('User', function() {
                         if (err) return done(err);
                         res.status.should.equal(200);
                         expect(res.body.user.email).to.equal("amr.dr@student.guc.edu.eg");
+                        done();
+                    });
+            });
+
+            it("should assign a user in lab group 6 to be in experiment group", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send({
+                        username: "dra.ious",
+                        uniId: "13-4345",
+                        labGroup: "EN 1",
+                        lectureGroup: "1",
+                        password: "drazdraz12",
+                        passwordConfirmation: "drazdraz12"
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        expect(res.body.user.flags.is_experiment).to.be.true;
+                        done();
+                    });
+            });
+
+             it("should assign a user with undefined lab group to assign by count", function(done) {
+                request(url)
+                    .post("/signup")
+                    .send({
+                        username: "dr.ious",
+                        uniId: "13-4345",
+                        labGroup: "T 01",
+                        lectureGroup: "1",
+                        password: "drazdraz12",
+                        passwordConfirmation: "drazdraz12"
+                    })
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        expect(res.body.user.flags.is_experiment).to.be.true;
                         done();
                     });
             });

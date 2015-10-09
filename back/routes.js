@@ -33,7 +33,7 @@ module.exports = function(app, passport) {
         app.get('/seed_db', require('./seed_db'));
     }
 
-     app.get('/pull/master', access.requireRole('admin') ,function(req, res) {
+    app.get('/pull/master', access.requireRole('admin'), function(req, res) {
         var exec = require('child_process').exec;
         exec('./pull.sh', {
             cwd: __dirname + '/..',
@@ -235,7 +235,7 @@ module.exports = function(app, passport) {
         }
         if (!req.body.email && req.body.username) {
             req.body.email = req.body.username + "@student.guc.edu.eg";
-        } else if(req.body.email) {
+        } else if (req.body.email) {
             req.body.email = req.body.email.toLowerCase();
         }
         return req;
@@ -262,12 +262,15 @@ module.exports = function(app, passport) {
             };
         }
         var role = getRoleByEmail(req.body.email);
-        var flags = {};
         return Promise.fulfilled().then(function() {
             return User.find({}).count({}).exec();
         }).then(function(count) {
-            flags.no_setup = flags.is_experiment = (count % 2 === 0);
-            flags.is_control = !flags.is_experiment;
+
+            var flags = getFlags({
+                user: req.body,
+                count: count
+            });
+
             return User.create({
                 username: req.body.username,
                 email: req.body.email,
@@ -282,6 +285,20 @@ module.exports = function(app, passport) {
         });
     }
 
+    function getFlags(params) {
+        var flags = {};
+        var controle = ["EN 6","EN 7","EN 9","EN 11","EN 14","EN 15","EN 25","EN 16","EN 26","EN 27","EN 28","EN 31","EN 34","EN 41","EN 44","EN 45","BI 20","EN 5","EN 22","EN 32","EN 35","EN 37","EN 43","BI 24","BI 22"];
+        var experiment = ["EN 1","EN 2","EN 3","EN 4","EN 8","EN 10","EN 13","EN 17","EN 18","EN 20","EN 21","EN 24","EN 30","EN 38","EN 40","EN 42","BI 19","EN 12","EN 19","EN 23","EN 29","EN 33","EN 36","EN 39","BI 21","BI 23"];
+        if (~_.indexOf(controle, params.user.labGroup)) {
+            flags.no_setup = flags.is_experiment = false;
+        } else if (~_.indexOf(experiment, params.user.labGroup)) {
+            flags.no_setup = flags.is_experiment = true;
+        } else {
+            flags.no_setup = flags.is_experiment = params.count%2===1;
+        }
+        flags.is_control = !flags.is_experiment;
+        return flags;
+    }
 
     function getRoleByEmail(email) {
         if (/^\S+\.\S+@guc\.edu\.eg$/.test(email)) {
