@@ -29,7 +29,6 @@ module.exports = function() {
         }
     }).then(function(u) {
         if(u) {
-            console.log('All Seeded '+pass+" ");
             mail.send({subject:'Admin was initialized', html:'password is '+pass, to:u.email}, function (err, info) {
                 if(err) throw err;
                 console.log('mail sent');

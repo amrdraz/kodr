@@ -19,14 +19,13 @@ var $IntDict = {__class__:$B.$type,
 }
 
 $IntDict.from_bytes = function() {
-  var $ns=$B.$MakeArgs1("from_bytes", 3, 
-      {x:null, byteorder:null, signed:null}, ['x', 'byteorder', 'signed'],
-      arguments, {signed:False}, 'args', 'kw')
+  var $=$B.args("from_bytes", 3, 
+      {bytes:null, byteorder:null, signed:null}, ['bytes', 'byteorder', 'signed'],
+      arguments, {signed:False}, null, null)
 
-  var x = $ns['x']
-  var byteorder = $ns['byteorder']
-  var signed = $ns['signed'] || _b_.dict.$dict.get($ns['kw'],'signed', False)
-
+  var x = $.bytes,
+      byteorder = $.byteorder,
+      signed = $.signed
   var _bytes, _len
   if (isinstance(x, [_b_.list, _b_.tuple])) {
      _bytes=x
@@ -303,8 +302,12 @@ $IntDict.__rshift__ = function(self,other){
 }
 
 $IntDict.__setattr__ = function(self,attr,value){
-    if(self.__class__===$IntDict){
-        throw _b_.AttributeError("'int' object has no attribute "+attr+"'")
+    if(typeof self=="number"){
+        if($IntDict[attr]===undefined){
+            throw _b_.AttributeError("'int' object has no attribute '"+attr+"'")
+        }else{
+            throw _b_.AttributeError("'int' object attribute '"+attr+"' is read-only")
+        }
     }
     // subclasses of int can have attributes set
     self[attr] = value
@@ -465,7 +468,7 @@ var int = function(value, base){
         throw TypeError("can't convert complex to int")
     }
 
-    var $ns=$B.$MakeArgs1('int',2,{x:null,base:null},['x','base'],arguments,
+    var $ns=$B.args('int',2,{x:null,base:null},['x','base'],arguments,
         {'base':10},'null','null')
     var value = $ns['x']
     var base = $ns['base']

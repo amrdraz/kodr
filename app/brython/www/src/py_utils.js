@@ -2,7 +2,7 @@
 
 var _b_=$B.builtins
 
-$B.$MakeArgs1 = function($fname,argcount,slots,var_names,$args,$dobj,
+$B.args = function($fname,argcount,slots,var_names,$args,$dobj,
     extra_pos_args,extra_kw_args){
     // builds a namespace from the arguments provided in $args
     // in a function defined like foo(x,y,z=1,*args,u,v,**kw) the parameters are
@@ -98,7 +98,6 @@ $B.$MakeArgs1 = function($fname,argcount,slots,var_names,$args,$dobj,
     
 }
 
-
 $B.get_class = function(obj){
     // generally we get the attribute __class__ of an object by obj.__class__
     // but Javascript builtins used by Brython (functions, numbers, strings...)
@@ -153,6 +152,8 @@ $B.$list_comp = function(env){
     // Called for list comprehensions
     // "env" is a list of [local_name, local_ns] lists for all the enclosing
     // namespaces
+
+        
     var $ix = $B.UUID()
     var $py = "x"+$ix+"=[]\n", indent = 0
     for(var $i=2, _len_$i = arguments.length; $i < _len_$i;$i++){
@@ -169,13 +170,14 @@ $B.$list_comp = function(env){
         var sc_id = '$locals_'+env[i][0].replace(/\./,'_')
         eval('var '+sc_id+'=env[i][1]')
     }
-    var local_name = env[0][0]
-    var module_env = env[env.length-1]
-    var module_name = module_env[0]
+    
+    var locals_id = env[0][0],
+        module_obj = env[env.length-1],
+        globals_id = module_obj[0]
 
     var listcomp_name = 'lc'+$ix
 
-    var $root = $B.py2js($py,module_name,listcomp_name,local_name,
+    var $root = $B.py2js($py, globals_id, listcomp_name, locals_id,
         $B.line_info)
     
     $root.caller = $B.line_info
@@ -185,11 +187,14 @@ $B.$list_comp = function(env){
         eval($js)
         var res = eval('$locals_'+listcomp_name+'["x"+$ix]')
     }
-    catch(err){throw $B.exception(err)}
+    catch(err){
+        console.log('list comp error\n',err)
+        throw $B.exception(err)
+    }
     finally{
         clear(listcomp_name)
     }
-
+    
     return res
 }
 
@@ -347,8 +352,10 @@ $B.$lambda = function(env,args,body){
 
 $B.$search = function(name, global_ns){
     var res = global_ns[name]
-    //if(res===undefined){console.log('no '+name+' in global ns '+$B.keys(global_ns))}
-    return res !== undefined ? res : $B.$NameError(name)
+    if(res===undefined){
+        throw _b_.NameError(name)
+    }
+    return res
 }
 
 // transform native JS types into Brython types
@@ -377,6 +384,53 @@ $B.$JS2Py = function(src){
     return $B.JSObject(src)
 }
 
+// Functions used if we can guess the type from lexical analysis
+$B.list_key = function(obj, key){
+    key = $B.$GetInt(key)
+    if(key<0){key += obj.length}
+    var res = obj[key]
+    if(res===undefined){throw _b_.IndexError("list index out of range")}
+    return res
+}
+
+$B.list_slice = function(obj, start, stop){
+    if(start===null){start=0}
+    else{
+        start=$B.$GetInt(start)
+        if(start<0){start=Math.max(0, start+obj.length)}
+    }
+    if(stop===null){return obj.slice(start)}
+    stop = $B.$GetInt(stop)
+    if(stop<0){stop=Math.max(0, stop+obj.length)}
+    return obj.slice(start, stop)
+}
+
+$B.list_slice_step = function(obj, start, stop, step){
+    if(step===null||step==1){return $B.list_slice(obj,start,stop)}
+
+    if(step==0){throw _b_.ValueError("slice step cannot be zero")}
+    step = $B.$GetInt(step)
+
+    if(start===null){start = step >=0 ? 0 : obj.length-1}
+    else{
+        start=$B.$GetInt(start)
+        if(start<0){start=Math.min(0, start+obj.length)}
+    }
+    if(stop===null){stop = step >= 0 ? obj.length : -1}
+    else{
+        stop = $B.$GetInt(stop)
+        if(stop<0){stop=Math.max(0, stop+obj.length)}
+    }
+    
+    var res=[], len=obj.length
+    if(step>0){
+        for(var i=start;i<stop;i+=step){res.push(obj[i])}
+    }else{
+        for(var i=start;i>stop;i+=step){res.push(obj[i])}    
+    }
+    return res
+}
+
 // get item
 function index_error(obj){
     var type = typeof obj=='string' ? 'string' : 'list'
@@ -401,8 +455,75 @@ $B.$getitem = function(obj, item){
     return _b_.getattr(obj,'__getitem__')(item)
 }
 
+// Set list key or slice
+$B.set_list_key = function(obj,key,value){
+    try{key = $B.$GetInt(key)}
+    catch(err){
+        if(_b_.isinstance(key, _b_.slice)){
+            return $B.set_list_slice_step(obj,key.start,
+                key.stop,key.step,value)
+        }
+    }
+    if(key<0){key+=obj.length}
+    if(obj[key]===undefined){
+        console.log(obj, key)
+        throw _b_.IndexError('list assignment index out of range')
+    }
+    obj[key]=value
+}
+
+$B.set_list_slice = function(obj,start,stop,value){
+    if(start===null){start=0}
+    else{
+        start=$B.$GetInt(start)
+        if(start<0){start=Math.max(0, start+obj.length)}
+    }
+    if(stop===null){stop=obj.length}
+    stop = $B.$GetInt(stop)
+    if(stop<0){stop=Math.max(0, stop+obj.length)}
+    var res = _b_.list(value)
+    obj.splice.apply(obj,[start, stop-start].concat(res))
+}
+
+$B.set_list_slice_step = function(obj,start,stop,step,value){
+    if(step===null||step==1){return $B.set_list_slice(obj,start,stop,value)}
+
+    if(step==0){throw _b_.ValueError("slice step cannot be zero")}
+    step = $B.$GetInt(step)
+
+    if(start===null){start = step>0 ? 0 : obj.length-1}
+    else{
+        start=$B.$GetInt(start)
+        if(start<0){start=Math.min(0, start+obj.length)}
+    }
+    
+    if(stop===null){stop = step>0 ? obj.length : -1}
+    else{
+        stop = $B.$GetInt(stop)
+        if(stop<0){stop=Math.max(0, stop+obj.length)}
+    }
+    
+    var repl = _b_.list(value),j=0,test,nb=0
+    if(step>0){test = function(i){return i<stop}}
+    else{test = function(i){return i>stop}}
+
+    // Test if number of values in the specified slice is equal to the
+    // length of the replacement sequence
+    for(var i=start;test(i);i+=step){nb++}
+    if(nb!=repl.length){
+            throw _b_.ValueError('attempt to assign sequence of size '+
+                repl.length+' to extended slice of size '+nb)
+    }
+
+    for(var i=start;test(i);i+=step){
+        obj[i]=repl[j]
+        j++
+    }
+}
+
+
 $B.$setitem = function(obj,item,value){
-    if(Array.isArray(obj) && typeof item=='number'){
+    if(Array.isArray(obj) && typeof item=='number' && !_b_.isinstance(obj,_b_.tuple)){
         if(item<0){item+=obj.length}
         if(obj[item]===undefined){throw _b_.IndexError("list assignment index out of range")}
         obj[item]=value
@@ -453,6 +574,7 @@ $B.$syntax_err_line = function(exc,module,pos) {
     var pos2line = {}
     var lnum=1
     var src = $B.$py_src[module]
+    if(src===undefined){console.log('no src for', module)}
     var line_pos = {1:0}
     for(var i=0, _len_i = src.length; i < _len_i;i++){
         pos2line[i]=lnum
@@ -602,9 +724,16 @@ $B.stdout = {
 }
 
 $B.stdin = {
-    __class__:$io,
-    //fix me
-    read: function(size){return ''}
+    __class__: $io,
+    __original__:true,
+    closed: false,
+    len:1, pos:0,
+    read: function () {
+        return '';
+    },
+    readline: function() {
+        return '';
+    }
 }
 
 $B.jsobject2pyobject=function(obj){
@@ -859,7 +988,7 @@ $B.set_func_names = function(klass){
     var name = klass.__name__
     for(var attr in klass){
         if(typeof klass[attr] == 'function'){
-            klass[attr].__name__ = name+'.'+attr
+            klass[attr].$infos = {__name__ : name+'.'+attr}
         }
     }
 }
@@ -876,7 +1005,7 @@ $B.InjectBuiltins=function() {
 
 $B.$GetInt=function(value) {
   // convert value to an integer
-  if(typeof value=="number"){return value}
+  if(typeof value=="number"||value.constructor===Number){return value}
   else if(typeof value==="boolean"){return value ? 1 : 0}
   else if (_b_.isinstance(value, _b_.int)) {return value}
   else if (_b_.isinstance(value, _b_.float)) {return value.valueOf()}
@@ -886,7 +1015,22 @@ $B.$GetInt=function(value) {
       "' object cannot be interpreted as an integer")
 }
 
+$B.int_or_bool = function(v){
+    switch(typeof v){
+        case "bool":
+            return v ? 1 : 0
+        case "number":
+            return v
+        case "object":
+            if(v.__class__===$B.LongInt.$dict){return v}
+        default:
+            throw _b_.TypeError("'"+$B.get_class(v).__name__+
+                "' object cannot be interpreted as an integer")
+    }
+}
+
 $B.enter_frame = function(frame){
+    if($B.frames_stack===undefined){alert('frames stack udef')}
     $B.frames_stack[$B.frames_stack.length]=frame
 }
 
