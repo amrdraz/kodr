@@ -18,6 +18,19 @@
       "browserify-global-shim"
     ]
   },
+  "config": {
+    "blanket": {
+      "pattern": "back",
+      "data-cover-never": [
+        "node_modules",
+        "test",
+        "app",
+        "data",
+        ".tmp",
+        "api"
+      ]
+    }
+  },
   "dependencies": {
     "bcrypt": "^0.8.5",
     "bluebird": "^2.3.0",
@@ -66,11 +79,13 @@
     "node": ">=0.10.0"
   },
   "devDependencies": {
+    "blanket": "^1.1.7",
     "chai": "^3.2.0",
     "mocha": "^2.3.2",
     "sinon": "^1.10.3",
     "superagent": "^0.18.2",
     "supertest": "^0.13.0",
-    "supertest-as-promised": "^1.0.0"
+    "supertest-as-promised": "^1.0.0",
+    "travis-cov": "^0.2.5"
   }
 }
