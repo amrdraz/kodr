@@ -36,9 +36,11 @@
                                                                     <td valign="top" class="textContent">
                                                                         <h3>Hello there</h3>
                                                                         <br />
-                                                                        You requested a to reset your password <br>
+                                                                        You requested a to <a href="{{confirmURL}}">reset your password</a> <br>
                                                                         <br>
-                                                                        <a href="{{confirmURL}}">{{confirmURL}}</a>
+                                                                        <br>
+                                                                        Copy and past the link bellow into your browser
+                                                                        <strong>{{confirmURL}}</strong>
                                                                         {% if token %}
                                                                         <br>
                                                                             {{token}}
