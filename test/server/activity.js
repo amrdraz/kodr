@@ -66,23 +66,35 @@ describe('Activity', function() {
         afterEach(setup.clearDB);
 
         it('should create an activity', function(done) {
-            Activity.new({subject:student, action:'started', object:challenge}).then(function (act) {
+            Activity.new({
+                subject: student,
+                action: 'started',
+                object: challenge
+            }).then(function(act) {
                 should.exist(act);
             }).finally(done);
         });
 
         it('should be able to get subject', function(done) {
-            Activity.new({subject:student, action:'started', object:challenge}).then(function (act) {
+            Activity.new({
+                subject: student,
+                action: 'started',
+                object: challenge
+            }).then(function(act) {
                 return act.getSubject();
-            }).then(function (subject) {
+            }).then(function(subject) {
                 student.id.should.equal(subject.id);
             }).finally(done);
         });
 
         it('should be able to get object', function(done) {
-            Activity.new({subject:student, action:'started', object:challenge}).then(function (act) {
+            Activity.new({
+                subject: student,
+                action: 'started',
+                object: challenge
+            }).then(function(act) {
                 return act.getObject();
-            }).then(function (object) {
+            }).then(function(object) {
                 challenge.id.should.equal(object.id);
             }).finally(done);
         });
@@ -90,124 +102,124 @@ describe('Activity', function() {
 
         it('should log when a user signs up', function(done) {
             request(setup.url)
-            .post("/signup")
-            .send({
-                username: "amr.dr",
-                password: "drazdraz12",
-                passwordConfirmation: "drazdraz12"
-            })
-            .expect(200)
-            .then(function (res) {
-               return Activity.findByVerb('signuped'); 
-            }).then(function (acts) {
-                should.exist(acts);
-                acts.length.should.equal(1);
-                acts[0].verb.should.equal('signuped');
-                acts[0].action.should.equal('signup');
-                done();
-            }).catch(done);
+                .post("/signup")
+                .send({
+                    username: "amr.dr",
+                    password: "drazdraz12",
+                    passwordConfirmation: "drazdraz12"
+                })
+                .expect(200)
+                .then(function(res) {
+                    return Activity.findByVerb('signuped');
+                }).then(function(acts) {
+                    should.exist(acts);
+                    acts.length.should.equal(1);
+                    acts[0].verb.should.equal('signuped');
+                    acts[0].action.should.equal('signup');
+                    done();
+                }).catch(done);
         });
 
         it('should log when a user verifies account', function(done) {
             request(setup.url)
-            .post("/signup")
-            .send({
-                username: "amrdr",
-                email: "amr.draz@guc.edu.eg",
-                password: "drazdraz12",
-                passwordConfirmation: "drazdraz12"
-            })
-            .expect(200)
-            .then(function (res) {
-                var activationToken = res.body.activation_token;
-                return request(setup.url)
-                    .get("/verify/" + activationToken)
-                    .expect(200);
-            }).then(function (res) {
-                return Activity.findByVerb('verified'); 
-            }).then(function (acts) {
-                should.exist(acts);
-                acts.length.should.equal(1);
-                acts[0].verb.should.equal('verified');
-                acts[0].action.should.equal('verify');
-                done();
-            }).catch(done);
+                .post("/signup")
+                .send({
+                    username: "amrdr",
+                    email: "amr.draz@guc.edu.eg",
+                    password: "drazdraz12",
+                    passwordConfirmation: "drazdraz12"
+                })
+                .expect(200)
+                .then(function(res) {
+                    var activationToken = res.body.activation_token;
+                    return request(setup.url)
+                        .get("/verify/" + activationToken)
+                        .expect(200);
+                }).then(function(res) {
+                    return Activity.findByVerb('verified');
+                }).then(function(acts) {
+                    should.exist(acts);
+                    acts.length.should.equal(1);
+                    acts[0].verb.should.equal('verified');
+                    acts[0].action.should.equal('verify');
+                    done();
+                }).catch(done);
         });
 
         it('should log when a user logs in', function(done) {
             request(setup.url)
-            .post("/signup")
-            .send({
-                username: "amrdr",
-                email: "amr.draz@guc.edu.eg",
-                password: "drazdraz12",
-                passwordConfirmation: "drazdraz12"
-            })
-            .expect(200)
-            .then(function (res) {
-                var activationToken = res.body.activation_token;
-                return request(setup.url)
-                    .get("/verify/" + activationToken)
-                    .expect(200);
-            }).then(function (res) {
-                return request(setup.url)
-                    .post("/token")
-                    .send({
-                        identification: "amrdr",
-                        password: "drazdraz12",
-                    })
-                    .expect(200);
-            }).then(function (res) {
-                return Activity.findByVerb('logedin'); 
-            }).then(function (acts) {
-                should.exist(acts);
-                acts.length.should.equal(1);
-                acts[0].verb.should.equal('logedin');
-                acts[0].action.should.equal('login');
-                done();
-            }).catch(done);
+                .post("/signup")
+                .send({
+                    username: "amrdr",
+                    email: "amr.draz@guc.edu.eg",
+                    password: "drazdraz12",
+                    passwordConfirmation: "drazdraz12"
+                })
+                .expect(200)
+                .then(function(res) {
+                    var activationToken = res.body.activation_token;
+                    return request(setup.url)
+                        .get("/verify/" + activationToken)
+                        .expect(200);
+                }).then(function(res) {
+                    return request(setup.url)
+                        .post("/token")
+                        .send({
+                            identification: "amrdr",
+                            password: "drazdraz12",
+                        })
+                        .expect(200);
+                }).then(function(res) {
+                    return Activity.findByVerb('logedin');
+                }).then(function(acts) {
+                    should.exist(acts);
+                    acts.length.should.equal(1);
+                    acts[0].verb.should.equal('logedin');
+                    acts[0].action.should.equal('login');
+                    done();
+                }).catch(done);
         });
 
         it('should log when a user verifies account', function(done) {
             request(setup.url)
-            .post("/signup")
-            .send({
-                username: "amrdr",
-                email: "amr.draz@guc.edu.eg",
-                password: "drazdraz12",
-                passwordConfirmation: "drazdraz12"
-            })
-            .expect(200)
-            .then(function (res) {
-                var activationToken = res.body.activation_token;
-                return request(setup.url)
-                    .get("/verify/" + activationToken)
-                    .expect(200);
-            }).then(function (res) {
-                return request(setup.url)
-                    .post("/token")
-                    .send({
-                        identification: "amrdr",
-                        password: "drazdraz12",
-                    })
-                    .expect(200);
-            }).then(function (res) {
-                return request(setup.url)
-                    .del("/logout")
-                    .set('X-K-Authorization', 'Bearer ' + res.body.access_token)
-                    .expect(204);
-            }).then(function (res) {
-                return Activity.findByVerb('logedout'); 
-            }).then(function (acts) {
-                should.exist(acts);
-                acts.length.should.equal(1);
-                acts[0].verb.should.equal('logedout');
-                acts[0].action.should.equal('logout');
-                done();
-            }).catch(done);
+                .post("/signup")
+                .send({
+                    username: "amrdr",
+                    email: "amr.draz@guc.edu.eg",
+                    password: "drazdraz12",
+                    passwordConfirmation: "drazdraz12"
+                })
+                .expect(200)
+                .then(function(res) {
+                    var activationToken = res.body.activation_token;
+                    return request(setup.url)
+                        .get("/verify/" + activationToken)
+                        .expect(200);
+                }).then(function(res) {
+                    return request(setup.url)
+                        .post("/token")
+                        .send({
+                            identification: "amrdr",
+                            password: "drazdraz12",
+                        })
+                        .expect(200);
+                }).then(function(res) {
+                    return request(setup.url)
+                        .del("/logout")
+                        .set('X-K-Authorization', 'Bearer ' + res.body.access_token)
+                        .expect(204);
+                }).then(function(res) {
+                    return Activity.findByVerb('logedout');
+                }).then(function(acts) {
+                    should.exist(acts);
+                    acts.length.should.equal(1);
+                    acts[0].verb.should.equal('logedout');
+                    acts[0].action.should.equal('logout');
+                    done();
+                }).catch(done);
         });
 
-        
+
         var options = {
             'force new connection': true
         };
@@ -217,14 +229,14 @@ describe('Activity', function() {
             var messages = 0;
 
             client1 = io.connect(setup.url, options);
-            
+
             client1.on('connect', function() {
                 client1.emit('login', student.id);
             });
-            client1.on('test.connect.response', function () {
-                Activity.findByAction('connect').then(function (act) {
-                   return act[0].getSubject(); 
-                }).then(function (subject) {
+            client1.on('test.connect.response', function() {
+                Activity.findByAction('connect').then(function(act) {
+                    return act[0].getSubject();
+                }).then(function(subject) {
                     subject.id.should.equal(student.id);
                     client1.disconnect();
                     done();
@@ -237,7 +249,7 @@ describe('Activity', function() {
         //     var messages = 0;
 
         //     client1 = io.connect(setup.url, options);
-            
+
         //     client1.on('connect', function() {
         //         client1.emit('login', student.id);
         //     });
@@ -265,6 +277,35 @@ describe('Activity', function() {
         //     });
         // });
 
-        
+
+    });
+
+    describe("API", function() {
+        var url = setup.url;
+        var api = setup.api;
+        describe("POST", function() {
+            
+            afterEach(setup.clearDB);
+
+            it("should be able to set activity form python debugger", function(done) {
+                request(api)
+                    .post("/activity")
+                    .send({
+                        "action": "run",
+                        "event": "python-debugger",
+                        "meta": {
+                            "student-id": "16-5240",
+                            "errors": 0
+                        }
+                    })
+                    .expect(200)
+                    .end(function(err, res) {
+                        if (err) return done(err);
+                        res.status.should.equal(200);
+                        expect(res.body.activity.action).to.equal('run');
+                        done();
+                    });
+            });
+        });
     });
 });

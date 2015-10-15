@@ -28,6 +28,8 @@ module.exports = function(app, passport) {
     require('./routes/quest')(app, passport);
     // userQuest routes
     require('./routes/userQuest')(app, passport);
+    // activity routes
+    require('./routes/activity')(app, passport);
 
     if (process.env.NODE_ENV !== 'production') {
         app.get('/seed_db', require('./seed_db'));
