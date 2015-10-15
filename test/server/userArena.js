@@ -171,9 +171,14 @@ describe('UserArena', function() {
         var accessToken;
         var arena = {
             arena: {
-                name: 'Basic Arena',
-                description: 'An arean for some challenges that are basic',
                 isPublished:true,
+                isBeta:false,
+            }
+        };
+        var betaArena = {
+            arena: {
+                isPublished:true,
+                isBeta:true,
             }
         };
         var challenge = {
@@ -205,16 +210,19 @@ describe('UserArena', function() {
                     User.create(teacher),
                     User.create(admin),
                     Arena.create(arena.arena),
+                    Arena.create(betaArena.arena),
                 ];
-            }).spread(function(st, t, a, ar) {
+            }).spread(function(st, t, a, ar, bar) {
                 // console.log(st,t,a);
                 student._id = st._id;
                 student.token = st.token;
                 admin._id = a._id;
                 admin.token = a.token;
                 teacher._id = t._id;
+                teacher.model = t;
                 accessToken = teacher.token = t.token;
                 arena.id = ar.id;
+                betaArena.id = bar.id;
                 userArena.userArena.arena = arena.id;
             }).finally(done);
         });
@@ -260,7 +268,7 @@ describe('UserArena', function() {
                     });
             });
 
-            it("should return a list of all userArenas", function(done) {
+            it("should return a list of all published none beta userArenas", function(done) {
                 request(api)
                     .get("/userArenas")
                     .set('X-K-Authorization', 'Bearer ' + accessToken)
@@ -271,6 +279,22 @@ describe('UserArena', function() {
                         expect(res.body.userArena[0]).to.not.equal(null);
                         done();
                     });
+            });
+
+            it("should return a list of all published including beta userArenas", function(done) {
+                teacher.model.set('flags', {beta:true});
+                teacher.model.save(function () {
+                    request(api)
+                        .get("/userArenas")
+                        .set('X-K-Authorization', 'Bearer ' + accessToken)
+                        .end(function(err, res) {
+                            if (err) return done(err);
+                            res.status.should.equal(200);
+                            res.body.userArena.length.should.equal(2);
+                            expect(res.body.userArena[0]).to.not.equal(null);
+                            done();
+                        });
+                });
             });
 
             it("should return an userArena by arena_id", function(done) {

@@ -27,6 +27,10 @@ var ArenaSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    isBeta: {
+        type:Boolean,
+        default:true
+    },
     requires: {
         type: [ObjectId], ref: 'Requirement'
     },

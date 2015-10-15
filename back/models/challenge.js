@@ -49,33 +49,9 @@ var ChallengeSchema = new mongoose.Schema({
         type: String,
         'default': null,
     },
-    // language: {
-    //     type: String,
-    //     'default': 'java',
-    //     enum: ['javascript', 'java', 'python']
-    // },
-    // inputs: [String],
-    // setup: {
-    //     type: String,
-    //     'default': '// Starting Code leave blank if you want Student to start from scratch\n'
-    // },
-    // solution: {
-    //     type: String,
-    //     'default': '// Challenge Solution goes here\n'
-    // },
-    // tests: {
-    //     type: String,
-    //     'default': '// Challenge Tests go here\n'
-    // },
-    // description: {
-    //     type: String,
-    //     'default': 'A new Challenge'
-    // },
-    // the current state of a cahllenge
-    status: {
-        type: String,
-        'default': 'unPublished',
-        'enum': ['unPublished', 'Beta', 'Published']
+    isBeta: {
+        type:Boolean,
+        default:true
     },
     isPublished: {
         type: Boolean,
