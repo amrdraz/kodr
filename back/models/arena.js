@@ -33,10 +33,6 @@ var ArenaSchema = new mongoose.Schema({
             beta: true
         }
     },
-    isBeta: {
-        type: Boolean,
-        default: true
-    },
     order: {
         type: Number,
         default: 0

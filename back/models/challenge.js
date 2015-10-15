@@ -49,9 +49,11 @@ var ChallengeSchema = new mongoose.Schema({
         type: String,
         'default': null,
     },
-    isBeta: {
-        type:Boolean,
-        default:true
+    flags: {
+        type: Mixed,
+        default: {
+            beta: true
+        }
     },
     isPublished: {
         type: Boolean,

@@ -46,6 +46,22 @@ module.exports = function(schema, options) {
         return Challenge.test(code, this);
     };
 
+    schema.methods.hasFlag = function (flag) {
+        return this.flags && this.flags[flag]!==undefined;
+    };
+
+    schema.methods.getFlag = function (flag) {
+        return this.flags && this.flags[flag];
+    };
+
+    schema.methods.matchFlags = function (flags) {
+        var aflags = this.flags;
+        aflags = _.keys(aflags).filter(function(flag){return aflags[flag];});
+        return _.every(aflags, function (flag) {
+            return flags[flag];
+        });
+    };
+
     schema.statics.test = function(code, challenge) {
         return new Promise(function(resolve, reject) {
             switch (challenge.type) {
