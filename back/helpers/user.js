@@ -60,6 +60,10 @@ module.exports = exports = function (schema, options) {
 
 
     schema.methods.hasFlag = function(flag) {
+        return this.flags && this.flags[flag]!==undefined;
+    };
+
+    schema.methods.getFlag = function(flag) {
         return this.flags && this.flags[flag];
     };
 

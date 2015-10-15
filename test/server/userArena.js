@@ -172,13 +172,14 @@ describe('UserArena', function() {
         var arena = {
             arena: {
                 isPublished:true,
-                isBeta:false,
+                flags:{
+                    beta:false
+                },
             }
         };
         var betaArena = {
             arena: {
                 isPublished:true,
-                isBeta:true,
             }
         };
         var challenge = {

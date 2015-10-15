@@ -60,7 +60,8 @@ module.exports = function(app, passport) {
                 return [
                     arenas,
                     Promise.map(arenas, function (arena) {
-                        if(arena.isPublished && (!arena.isBeta || (arena.isBeta && req.user.hasFlag('beta')))) {
+                        console.log(arena.flags, req.user.flags);
+                        if(arena.isPublished && arena.matchFlags(req.user.flags)) {
                             var obj = {arena:arena.id, user:req.user.id};
                             return UserArena.getOneByQueryOrCreate(obj, obj);
                         }

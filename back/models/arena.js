@@ -24,19 +24,30 @@ var ArenaSchema = new mongoose.Schema({
         type: String,
     },
     isPublished: {
-        type:Boolean,
-        default:false
+        type: Boolean,
+        default: false
+    },
+    flags: {
+        type: Mixed,
+        default: {
+            beta: true
+        }
     },
     isBeta: {
-        type:Boolean,
-        default:true
+        type: Boolean,
+        default: true
+    },
+    order: {
+        type: Number,
+        default: 0
     },
     requires: {
-        type: [ObjectId], ref: 'Requirement'
+        type: [ObjectId],
+        ref: 'Requirement'
     },
-    flow:  {
+    flow: {
         type: String,
-        default:'sequencial',
+        default: 'sequencial',
         enum: ['any', 'sequencial']
     },
     challenges: [{
