@@ -293,9 +293,12 @@ module.exports = function(app, passport) {
         var experiment = ["EN 1","EN 2","EN 3","EN 4","EN 8","EN 10","EN 13","EN 15","EN 17","EN 18","EN 20","EN 21","EN 24","EN 28","EN 30","EN 38","BI 19","EN 12","EN 19","EN 23","EN 29","EN 33","EN 36","EN 39","BI 21","BI 23"];
         if (~_.indexOf(controle, params.user.labGroup)) {
             flags.no_setup = flags.is_experiment = false;
+            flags.csen = true;
         } else if (~_.indexOf(experiment, params.user.labGroup)) {
             flags.no_setup = flags.is_experiment = true;
+            flags.csen = true;
         } else {
+            flags.csis = true;
             flags.no_setup = flags.is_experiment = params.count%2===1;
         }
         flags.is_control = !flags.is_experiment;

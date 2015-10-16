@@ -13,22 +13,17 @@ mongoose.connect(config.db.url);
 
 var User = require('./back/models/user');
 
-console.log('script running');
-
-User.find({labGroup: null, 'flags.beta': {$exists: false}}).exec().then(function (users) {
-    console.log('find users', users.length);
+User.find({}).exec().then(function (users) {
     return Promise.all(users.map(function (user) {
-        console.log(user.username, user.flags);
         var flags = user.get('flags') || {};
-        flags.beta = true;
+        flags.csen = true;
         if(!flags.TA) {
-            flags.jta = true;
+            flags.csis = true;
         }
         user.set('flags', flags);
         user.markModified('flags');
         return new Promise(function (res, rej) {
             user.save(function (err, user) {
-                console.log("after save", user.username, user.flags);
                 if(err) return rej(err);
                 res(user);
             });
