@@ -5,7 +5,7 @@ var smtpPoolTransport = require('nodemailer-smtp-pool');
 var stubTransport = require('nodemailer-stub-transport');
 // var htmlToText = require('nodemailer-html-to-text').htmlToText;
 var path = require('path');
-var emailTemplates = require('swig-email-templates');
+var EmailTemplates = require('swig-email-templates');
 var config = require('./server');
 var options = {
     root: path.join(__dirname, "../views/mail"),
@@ -90,18 +90,19 @@ var send = exports.send = function(mailOptions, cb) {
  */
 var renderAndSend = exports.renderAndSend = function(template, context, mailOptions, cb) {
     return new Promise(function(res, rej) {
-        emailTemplates(options, function(err, render) {
-            if (err) return cb(err);
-            render(template, context, function(err, html, text) {
-                if (err) return cb(err, html);
+        var templates = new EmailTemplates(options);
+        templates.render(template, context, function(err, html, text) {
+            if (err) {
+                if (cb) return cb(err, html);
+                return rej(err);
+            }
 
-                mailOptions.subject = mailOptions.subject || 'Hello There'; // Subject line
-                mailOptions.html = html;
-                mailOptions.text = text;
-                mailOptions.from = mailOptions.from || from;
+            mailOptions.subject = mailOptions.subject || 'Hello There'; // Subject line
+            mailOptions.html = html;
+            mailOptions.text = text;
+            mailOptions.from = mailOptions.from || from;
 
-                return res(send(mailOptions, cb));
-            });
+            return res(send(mailOptions, cb));
         });
     });
 };
@@ -164,22 +165,19 @@ var batchSend = exports.batchSend = function(tos, mailOptions, cb) {
  * @param  {Function} cb          callback after mail is sent
  */
 exports.batchRenderAndSend = function(template, context, tos, mailOptions, cb) {
+    var templates = new EmailTemplates(options);
+    templates.render(template, context, function(err, html, text) {
+        if (err) return cb(err, html);
 
-    emailTemplates(options, function(err, render) {
-        if (err) return cb(err);
-        render(template, context, function(err, html, text) {
-            if (err) return cb(err, html);
+        mailOptions.subject = mailOptions.subject || 'Hello There'; // Subject line
+        mailOptions.html = html;
+        mailOptions.text = text;
+        mailOptions.from = mailOptions.from || from;
 
-            mailOptions.subject = mailOptions.subject || 'Hello There'; // Subject line
-            mailOptions.html = html;
-            mailOptions.text = text;
-            mailOptions.from = mailOptions.from || from;
-
-            if (mailOptions.stub) {
-                stubTransport.sendMail(mailOptions, cb);
-            } else {
-                batchSend.sendMail(tos, mailOptions, cb);
-            }
-        });
+        if (mailOptions.stub) {
+            stubTransport.sendMail(mailOptions, cb);
+        } else {
+            batchSend.sendMail(tos, mailOptions, cb);
+        }
     });
 };

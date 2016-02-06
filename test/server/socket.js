@@ -23,6 +23,7 @@ describe('Socket', function() {
 
         var checkMessage = function(client) {
             client.on('message', function(msg) {
+                console.log('respond');
                 message.should.equal(msg);
                 client.disconnect();
                 messages++;
@@ -31,7 +32,6 @@ describe('Socket', function() {
                 };
             });
         };
-
         client1 = io.connect(setup.url, options);
         checkMessage(client1);
 
@@ -44,7 +44,7 @@ describe('Socket', function() {
                 checkMessage(client3);
 
                 client3.on('connect', function(data) {
-                    client2.send(message);
+                    client1.emit('message', message);
                 });
             });
         });
