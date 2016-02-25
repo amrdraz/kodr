@@ -18,12 +18,15 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * @type {mongoose.Schema}
  */
 
-var PostSchema =  new mongoose.schema({
+var PostSchema =  new mongoose.Schema({
   title: {
-      type: String,
+      type: String
   },
   text: {
-      type: String,
+      type: String
+  },
+  post_type: {
+      type: Number
   },
   author: {
       type: ObjectId,
@@ -41,6 +44,6 @@ var PostSchema =  new mongoose.schema({
   }
 });
 
-PostSchema.plugin(require('../helpers/post'), 'Post');
+//PostSchema.plugin(require('../helpers/post'), 'Post');
 
 var Post = module.exports = mongoose.model('Post', PostSchema);

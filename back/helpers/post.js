@@ -12,6 +12,7 @@ module.exports = exports = function (schema, options) {
      * on every save, add the date
      */
     schema.pre('save', true, function(next, done) {
+        next();
         // get the current date
         var currentDate = new Date();
 
@@ -21,8 +22,6 @@ module.exports = exports = function (schema, options) {
         // if created_at doesn't exist, add to that field
         if (!this.created_at)
           this.created_at = currentDate;
-
-        next();
     });
 
 };
