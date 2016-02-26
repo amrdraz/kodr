@@ -51,7 +51,7 @@
     "memory-streams": "0.0.3",
     "method-override": "~1.0.0",
     "mongoose": "^4.1.6",
-    "mongoose-relationship": "^0.1.4",
+    "mongoose-relationship": "^0.1.5",
     "morgan": "^1.0.1",
     "multer": "^0.1.4",
     "nodemailer": "^1.2.1",

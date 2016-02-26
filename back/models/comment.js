@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
-
+var observer = require('../observer');
+var relationship = require("mongoose-relationship");
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
-
 
 /**
  * Comment Schema.
@@ -22,8 +22,9 @@ var CommentSchema =  new mongoose.Schema({
       type: String
   },
   post: {
-    type: ObjectId,
-    ref: 'Post'      
+      type: ObjectId,
+      ref: 'Post',
+      childPath:"comment"
   },
   author: {
       type: ObjectId,
@@ -41,6 +42,6 @@ var CommentSchema =  new mongoose.Schema({
   }
 });
 
-//CommentSchema.plugin(require('../helpers/comment'), 'Comment');
+CommentSchema.plugin(relationship, { relationshipPathName:'post' });
 
 var Comment = module.exports = mongoose.model('Comment', CommentSchema);

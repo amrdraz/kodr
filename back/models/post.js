@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
-
+var observer = require('../observer');
+var relationship = require("mongoose-relationship");
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 
@@ -11,6 +12,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * @attribute text          String          post markdown
  * @attribute author        [ObjectId]      Id of the User who created the post
  * @attribute votes         [ObjectId]      Id's of User's who voted the post
+ * @attribute comments      [ObjectId]      Id's of Comment's on the post
  * @attribute tags          [Tag]           categories the post belongs to
  * @attribute created_at    [Date]          the time at which the post was created
  * @attribute updated_at    [Date]          the last time at which the post was updated
@@ -35,6 +37,10 @@ var PostSchema =  new mongoose.Schema({
   votes: [{
       type: ObjectId,
       ref: 'User'
+  }],
+  comments: [{
+      type: ObjectId,
+      ref: 'Comment'
   }],
   created_at: {
      type:Date
