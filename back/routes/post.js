@@ -63,14 +63,14 @@ module.exports = function(app, passport) {
   /**
    * Update an existing post.
    *
-   * @param
+   * @param post id
    * @returns {object} post
    */
 
   app.put('/api/posts/:id', access.requireRole(), function(req, res, next) {
     Post.findById(req.params.id, function(err, post) {
       if (!post)
-        return next(new Error('Could not load Document'));
+        return next(new Error('Could find the Post'));
       else {
         if(req.user._id.toString()===post.author.toString()){
             post.updated_at = new Date();
@@ -81,6 +81,31 @@ module.exports = function(app, passport) {
               res.json({
                 post: model
               });
+            });
+        } else {
+            return res.send(401, "Unauthorized");
+        }
+      }
+    });
+  });
+
+  /**
+   * Delete an existing post.
+   *
+   * @param   post id
+   * @returns {object} post
+   */
+
+  app.delete('/api/posts/:id', access.requireRole(), function(req, res, next) {
+    Post.findById(req.params.id, function(err, post) {
+      if (!post)
+        return next(new Error('Could find the Post'));
+      else {
+        if(req.user._id.toString()===post.author.toString()){
+            post.remove(function(err) {
+              if (err)
+                return next(err);
+              res.send(204);
             });
         } else {
             return res.send(401, "Unauthorized");
