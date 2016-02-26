@@ -6,6 +6,14 @@ var access = require('./access');
 var observer = require('../observer');
 
 module.exports = function(app, passport) {
+
+  /**
+   * GET a comment.
+   *
+   * @param   comment id
+   * @returns comment
+   */
+
   app.get('/api/comments/:id',function(req, res, next) {
     Comment.findById(req.params.id, function(err, model) {
         if (err) return next(err);
@@ -15,6 +23,13 @@ module.exports = function(app, passport) {
         });
     });
   });
+
+  /**
+   * Post a comment.
+   *
+   * @param   comment
+   * @returns comment
+   */
 
   app.post('/api/comments',access.requireRole() ,function(req, res, next) {
     var comment = req.body.comment;
@@ -29,6 +44,35 @@ module.exports = function(app, passport) {
         });
     });
 
+  });
+
+  /**
+   * Edit a comment.
+   *
+   * @param   comment id
+   * @returns
+   */
+
+  app.put('/api/comments/:id', access.requireRole(), function(req, res, next) {
+    Comment.findById(req.params.id, function(err, comment) {
+      if (!comment)
+        return next(new Error('Could find the Comment'));
+      else {
+        if(req.user._id.toString()===comment.author.toString()){
+          comment.updated_at = new Date();
+          comment.set(req.body.comment);
+          comment.save(function(err,model) {
+            if (err)
+              next(err);
+            res.json({
+              comment: model
+            });
+          });
+        } else {
+            return res.send(401, "Unauthorized");
+        }
+      }
+    });
   });
 
   /**
