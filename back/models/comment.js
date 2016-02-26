@@ -24,7 +24,7 @@ var CommentSchema =  new mongoose.Schema({
   post: {
       type: ObjectId,
       ref: 'Post',
-      childPath:"comment"
+      childPath:"comments"
   },
   author: {
       type: ObjectId,

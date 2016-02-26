@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var observer = require('../observer');
-var relationship = require("mongoose-relationship");
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
 

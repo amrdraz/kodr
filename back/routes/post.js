@@ -51,6 +51,7 @@ module.exports = function(app, passport) {
       post.author = post.user || req.user.id;
       post.created_at = post.updated_at = new Date();
       post = new Post(post);
+            console.log("here");
       post.save(function(err,model) {
           if(err)
             next(err);
