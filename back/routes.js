@@ -32,6 +32,8 @@ module.exports = function(app, passport) {
     require('./routes/activity')(app, passport);
     // post routes
     require('./routes/post')(app, passport);
+    // comment routes
+    require('./routes/comment')(app, passport);
 
     if (process.env.NODE_ENV !== 'production') {
         app.get('/seed_db', require('./seed_db'));

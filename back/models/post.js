@@ -11,7 +11,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * @attribute text          String          post markdown
  * @attribute author        [ObjectId]      Id of the User who created the post
  * @attribute votes         [ObjectId]      Id's of User's who voted the post
- * @attribute tags          [Tag]           lecture group used for segmentation (should probably abstract these data later)
+ * @attribute tags          [Tag]           categories the post belongs to
  * @attribute created_at    [Date]          the time at which the post was created
  * @attribute updated_at    [Date]          the last time at which the post was updated
  *

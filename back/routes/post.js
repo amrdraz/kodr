@@ -105,7 +105,7 @@ module.exports = function(app, passport) {
             post.remove(function(err) {
               if (err)
                 return next(err);
-              res.send(204);
+              res.send(204)
             });
         } else {
             return res.send(401, "Unauthorized");
