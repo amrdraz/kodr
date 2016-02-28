@@ -58,19 +58,31 @@ module.exports = function(app, passport) {
       if (!comment)
         return next(new Error('Could find the Comment'));
       else {
-        if(req.user._id.toString()===comment.author.toString()){
-          comment.updated_at = new Date();
-          comment.set(req.body.comment);
-          comment.save(function(err,model) {
-            if (err)
-              next(err);
-            res.json({
-              comment: model
+        // Set the comment without saving
+        comment.set(req.body.comment);
+        if(!comment.isModified()){
+            //Nothing is Modified
+            return res.json({
+              comment: comment
             });
-          });
+        } else if(comment.isModified('votesUp')){
+            comment.votesDown.remove(req.user.id);
+        } else if(comment.isModified('votesDown')){
+            comment.votesUp.remove(req.user.id);
+        } else if(req.user._id.toString()===comment.author.toString()){
+            //User is the owner of the comment, set updated_at
+            comment.updated_at = new Date();
         } else {
+            // Unauthorized
             return res.send(401, "Unauthorized");
         }
+        comment.save(function(err,model) {
+          if (err)
+            next(err);
+          res.json({
+            comment: model
+          });
+        });
       }
     });
   });

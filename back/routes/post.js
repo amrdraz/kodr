@@ -51,7 +51,6 @@ module.exports = function(app, passport) {
       post.author = post.user || req.user.id;
       post.created_at = post.updated_at = new Date();
       post = new Post(post);
-            console.log("here");
       post.save(function(err,model) {
           if(err)
             next(err);
@@ -73,19 +72,31 @@ module.exports = function(app, passport) {
       if (!post)
         return next(new Error('Could find the Post'));
       else {
-        if(req.user._id.toString()===post.author.toString()){
-            post.updated_at = new Date();
-            post.set(req.body.post);
-            post.save(function(err,model) {
-              if (err)
-                next(err);
-              res.json({
-                post: model
-              });
+        // Set the post without saving
+        post.set(req.body.post);
+        if(!post.isModified()){
+            //Nothing is Modified
+            return res.json({
+              post: post
             });
+        } else if(post.isModified('votesUp')){
+            post.votesDown.remove(req.user.id);
+        } else if(post.isModified('votesDown')){
+            post.votesUp.remove(req.user.id);
+        } else if(req.user._id.toString()===post.author.toString()){
+            //User is the owner of the post, set updated_at
+            post.updated_at = new Date();
         } else {
+            // Unauthorized
             return res.send(401, "Unauthorized");
         }
+        post.save(function(err,model) {
+          if (err)
+            next(err);
+          res.json({
+            post: model
+          });
+        });
       }
     });
   });

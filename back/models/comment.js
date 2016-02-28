@@ -34,7 +34,11 @@ var CommentSchema =  new mongoose.Schema({
       type: ObjectId,
       ref: 'Reply'
   }],
-  votes: [{
+  votesUp: [{
+      type: ObjectId,
+      ref: 'User'
+  }],
+  votesDown: [{
       type: ObjectId,
       ref: 'User'
   }],
