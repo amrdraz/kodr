@@ -49,6 +49,63 @@ module.exports = function(app, passport) {
 
   });
 
+  /**
+   * Vote up a Comment.
+   *
+   * @param
+   * @returns {object} totalVotes
+   */
+
+  app.post('/api/comments/:id/voteUp', access.requireRole(), function(req, res, next) {
+    Comment.findById(req.params.id, function(err, comment) {
+      if (!comment)
+        return next(new Error('Could find the Comment'));
+      else {
+        var len = comment.votesUp.length;
+        comment.votesUp.remove(req.user.id);
+        comment.votesDown.remove(req.user.id);
+        if(len === comment.votesUp.length){
+            comment.votesUp.push(req.user.id);
+        }
+        comment.save(function(err,model) {
+          if (err)
+            next(err);
+          res.json({
+            totalVotes: model.totalVotes
+          });
+        });
+      }
+    });
+  });
+
+  /**
+   * Vote down a Comment.
+   *
+   * @param
+   * @returns {object} totalVotes
+   */
+
+  app.post('/api/comments/:id/voteDown', access.requireRole(), function(req, res, next) {
+    Comment.findById(req.params.id, function(err, comment) {
+      if (!comment)
+        return next(new Error('Could find the Comment'));
+      else {
+        var len = comment.votesDown.length;
+        comment.votesUp.remove(req.user.id);
+        comment.votesDown.remove(req.user.id);
+        if(len === comment.votesDown.length){
+            comment.votesDown.push(req.user.id);
+        }
+        comment.save(function(err,model) {
+          if (err)
+            next(err);
+          res.json({
+            totalVotes: model.totalVotes
+          });
+        });
+      }
+    });
+  });
 
   /**
    * Edit a comment.

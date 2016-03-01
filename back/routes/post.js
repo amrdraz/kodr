@@ -35,7 +35,7 @@ module.exports = function(app, passport) {
    */
 
   app.get('/api/posts', function(req, res, next) {
-      Post.find(req.query).exec().then(function(model) {
+      Post.find(req.query).select('-votesDown -votesUp').exec().then(function(model) {
           if (!model) return res.send(404, "Not Found");
           res.json({
               post: model
@@ -68,31 +68,59 @@ module.exports = function(app, passport) {
    * Vote up a Post.
    *
    * @param
-   * @returns {object} post
+   * @returns {object} totalVotes
    */
 
-  app.post('/api/posts/voteUp', access.requireRole(), function(req, res, next) {
-    Post.findById(req.body.post, function(err, post) {
+  app.post('/api/posts/:id/voteUp', access.requireRole(), function(req, res, next) {
+    Post.findById(req.params.id, function(err, post) {
       if (!post)
         return next(new Error('Could find the Post'));
       else {
         var len = post.votesUp.length;
         post.votesUp.remove(req.user.id);
+        post.votesDown.remove(req.user.id);
         if(len === post.votesUp.length){
             post.votesUp.push(req.user.id);
         }
-        console.log(post.votesUp);
         post.save(function(err,model) {
           if (err)
             next(err);
           res.json({
-            post: model
+            totalVotes: model.totalVotes
           });
         });
       }
     });
   });
 
+  /**
+   * Vote down a Post.
+   *
+   * @param
+   * @returns {object} totalVotes
+   */
+
+  app.post('/api/posts/:id/voteDown', access.requireRole(), function(req, res, next) {
+    Post.findById(req.params.id, function(err, post) {
+      if (!post)
+        return next(new Error('Could find the Post'));
+      else {
+        var len = post.votesDown.length;
+        post.votesUp.remove(req.user.id);
+        post.votesDown.remove(req.user.id);
+        if(len === post.votesDown.length){
+            post.votesDown.push(req.user.id);
+        }
+        post.save(function(err,model) {
+          if (err)
+            next(err);
+          res.json({
+            totalVotes: model.totalVotes
+          });
+        });
+      }
+    });
+  });
 
   /**
    * Update an existing post.
