@@ -3,6 +3,7 @@ var Post = require('../models/post');
 var ExpiringToken = require('../models/expiringToken');
 var access = require('./access');
 var observer = require('../observer');
+var ObjectId = require('mongoose').Schema.Types.ObjectId;
 
 module.exports = function(app, passport) {
 
@@ -14,9 +15,12 @@ module.exports = function(app, passport) {
    */
 
   app.get('/api/posts/:id', function(req, res, next) {
-      Post.findById(req.params.id, function(err, model) {
+      Post
+        .findOne(req.params.id)
+        .select('-votesDown -votesUp')
+        .exec(function (err, model) {
           if (err) return next(err);
-          if (!model) return res.send(404, "Not Found");
+          if(!model) return res.send(404,"Not Found");
           res.json({
               post: model
           });
@@ -61,6 +65,36 @@ module.exports = function(app, passport) {
   });
 
   /**
+   * Vote up a Post.
+   *
+   * @param
+   * @returns {object} post
+   */
+
+  app.post('/api/posts/voteUp', access.requireRole(), function(req, res, next) {
+    Post.findById(req.body.post, function(err, post) {
+      if (!post)
+        return next(new Error('Could find the Post'));
+      else {
+        var len = post.votesUp.length;
+        post.votesUp.remove(req.user.id);
+        if(len === post.votesUp.length){
+            post.votesUp.push(req.user.id);
+        }
+        console.log(post.votesUp);
+        post.save(function(err,model) {
+          if (err)
+            next(err);
+          res.json({
+            post: model
+          });
+        });
+      }
+    });
+  });
+
+
+  /**
    * Update an existing post.
    *
    * @param post id
@@ -72,31 +106,21 @@ module.exports = function(app, passport) {
       if (!post)
         return next(new Error('Could find the Post'));
       else {
-        // Set the post without saving
-        post.set(req.body.post);
-        if(!post.isModified()){
-            //Nothing is Modified
-            return res.json({
-              post: post
-            });
-        } else if(post.isModified('votesUp')){
-            post.votesDown.remove(req.user.id);
-        } else if(post.isModified('votesDown')){
-            post.votesUp.remove(req.user.id);
-        } else if(req.user._id.toString()===post.author.toString()){
+        if(req.user._id.toString()===post.author.toString()){
             //User is the owner of the post, set updated_at
+            post.set(req.body.post);
             post.updated_at = new Date();
+            post.save(function(err,model) {
+              if (err)
+                next(err);
+              res.json({
+                post: model
+              });
+            });
         } else {
             // Unauthorized
             return res.send(401, "Unauthorized");
         }
-        post.save(function(err,model) {
-          if (err)
-            next(err);
-          res.json({
-            post: model
-          });
-        });
       }
     });
   });
