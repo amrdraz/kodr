@@ -8,6 +8,26 @@ var observer = require('../observer');
 module.exports = function(app, passport) {
 
   /**
+   * GET All comments of specific query
+   *
+   * @param   query {optional}
+   * @returns comments
+   */
+
+  app.get('/api/comments',function(req,res,next) {
+    Comment.find({post:req.query.post})
+        .select('')
+        .exec()
+        .then(function(model) {
+          if (!model) return res.send(404, "Not Found");
+          console.log(model);
+          res.json({
+              comments: model
+          });
+    }, next);
+  });
+
+  /**
    * GET a comment.
    *
    * @param   comment id
