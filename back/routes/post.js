@@ -17,7 +17,7 @@ module.exports = function(app, passport) {
   app.get('/api/posts/:id', function(req, res, next) {
       Post
         .findOne(req.params.id)
-        .select('-votesDown -votesUp')
+        .select('')
         .exec(function (err, model) {
           if (err) return next(err);
           if(!model) return res.send(404,"Not Found");
@@ -35,11 +35,14 @@ module.exports = function(app, passport) {
    */
 
   app.get('/api/posts', function(req, res, next) {
-      Post.find(req.query).select('-votesDown -votesUp').exec().then(function(model) {
-          if (!model) return res.send(404, "Not Found");
-          res.json({
-              post: model
-          });
+      Post.find(req.query)
+          .select('')
+          .exec()
+          .then(function(model) {
+            if (!model) return res.send(404, "Not Found");
+            res.json({
+                post: model
+            });
       }, next);
   });
 
@@ -85,8 +88,9 @@ module.exports = function(app, passport) {
         post.save(function(err,model) {
           if (err)
             next(err);
+          console.log(model);
           res.json({
-            totalVotes: model.totalVotes
+            model: model
           });
         });
       }
@@ -115,7 +119,7 @@ module.exports = function(app, passport) {
           if (err)
             next(err);
           res.json({
-            totalVotes: model.totalVotes
+            model: model
           });
         });
       }

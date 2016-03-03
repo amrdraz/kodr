@@ -17,7 +17,7 @@ module.exports = function(app, passport) {
   app.get('/api/comments/:id',function(req, res, next) {
     Comment
       .findOne(req.params.id)
-      .select('-votesDown -votesUp')
+      .select('')
       .exec(function (err, model) {
         if (err) return next(err);
         if(!model) return res.send(404,"Not Found");
@@ -71,7 +71,7 @@ module.exports = function(app, passport) {
           if (err)
             next(err);
           res.json({
-            totalVotes: model.totalVotes
+            model: model
           });
         });
       }
@@ -100,7 +100,7 @@ module.exports = function(app, passport) {
           if (err)
             next(err);
           res.json({
-            totalVotes: model.totalVotes
+            model: model
           });
         });
       }
