@@ -32,6 +32,8 @@ module.exports = function(app, passport) {
     require('./routes/activity')(app, passport);
     // post routes
     require('./routes/post')(app, passport);
+    // question routes
+    require('./routes/question')(app, passport);
     // comment routes
     require('./routes/comment')(app, passport);
     // reply routes
