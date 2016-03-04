@@ -67,6 +67,21 @@ module.exports = function(app, passport) {
       });
   });
 
+  app.get('/api/posts/:id/vote',access.requireRole(),function(req, res, next) {
+    Post.findById(req.params.id, function(err, post) {
+      if (err)
+          next(err);
+      else if (!post)
+        return next(new Error('Could find the Post'));
+      else {
+        var x = 1;
+        res.json({
+          vote: x
+        });
+      }
+    });
+  });
+
   /**
    * Vote up a Post.
    *

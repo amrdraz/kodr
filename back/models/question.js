@@ -10,7 +10,9 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * @attribute title         String          question title
  * @attribute text          String          question markdown
  * @attribute author        [ObjectId]      Id of the User who created the question
- * @attribute votesUp         [ObjectId]      Id's of User's who voted the question
+ * @attribute votesUp       [ObjectId]      Id's of User's who up voted the comment
+ * @attribute votesDown     [ObjectId]      Id's of User's who down voted the comment
+ * @attribute totalVotes    Number          All up votes minus all down votes
  * @attribute comments      [ObjectId]      Id's of Comment's on the question
  * @attribute tags          [Tag]           categories the question belongs to
  * @attribute created_at    [Date]          the time at which the question was created
@@ -37,6 +39,10 @@ var QuestionSchema =  new mongoose.Schema({
   votesDown: [{
       type: ObjectId,
       ref: 'User'
+  }],
+  totalVotes: [{
+      type: Number,
+      default: 0
   }],
   comments: [{
       type: ObjectId,

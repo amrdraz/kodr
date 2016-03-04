@@ -21,19 +21,16 @@ module.exports = function(app, passport) {
             .exec()
             .then(function(model) {
               if (!model) return res.send(404, "Not Found");
-              console.log(model);
               res.json({
                   comments: model
               });
         }, next);
     }else{
-      console.log("here"+req.query.question);
       Comment.find({question:req.query.question})
           .select('')
           .exec()
           .then(function(model) {
             if (!model) return res.send(404, "Not Found");
-            console.log(model);
             res.json({
                 comments: model
             });
@@ -72,6 +69,7 @@ module.exports = function(app, passport) {
     var comment = req.body.comment;
     comment.author = comment.user || req.user.id;
     comment.created_at = comment.updated_at = new Date();
+    comment.totalVotes = 0;
     comment = new Comment(comment);
     comment.save(function(err,model) {
         if(err)
@@ -81,6 +79,22 @@ module.exports = function(app, passport) {
         });
     });
 
+  });
+
+  app.get('/api/comments/:id/vote',access.requireRole(),function(req, res, next) {
+    Comment.findById(req.params.id, function(err, comment) {
+      if (err)
+          next(err);
+      else if (!comment)
+        return next(new Error('Could find the Comment'));
+      else {
+        //console.log(comment.votesUp);
+        var x = 1;
+        res.json({
+          vote: x
+        });
+      }
+    });
   });
 
   /**
@@ -101,9 +115,11 @@ module.exports = function(app, passport) {
         if(len === comment.votesUp.length){
             comment.votesUp.push(req.user.id);
         }
+        comment.totalVotes = comment.votesUp.length - comment.votesDown.length;
         comment.save(function(err,model) {
           if (err)
             next(err);
+            console.log(model);
           res.json({
             model: model
           });
@@ -130,6 +146,7 @@ module.exports = function(app, passport) {
         if(len === comment.votesDown.length){
             comment.votesDown.push(req.user.id);
         }
+        comment.totalVotes = comment.votesUp.length - comment.votesDown.length;
         comment.save(function(err,model) {
           if (err)
             next(err);
