@@ -74,9 +74,9 @@ module.exports = function(app, passport) {
       else if (!post)
         return next(new Error('Could find the Post'));
       else {
-        var x = 1;
+        var vote = post.votesUp.indexOf(req.user.id)!=-1?1:post.votesDown.indexOf(req.user.id)!=-1?-1:0;
         res.json({
-          vote: x
+          vote: vote
         });
       }
     });
@@ -100,10 +100,10 @@ module.exports = function(app, passport) {
         if(len === post.votesUp.length){
             post.votesUp.push(req.user.id);
         }
+        post.totalVotes = post.votesUp.length - post.votesDown.length;
         post.save(function(err,model) {
           if (err)
             next(err);
-          console.log(model);
           res.json({
             model: model
           });
@@ -130,6 +130,7 @@ module.exports = function(app, passport) {
         if(len === post.votesDown.length){
             post.votesDown.push(req.user.id);
         }
+        post.totalVotes = post.votesUp.length - post.votesDown.length;
         post.save(function(err,model) {
           if (err)
             next(err);

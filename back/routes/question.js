@@ -67,6 +67,20 @@ module.exports = function(app, passport) {
       });
   });
 
+  app.get('/api/questions/:id/vote',access.requireRole(),function(req, res, next) {
+    Question.findById(req.params.id, function(err, question) {
+      if (err)
+          next(err);
+      else if (!question)
+        return next(new Error('Could find the Question'));
+      else {
+        var vote = question.votesUp.indexOf(req.user.id)!=-1?1:question.votesDown.indexOf(req.user.id)!=-1?-1:0;
+        res.json({
+          vote: vote
+        });
+      }
+    });
+  });
   /**
    * Vote up a Question.
    *
@@ -85,6 +99,7 @@ module.exports = function(app, passport) {
         if(len === question.votesUp.length){
             question.votesUp.push(req.user.id);
         }
+        question.totalVotes = question.votesUp.length - question.votesDown.length;
         question.save(function(err,model) {
           if (err)
             next(err);
@@ -114,6 +129,7 @@ module.exports = function(app, passport) {
         if(len === question.votesDown.length){
             question.votesDown.push(req.user.id);
         }
+        question.totalVotes = question.votesUp.length - question.votesDown.length;
         question.save(function(err,model) {
           if (err)
             next(err);

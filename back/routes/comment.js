@@ -88,10 +88,9 @@ module.exports = function(app, passport) {
       else if (!comment)
         return next(new Error('Could find the Comment'));
       else {
-        //console.log(comment.votesUp);
-        var x = 1;
+        var vote = comment.votesUp.indexOf(req.user.id)!=-1?1:comment.votesDown.indexOf(req.user.id)!=-1?-1:0;
         res.json({
-          vote: x
+          vote: vote
         });
       }
     });
@@ -119,7 +118,6 @@ module.exports = function(app, passport) {
         comment.save(function(err,model) {
           if (err)
             next(err);
-            console.log(model);
           res.json({
             model: model
           });
