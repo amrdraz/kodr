@@ -26,9 +26,6 @@ var PostSchema =  new mongoose.Schema({
   text: {
       type: String
   },
-  post_type: {
-      type: Number
-  },
   author: {
       type: ObjectId,
       ref: 'User'
