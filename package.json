@@ -72,7 +72,8 @@
     "socket.io-redis": "^1.0.0",
     "structured": "^0.1.2",
     "swig": "^1.4.2",
-    "swig-email-templates": "^2.0.0"
+    "swig-email-templates": "^2.0.0",
+    "underscore": "latest"
   },
   "engines": {
     "node": ">=0.10.0"
