@@ -35,7 +35,6 @@ module.exports = function(app, passport) {
   app.post('/api/replies',access.requireRole() ,function(req, res, next) {
     var reply = req.body.reply;
     reply.author = reply.user || req.user.id;
-    reply.created_at = reply.updated_at = new Date();
     reply = new Reply(reply);
     reply.save(function(err,model) {
         if(err)
@@ -59,7 +58,6 @@ module.exports = function(app, passport) {
         return next(new Error('Could find the Reply'));
       else {
         if(req.user._id.toString()===reply.author.toString()){
-          reply.updated_at = new Date();
           reply.set(req.body.reply);
           reply.save(function(err,model) {
             if (err)

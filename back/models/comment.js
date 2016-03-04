@@ -62,5 +62,6 @@ var CommentSchema =  new mongoose.Schema({
 });
 
 CommentSchema.plugin(relationship, { relationshipPathName:['post','question'] });
+CommentSchema.plugin(require('../helpers/comment'), 'Comment');
 
 var Comment = module.exports = mongoose.model('Comment', CommentSchema);

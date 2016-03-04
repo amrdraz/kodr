@@ -56,7 +56,6 @@ module.exports = function(app, passport) {
   app.post('/api/questions', access.requireRole(), function(req, res, next) {
       var question = req.body.question;
       question.author = question.user || req.user.id;
-      question.created_at = question.updated_at = new Date();
       question = new Question(question);
       question.save(function(err,model) {
           if(err)
@@ -154,9 +153,7 @@ module.exports = function(app, passport) {
         return next(new Error('Could find the Question'));
       else {
         if(req.user._id.toString()===question.author.toString()){
-            //User is the owner of the question, set updated_at
             question.set(req.body.question);
-            question.updated_at = new Date();
             question.save(function(err,model) {
               if (err)
                 next(err);

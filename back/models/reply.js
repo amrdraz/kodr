@@ -39,5 +39,6 @@ var ReplySchema =  new mongoose.Schema({
 });
 
 ReplySchema.plugin(relationship, { relationshipPathName:'comment' });
+ReplySchema.plugin(require('../helpers/reply'), 'Reply');
 
 var Reply = module.exports = mongoose.model('Reply', ReplySchema);

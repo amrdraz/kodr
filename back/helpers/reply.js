@@ -6,7 +6,7 @@ var observer = require('../observer');
 module.exports = exports = function (schema, options) {
     var Model = options.model || options;
     /**
-     * Post Schema pre-save hooks.
+     * Reply Schema pre-save hooks.
      * on every save, add the date
      */
     schema.pre('save', true, function(next, done) {

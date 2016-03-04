@@ -56,6 +56,6 @@ var QuestionSchema =  new mongoose.Schema({
   }
 });
 
-//PostSchema.plugin(require('../helpers/post'), 'Post');
+QuestionSchema.plugin(require('../helpers/question'), 'Question');
 
 var Question = module.exports = mongoose.model('Question', QuestionSchema);

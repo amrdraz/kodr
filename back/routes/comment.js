@@ -68,7 +68,6 @@ module.exports = function(app, passport) {
   app.post('/api/comments',access.requireRole() ,function(req, res, next) {
     var comment = req.body.comment;
     comment.author = comment.user || req.user.id;
-    comment.created_at = comment.updated_at = new Date();
     comment.totalVotes = 0;
     comment = new Comment(comment);
     comment.save(function(err,model) {
@@ -172,7 +171,6 @@ module.exports = function(app, passport) {
         if(req.user._id.toString()===comment.author.toString()){
             //User is the owner of the comment, set updated_at
             comment.set(req.body.comment);
-            comment.updated_at = new Date();
             comment.save(function(err,model) {
               if (err)
                 next(err);

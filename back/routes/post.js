@@ -56,7 +56,6 @@ module.exports = function(app, passport) {
   app.post('/api/posts', access.requireRole(), function(req, res, next) {
       var post = req.body.post;
       post.author = post.user || req.user.id;
-      post.created_at = post.updated_at = new Date();
       post = new Post(post);
       post.save(function(err,model) {
           if(err)
@@ -155,9 +154,7 @@ module.exports = function(app, passport) {
         return next(new Error('Could find the Post'));
       else {
         if(req.user._id.toString()===post.author.toString()){
-            //User is the owner of the post, set updated_at
             post.set(req.body.post);
-            post.updated_at = new Date();
             post.save(function(err,model) {
               if (err)
                 next(err);
