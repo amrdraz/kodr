@@ -15,16 +15,30 @@ module.exports = function(app, passport) {
    */
 
   app.get('/api/comments',function(req,res,next) {
-    Comment.find({post:req.query.post})
-        .select('')
-        .exec()
-        .then(function(model) {
-          if (!model) return res.send(404, "Not Found");
-          console.log(model);
-          res.json({
-              comments: model
-          });
-    }, next);
+    if(req.query.post){
+        Comment.find({post:req.query.post})
+            .select('')
+            .exec()
+            .then(function(model) {
+              if (!model) return res.send(404, "Not Found");
+              console.log(model);
+              res.json({
+                  comments: model
+              });
+        }, next);
+    }else{
+      console.log("here"+req.query.question);
+      Comment.find({question:req.query.question})
+          .select('')
+          .exec()
+          .then(function(model) {
+            if (!model) return res.send(404, "Not Found");
+            console.log(model);
+            res.json({
+                comments: model
+            });
+      }, next);
+    }
   });
 
   /**

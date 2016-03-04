@@ -26,6 +26,11 @@ var CommentSchema =  new mongoose.Schema({
       ref: 'Post',
       childPath:"comments"
   },
+  question: {
+      type: ObjectId,
+      ref: 'Question',
+      childPath:"comments"
+  },
   author: {
       type: ObjectId,
       ref: 'User'
@@ -50,6 +55,6 @@ var CommentSchema =  new mongoose.Schema({
   }
 });
 
-CommentSchema.plugin(relationship, { relationshipPathName:'post' });
+CommentSchema.plugin(relationship, { relationshipPathName:['post','question'] });
 
 var Comment = module.exports = mongoose.model('Comment', CommentSchema);
