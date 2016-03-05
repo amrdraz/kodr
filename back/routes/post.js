@@ -57,15 +57,13 @@ module.exports = function(app, passport) {
       var post = req.body.post;
       var tags = post.tags;
       delete post['tags'];
-      console.log(post);
       post.author = post.user || req.user.id;
       post = new Post(post);
-      post.findOrCreateTags(0,tags,[],function(err,result) {
+      post.findOrCreateTags(0,tags,post.tags,function(err,result) {
         if(err){
           console.log(err);
           return next(err);
         }
-        post.tags = result;
         post.save(function(err,model) {
             if(err)
               next(err);
@@ -168,12 +166,12 @@ module.exports = function(app, passport) {
             var tags = req.body.post.tags;
             delete req.body.post['tags'];
             post.set(req.body.post);
-            post.findOrCreateTags(0,tags,[],function(err,result) {
+            while(post.tags.pop());
+            post.findOrCreateTags(0,tags,post.tags,function(err,result) {
               if(err){
                 console.log(err);
                 return next(err);
               }
-              post.tags = result;
               post.save(function(err,model) {
                   if(err)
                     next(err);

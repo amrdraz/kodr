@@ -24,7 +24,7 @@ module.exports = exports = function (schema, options) {
                       });
                   }else{
                       //Repeated
-                      if(result.indexOf(tag)==-1)
+                      if(!result.id(tag))
                           result.push(tag);
                       findOrCreateTags(index+1,tags,result,cb);
                   }
@@ -32,7 +32,7 @@ module.exports = exports = function (schema, options) {
         }else{
           cb(null,result);
         }
-    }
+    };
 
     /**
      * Post Schema pre-save hooks.

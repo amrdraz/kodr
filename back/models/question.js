@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var observer = require('../observer');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
-
+var TagSchema = require('./tag').schema;
 
 /**
  * Question Schema.
@@ -48,6 +48,7 @@ var QuestionSchema =  new mongoose.Schema({
       type: ObjectId,
       ref: 'Comment'
   }],
+  tags: [TagSchema],
   created_at: {
      type:Date
   },

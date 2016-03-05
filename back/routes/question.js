@@ -53,18 +53,27 @@ module.exports = function(app, passport) {
    * @returns {object} question
    */
 
-  app.post('/api/questions', access.requireRole(), function(req, res, next) {
-      var question = req.body.question;
-      question.author = question.user || req.user.id;
-      question = new Question(question);
-      question.save(function(err,model) {
-          if(err)
-            next(err);
-          res.json({
-            question: model
-          });
-      });
-  });
+   app.post('/api/questions', access.requireRole(), function(req, res, next) {
+       var question = req.body.question;
+       var tags = question.tags;
+       delete question['tags'];
+       question.author = question.user || req.user.id;
+       question = new Question(question);
+       question.findOrCreateTags(0,tags,question.tags,function(err,result) {
+         if(err){
+           console.log(err);
+           return next(err);
+         }
+         question.save(function(err,model) {
+             if(err)
+               next(err);
+             res.json({
+               question: model
+             });
+         });
+       });
+
+   });
 
   app.get('/api/questions/:id/vote',access.requireRole(),function(req, res, next) {
     Question.findById(req.params.id, function(err, question) {
@@ -147,27 +156,36 @@ module.exports = function(app, passport) {
    * @returns {object} question
    */
 
-  app.put('/api/questions/:id', access.requireRole(), function(req, res, next) {
-    Question.findById(req.params.id, function(err, question) {
-      if (!question)
-        return next(new Error('Could find the Question'));
-      else {
-        if(req.user._id.toString()===question.author.toString()){
-            question.set(req.body.question);
-            question.save(function(err,model) {
-              if (err)
-                next(err);
-              res.json({
-                question: model
-              });
-            });
-        } else {
-            // Unauthorized
-            return res.send(401, "Unauthorized");
-        }
-      }
-    });
-  });
+   app.put('/api/questions/:id', access.requireRole(), function(req, res, next) {
+     Question.findById(req.params.id, function(err, question) {
+       if (!question)
+         return next(new Error('Could find the Question'));
+       else {
+         if(req.user._id.toString()===question.author.toString()){
+             var tags = req.body.question.tags;
+             delete req.body.question['tags'];
+             question.set(req.body.question);
+             while(question.tags.pop());
+             question.findOrCreateTags(0,tags,question.tags,function(err,result) {
+               if(err){
+                 console.log(err);
+                 return next(err);
+               }
+               question.save(function(err,model) {
+                   if(err)
+                     next(err);
+                   res.json({
+                     question: model
+                   });
+               });
+             });
+         } else {
+             // Unauthorized
+             return res.send(401, "Unauthorized");
+         }
+       }
+     });
+   });
 
   /**
    * Delete an existing question.
