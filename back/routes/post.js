@@ -56,6 +56,8 @@ module.exports = function(app, passport) {
   app.post('/api/posts', access.requireRole(), function(req, res, next) {
       var post = req.body.post;
       var tags = post.tags;
+      delete post['tags'];
+      console.log(post);
       post.author = post.user || req.user.id;
       post = new Post(post);
       post.findOrCreateTags(0,tags,[],function(err,result) {

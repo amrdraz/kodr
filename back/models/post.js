@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var observer = require('../observer');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Mixed = mongoose.Schema.Types.Mixed;
-var TagSchema = require('./tag').schema
+var TagSchema = require('./tag').schema;
 
 /**
  * Post Schema.
