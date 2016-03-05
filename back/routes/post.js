@@ -165,12 +165,21 @@ module.exports = function(app, passport) {
         return next(new Error('Could find the Post'));
       else {
         if(req.user._id.toString()===post.author.toString()){
+            var tags = req.body.post.tags;
+            delete req.body.post['tags'];
             post.set(req.body.post);
-            post.save(function(err,model) {
-              if (err)
-                next(err);
-              res.json({
-                post: model
+            post.findOrCreateTags(0,tags,[],function(err,result) {
+              if(err){
+                console.log(err);
+                return next(err);
+              }
+              post.tags = result;
+              post.save(function(err,model) {
+                  if(err)
+                    next(err);
+                  res.json({
+                    post: model
+                  });
               });
             });
         } else {
