@@ -55,15 +55,24 @@ module.exports = function(app, passport) {
 
   app.post('/api/posts', access.requireRole(), function(req, res, next) {
       var post = req.body.post;
+      var tags = post.tags;
       post.author = post.user || req.user.id;
       post = new Post(post);
-      post.save(function(err,model) {
-          if(err)
-            next(err);
-          res.json({
-            post: model
-          });
+      post.findOrCreateTags(0,tags,[],function(err,result) {
+        if(err){
+          console.log(err);
+          return next(err);
+        }
+        post.tags = result;
+        post.save(function(err,model) {
+            if(err)
+              next(err);
+            res.json({
+              post: model
+            });
+        });
       });
+
   });
 
   app.get('/api/posts/:id/vote',access.requireRole(),function(req, res, next) {
