@@ -16,11 +16,12 @@ module.exports = function(app, passport) {
 
   app.get('/api/posts/:id', function(req, res, next) {
       Post
-        .findOne(req.params.id)
+        .findById(req.params.id)
         .select('')
         .exec(function (err, model) {
           if (err) return next(err);
           if(!model) return res.send(404,"Not Found");
+          console.log(model);
           res.json({
               post: model
           });

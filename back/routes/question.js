@@ -16,7 +16,7 @@ module.exports = function(app, passport) {
 
   app.get('/api/questions/:id', function(req, res, next) {
       Question
-        .findOne(req.params.id)
+        .findById(req.params.id)
         .select('')
         .exec(function (err, model) {
           if (err) return next(err);
