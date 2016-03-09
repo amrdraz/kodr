@@ -47,7 +47,7 @@ module.exports = function(app, passport) {
 
   app.get('/api/comments/:id',function(req, res, next) {
     Comment
-      .findOne(req.params.id)
+      .findById(req.params.id)
       .select('')
       .exec(function (err, model) {
         if (err) return next(err);
