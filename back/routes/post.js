@@ -7,210 +7,221 @@ var ObjectId = require('mongoose').Schema.Types.ObjectId;
 
 module.exports = function(app, passport) {
 
-  /**
-   * Find Post by id.
-   *
-   * @param {string} id
-   * @returns {object} Post
-   */
+    /**
+     * Find Post by id.
+     *
+     * @param {string} id
+     * @returns {object} Post
+     */
 
-  app.get('/api/posts/:id', function(req, res, next) {
-      Post
-        .findById(req.params.id)
-        .select('')
-        .exec(function (err, model) {
-          if (err) return next(err);
-          if(!model) return res.send(404,"Not Found");
-          console.log(model);
-          res.json({
-              post: model
-          });
-      });
-  });
-
-  /**
-   * get all posts.
-   *
-   * @param
-   * @returns {object} posts
-   */
-
-  app.get('/api/posts', function(req, res, next) {
-      Post.find(req.query)
-          .select('')
-          .exec()
-          .then(function(model) {
-            if (!model) return res.send(404, "Not Found");
-            res.json({
-                post: model
-            });
-      }, next);
-  });
-
-  /**
-   * Create new post.
-   *
-   * @param range
-   * @returns {object} post
-   */
-
-  app.post('/api/posts', access.requireRole(), function(req, res, next) {
-      var post = req.body.post;
-      var tags = post.tags;
-      delete post['tags'];
-      post.author = post.user || req.user.id;
-      post = new Post(post);
-      post.findOrCreateTags(0,tags,post.tags,function(err,result) {
-        if(err){
-          console.log(err);
-          return next(err);
-        }
-        post.save(function(err,model) {
-            if(err)
-              next(err);
-            res.json({
-              post: model
-            });
-        });
-      });
-
-  });
-
-  app.get('/api/posts/:id/vote',access.requireRole(),function(req, res, next) {
-    Post.findById(req.params.id, function(err, post) {
-      if (err)
-          next(err);
-      else if (!post)
-        return next(new Error('Could find the Post'));
-      else {
-        var vote = post.votesUp.indexOf(req.user.id)!=-1?1:post.votesDown.indexOf(req.user.id)!=-1?-1:0;
-        res.json({
-          vote: vote
-        });
-      }
-    });
-  });
-
-  /**
-   * Vote up a Post.
-   *
-   * @param
-   * @returns {object} totalVotes
-   */
-
-  app.post('/api/posts/:id/voteUp', access.requireRole(), function(req, res, next) {
-    Post.findById(req.params.id, function(err, post) {
-      if (!post)
-        return next(new Error('Could find the Post'));
-      else {
-        var len = post.votesUp.length;
-        post.votesUp.remove(req.user.id);
-        post.votesDown.remove(req.user.id);
-        if(len === post.votesUp.length){
-            post.votesUp.push(req.user.id);
-        }
-        post.totalVotes = post.votesUp.length - post.votesDown.length;
-        post.save(function(err,model) {
-          if (err)
-            next(err);
-          res.json({
-            model: model
-          });
-        });
-      }
-    });
-  });
-
-  /**
-   * Vote down a Post.
-   *
-   * @param
-   * @returns {object} totalVotes
-   */
-
-  app.post('/api/posts/:id/voteDown', access.requireRole(), function(req, res, next) {
-    Post.findById(req.params.id, function(err, post) {
-      if (!post)
-        return next(new Error('Could find the Post'));
-      else {
-        var len = post.votesDown.length;
-        post.votesUp.remove(req.user.id);
-        post.votesDown.remove(req.user.id);
-        if(len === post.votesDown.length){
-            post.votesDown.push(req.user.id);
-        }
-        post.totalVotes = post.votesUp.length - post.votesDown.length;
-        post.save(function(err,model) {
-          if (err)
-            next(err);
-          res.json({
-            model: model
-          });
-        });
-      }
-    });
-  });
-
-  /**
-   * Update an existing post.
-   *
-   * @param post id
-   * @returns {object} post
-   */
-
-  app.put('/api/posts/:id', access.requireRole(), function(req, res, next) {
-    Post.findById(req.params.id, function(err, post) {
-      if (!post)
-        return next(new Error('Could find the Post'));
-      else {
-        if(req.user._id.toString()===post.author.toString()){
-            var tags = req.body.post.tags;
-            delete req.body.post['tags'];
-            post.set(req.body.post);
-            while(post.tags.pop());
-            post.findOrCreateTags(0,tags,post.tags,function(err,result) {
-              if(err){
-                console.log(err);
-                return next(err);
-              }
-              post.save(function(err,model) {
-                  if(err)
-                    next(err);
-                  res.json({
+    app.get('/api/posts/:id', function(req, res, next) {
+        Post
+            .findById(req.params.id)
+            .select('')
+            .exec(function(err, model) {
+                if (err) return next(err);
+                if (!model) return res.send(404, "Not Found");
+                res.json({
                     post: model
-                  });
+                });
+            });
+    });
+
+    /**
+     * get all posts.
+     *
+     * @param
+     * @returns {object} posts
+     */
+
+    app.get('/api/posts', function(req, res, next) {
+        if (req.query.tag) {
+            Post.find({
+                'tags._id': req.query.tag
+            }, function(err, model) {
+              if(err)
+                return next(err);
+              res.json({
+                  posts: model
               });
             });
         } else {
-            // Unauthorized
-            return res.send(401, "Unauthorized");
+            Post.find(req.query)
+                .select('')
+                .exec()
+                .then(function(model) {
+                    if (!model) return res.send(404, "Not Found");
+                    res.json({
+                        posts: model
+                    });
+                }, next);
         }
-      }
     });
-  });
 
-  /**
-   * Delete an existing post.
-   *
-   * @param   post id
-   * @returns {object} post
-   */
+    /**
+     * Create new post.
+     *
+     * @param range
+     * @returns {object} post
+     */
 
-  app.delete('/api/posts/:id', access.requireRole(), function(req, res, next) {
-    Post.findById(req.params.id, function(err, post) {
-      if (!post)
-        return next(new Error('Could find the Post'));
-      else {
-        if(req.user._id.toString()===post.author.toString()){
-            post.remove(function(err) {
-              if (err)
+    app.post('/api/posts', access.requireRole(), function(req, res, next) {
+        var post = req.body.post;
+        var tags = post.tags;
+        delete post['tags'];
+        post.author = post.user || req.user.id;
+        post = new Post(post);
+        post.findOrCreateTags(0, tags, post.tags, function(err, result) {
+            if (err) {
+                console.log(err);
                 return next(err);
-              res.send(204)
+            }
+            post.save(function(err, model) {
+                if (err)
+                    next(err);
+                res.json({
+                    post: model
+                });
             });
-        } else {
-            return res.send(401, "Unauthorized");
-        }
-      }
+        });
+
     });
-  });
+
+    app.get('/api/posts/:id/vote', access.requireRole(), function(req, res, next) {
+        Post.findById(req.params.id, function(err, post) {
+            if (err)
+                next(err);
+            else if (!post)
+                return next(new Error('Could find the Post'));
+            else {
+                var vote = post.votesUp.indexOf(req.user.id) != -1 ? 1 : post.votesDown.indexOf(req.user.id) != -1 ? -1 : 0;
+                res.json({
+                    vote: vote
+                });
+            }
+        });
+    });
+
+    /**
+     * Vote up a Post.
+     *
+     * @param
+     * @returns {object} totalVotes
+     */
+
+    app.post('/api/posts/:id/voteUp', access.requireRole(), function(req, res, next) {
+        Post.findById(req.params.id, function(err, post) {
+            if (!post)
+                return next(new Error('Could find the Post'));
+            else {
+                var len = post.votesUp.length;
+                post.votesUp.remove(req.user.id);
+                post.votesDown.remove(req.user.id);
+                if (len === post.votesUp.length) {
+                    post.votesUp.push(req.user.id);
+                }
+                post.totalVotes = post.votesUp.length - post.votesDown.length;
+                post.save(function(err, model) {
+                    if (err)
+                        next(err);
+                    res.json({
+                        model: model
+                    });
+                });
+            }
+        });
+    });
+
+    /**
+     * Vote down a Post.
+     *
+     * @param
+     * @returns {object} totalVotes
+     */
+
+    app.post('/api/posts/:id/voteDown', access.requireRole(), function(req, res, next) {
+        Post.findById(req.params.id, function(err, post) {
+            if (!post)
+                return next(new Error('Could find the Post'));
+            else {
+                var len = post.votesDown.length;
+                post.votesUp.remove(req.user.id);
+                post.votesDown.remove(req.user.id);
+                if (len === post.votesDown.length) {
+                    post.votesDown.push(req.user.id);
+                }
+                post.totalVotes = post.votesUp.length - post.votesDown.length;
+                post.save(function(err, model) {
+                    if (err)
+                        next(err);
+                    res.json({
+                        model: model
+                    });
+                });
+            }
+        });
+    });
+
+    /**
+     * Update an existing post.
+     *
+     * @param post id
+     * @returns {object} post
+     */
+
+    app.put('/api/posts/:id', access.requireRole(), function(req, res, next) {
+        Post.findById(req.params.id, function(err, post) {
+            if (!post)
+                return next(new Error('Could find the Post'));
+            else {
+                if (req.user._id.toString() === post.author.toString()) {
+                    var tags = req.body.post.tags;
+                    delete req.body.post['tags'];
+                    post.set(req.body.post);
+                    while (post.tags.pop());
+                    post.findOrCreateTags(0, tags, post.tags, function(err, result) {
+                        if (err) {
+                            console.log(err);
+                            return next(err);
+                        }
+                        post.save(function(err, model) {
+                            if (err)
+                                next(err);
+                            res.json({
+                                post: model
+                            });
+                        });
+                    });
+                } else {
+                    // Unauthorized
+                    return res.send(401, "Unauthorized");
+                }
+            }
+        });
+    });
+
+    /**
+     * Delete an existing post.
+     *
+     * @param   post id
+     * @returns {object} post
+     */
+
+    app.delete('/api/posts/:id', access.requireRole(), function(req, res, next) {
+        Post.findById(req.params.id, function(err, post) {
+            if (!post)
+                return next(new Error('Could find the Post'));
+            else {
+                if (req.user._id.toString() === post.author.toString()) {
+                    post.remove(function(err) {
+                        if (err)
+                            return next(err);
+                        res.send(204)
+                    });
+                } else {
+                    return res.send(401, "Unauthorized");
+                }
+            }
+        });
+    });
 };
