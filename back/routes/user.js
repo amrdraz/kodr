@@ -52,8 +52,8 @@ module.exports = function(app, passport) {
      * @returns {object} User
      */
 
-    app.get('/api/users/:id', function(req, res, next) {
-        User.findById(req.params.id).select('username').exec(function(err, model) {
+    app.get('/api/users/:id', access.requireRole(), function(req, res, next) {
+        User.findById(req.params.id).exec(function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             res.json({
