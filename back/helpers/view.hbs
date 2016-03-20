@@ -1,0 +1,38 @@
+<div class="container col-xs-10">
+  <h4>{{model.title}}</h4>
+
+</div>
+<div class="well col-md-10">
+  <td class="vote-box">
+    {{vote-box model=model modelName='posts' totalVotes=model.totalVotes}}
+  </td>
+  <td>
+    <p>{{markdown-to-html markdown=model.text}}</p>
+    {{#desc-item item=model}}{{/desc-item}}
+    <p>
+      {{#each model.tags as |tag|}}
+        {{#link-to 'discussions.tag' tag._id class='tag' }}{{tag.title}}{{/link-to}}
+      {{/each}}
+    </p>
+    <p>
+      {{#link-to 'discussions.edit' model.id class='btn-edit' }}Edit{{/link-to}}
+      <a {{action 'deletePost' model}} class='btn-edit'>Delete</a>
+    </p>
+  </td>
+</div>
+<div class="container col-xs-10">
+  <h3>Comments ({{comments.length}})</h3>
+</div>
+
+{{#each comments as |comment|}}
+  {{#comment-item item=comment hasReplies=true action='deleteComment' }}
+    {{#each comment.replies as |reply|}}
+      {{reply-item item=reply action='deleteReply' model=comment}}
+      <hr/>
+    {{/each}}
+    {{reply-item-form buttonLabel='Reply' model=comment action='saveReply'}}
+  {{/comment-item}}
+{{/each}}
+<div class="well col-xs-10">
+  {{comment-item-form buttonLabel='Comment' action='saveComment'}}
+</div>

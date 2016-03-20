@@ -15,7 +15,7 @@ var Mixed = mongoose.Schema.Types.Mixed;
  * @type {mongoose.Schema}
  */
 
-var PostSchema =  new mongoose.Schema({
+var WikiSchema =  new mongoose.Schema({
   title: {
       type: String
   },

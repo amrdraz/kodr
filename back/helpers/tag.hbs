@@ -1,0 +1,22 @@
+<div class="well col-md-10">
+  {{#if model.length}}
+    {{#each model as |post|}}
+      {{tag}}
+      {{#post-item item=post itemTitle='Comment' link='discussions.edit' tag=tag}}
+        {{#link-to 'discussions.view' post.id}}
+          <h1 class="panel-title">{{post.title}}</h1>
+        {{/link-to}}
+        {{#desc-item item=post}}{{/desc-item}}
+        {{#each post.tags as |tag|}}
+          {{#link-to 'discussions.tag' tag._id class='tag' }}{{tag.title}}{{/link-to}}
+        {{/each}}
+
+      {{/post-item}}
+      <hr/>
+    {{/each}}
+  {{else}}
+    <div class="text-center">
+      <h3> There Are No Posts , {{#link-to 'discussions.new'}}<a href="">Add One?</a>{{/link-to}} </h3>
+    </div>
+  {{/if}}
+</div>
