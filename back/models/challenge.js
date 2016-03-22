@@ -76,6 +76,10 @@ var ChallengeSchema = new mongoose.Schema({
     trials: [{
         type: ObjectId,
         ref: 'Trial'
+    }],
+    concepts: [{
+        type: ObjectId,
+        ref: 'Concept'
     }]
 
 });

@@ -10,6 +10,9 @@ module.exports = function(schema, options) {
     var Model = options.model || options;
     schema.plugin(require('./_common_helper'), options);
 
+    var Concept = this.db.model('Concept');
+    var UserConcept = this.db.model('UserConcept');
+
     schema.methods.run = function(code) {
         var Challenge = this.db.model('Challenge');
         return Challenge.run(code, this);

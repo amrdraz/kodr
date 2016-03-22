@@ -20,6 +20,8 @@ module.exports = function(app, passport) {
         UserArena.findById(req.params.id, function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
+            // var userArena = req.params.id
+            // UserArena.findOrCreateWithTrials({user:req.user.id,arena:arena});
             res.json({
                 userArena: model
             });

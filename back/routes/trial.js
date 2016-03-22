@@ -34,6 +34,7 @@ module.exports = function(app, passport) {
 
     app.get('/api/trials', access.requireRole(), function(req, res, next) {
         var promise;
+        // UserArena.findOrCreateWithTrials({user:req.query.user,arena:req.query.arena});
         if(req.query.ids) {
             req.query._id = {$in:req.query.ids};
             delete req.query.ids;

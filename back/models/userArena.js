@@ -58,6 +58,18 @@ var UserArenaSchema = new mongoose.Schema({
         ref: 'User',
         childPath: "userArenas"
     },
+    locked: {
+        type: Boolean,
+        default: false
+    },
+    /*
+    Prerequisit defines the arena that has to be unlocked before
+    accessing this one. Could be null.
+    */
+    prerequisit: {
+        type: ObjectId,
+        ref: 'Arena'
+    },
 
 });
 

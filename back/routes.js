@@ -282,7 +282,7 @@ module.exports = function(app, passport) {
                 password: req.body.password,
                 role: role,
                 flags: flags,
-                activated: false
+                activated: true
             });
         });
     }

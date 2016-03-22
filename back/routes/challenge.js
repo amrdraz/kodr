@@ -25,7 +25,7 @@ module.exports = function(app, passport) {
      * get all challenges.
      *
      * @param range
-     * @returns {object} person
+     * @returns {object} challenge
      */
 
     app.get('/api/challenges', function(req, res, next) {

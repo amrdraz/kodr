@@ -62,7 +62,15 @@ var ArenaSchema = new mongoose.Schema({
     users: [{
         type: ObjectId,
         ref: 'UserArena'
-    }]
+    }],
+    /*
+    Prerequisit defines the arena that has to be unlocked before
+    accessing this one. Could be null.
+    */
+    prerequisit: {
+        type: ObjectId,
+        ref: 'Arena'
+    },
 });
 
 ArenaSchema.plugin(relationship, {

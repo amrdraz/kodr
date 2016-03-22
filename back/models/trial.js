@@ -92,7 +92,11 @@ var TrialSchema = new mongoose.Schema({
         ref: 'Arena',
         childPath: "trials",
         // required: true
-    }
+    },
+    concepts: [{
+        type: ObjectId,
+        ref: 'Concept'
+    }]
 
 });
 
