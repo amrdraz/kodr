@@ -29,7 +29,8 @@ var ConceptSchema = new mongoose.Schema({
 		type: Number,
 		default: 10
 	},
-	challenge: [{
+	// Difficulty upgrade
+	challenges: [{
 		type: ObjectId,
 		ref: 'Challenge'
 	}],

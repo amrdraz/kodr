@@ -16,6 +16,8 @@ var SuggestionSchema = new mongoose.Schema({
 		type: ObjectId,
 		ref: 'User'
 	},
+	// List of dates suggested
+	// List of dates resolved
 	date: {
 		type: Date,
 		default: Date.now()

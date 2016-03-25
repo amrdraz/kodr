@@ -73,7 +73,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
 			});
 		});
 	}
-
+// TODO: remove user concept
 	schema.methods.removeConceptFromTrials = function() {
 		var doc = this;
 		return Trial.find({
