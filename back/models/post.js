@@ -48,6 +48,10 @@ var PostSchema =  new mongoose.Schema({
       type: ObjectId,
       ref: 'Comment'
   }],
+  challenge: {
+    type: ObjectId,
+    ref: 'Challenge'
+  },
   tags: [TagSchema],
   created_at: {
      type:Date

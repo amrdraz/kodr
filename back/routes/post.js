@@ -39,14 +39,16 @@ module.exports = function(app, passport) {
             Post.find({
                 'tags._id': req.query.tag
             }, function(err, model) {
-              if(err)
-                return next(err);
-              res.json({
-                  posts: model
-              });
+                if (err)
+                    return next(err);
+                res.json({
+                    posts: model
+                });
             });
         } else {
-            Post.find(req.query)
+            Post.find({
+              challenge: null
+                })
                 .select('')
                 .exec()
                 .then(function(model) {
@@ -66,25 +68,66 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/posts', access.requireRole(), function(req, res, next) {
-        var post = req.body.post;
-        var tags = post.tags;
-        delete post['tags'];
-        post.author = post.user || req.user.id;
-        post = new Post(post);
-        post.findOrCreateTags(0, tags, post.tags, function(err, result) {
-            if (err) {
-                console.log(err);
-                return next(err);
-            }
-            post.save(function(err, model) {
+        if (req.body.challenge) {
+            var challenge = JSON.parse(req.body.challenge);
+            var challenge_id = req.body.challenge_id;
+            Post.findOne({
+                'challenge': challenge_id
+            }, function(err, post) {
                 if (err)
-                    next(err);
-                res.json({
-                    post: model
+                    return next(err);
+                if (!post) {
+                    var post = new Post();
+                    post.challenge = challenge_id;
+                    post.author = challenge.content.author;
+                    var type= challenge.content.type;
+                    post.totalVotes = 0;
+                    post.title = challenge.content.name + " (" + type +")";
+                    post.text = "**Author's Solution:** \n ~~~\n" +
+                                challenge.content.blueprint.solution +
+                                "\n~~~";
+                    var tags = [];
+                    tags.push(challenge.content.type);
+                    post.findOrCreateTags(0, tags, post.tags, function(err, result) {
+                        if (err) {
+                            console.log(err);
+                            return next(err);
+                        }
+                        post.save(function(err, model) {
+                            if (err)
+                                next(err);
+                            res.json({
+                                post: model
+                            });
+                        });
+                    });
+                } else {
+                  console.log("hereeee");
+                    res.json({
+                        post: post
+                    });
+                }
+            });
+        } else {
+            var post = req.body.post;
+            var tags = post.tags;
+            delete post['tags'];
+            post.author = post.user || req.user.id;
+            post = new Post(post);
+            post.findOrCreateTags(0, tags, post.tags, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    return next(err);
+                }
+                post.save(function(err, model) {
+                    if (err)
+                        next(err);
+                    res.json({
+                        post: model
+                    });
                 });
             });
-        });
-
+        }
     });
 
     app.get('/api/posts/:id/vote', access.requireRole(), function(req, res, next) {
