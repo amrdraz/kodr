@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 var Post = require('../models/post');
+var User = require('../models/user');
 var ExpiringToken = require('../models/expiringToken');
 var access = require('./access');
 var observer = require('../observer');
@@ -47,7 +48,7 @@ module.exports = function(app, passport) {
             });
         } else {
             Post.find({
-              challenge: null
+                    challenge: null
                 })
                 .select('')
                 .exec()
@@ -80,12 +81,12 @@ module.exports = function(app, passport) {
                     var post = new Post();
                     post.challenge = challenge_id;
                     post.author = challenge.content.author;
-                    var type= challenge.content.type;
+                    var type = challenge.content.type;
                     post.totalVotes = 0;
-                    post.title = challenge.content.name + " (" + type +")";
+                    post.title = challenge.content.name;
                     post.text = "**Author's Solution:** \n ~~~\n" +
-                                challenge.content.blueprint.solution +
-                                "\n~~~";
+                        challenge.content.blueprint.solution +
+                        "\n~~~";
                     var tags = [];
                     tags.push(challenge.content.type);
                     post.findOrCreateTags(0, tags, post.tags, function(err, result) {
@@ -102,7 +103,7 @@ module.exports = function(app, passport) {
                         });
                     });
                 } else {
-                  console.log("hereeee");
+                    console.log("hereeee");
                     res.json({
                         post: post
                     });
@@ -158,19 +159,38 @@ module.exports = function(app, passport) {
                 return next(new Error('Could find the Post'));
             else {
                 var len = post.votesUp.length;
+                var voteWeight = 10; //TODO change vote weight according to role
                 post.votesUp.remove(req.user.id);
                 post.votesDown.remove(req.user.id);
-                if (len === post.votesUp.length) {
-                    post.votesUp.push(req.user.id);
-                }
-                post.totalVotes = post.votesUp.length - post.votesDown.length;
-                post.save(function(err, model) {
-                    if (err)
-                        next(err);
-                    res.json({
-                        model: model
+                //Increasing Post Author's reputation
+                User.findById(post.author).exec(function(err, user) {
+                    if (err) return next(err);
+                    if (!user) return res.send(404, "Not Found");
+                    if (len === post.votesUp.length) {
+                        //Voting Up
+                        post.votesUp.push(req.user.id);
+                        user.rp = user.rp + voteWeight;
+                    } else {
+                        //Removing A Vote Up
+                        user.rp = user.rp - voteWeight;
+                    }
+                    //Saving The User
+                    user.save(function(err, u) {
+                        if (err)
+                            next(err);
+                        console.log(u.rp);
+                        //Saving The Post
+                        post.totalVotes = post.votesUp.length - post.votesDown.length;
+                        post.save(function(err, model) {
+                            if (err)
+                                next(err);
+                            res.json({
+                                model: model
+                            });
+                        });
                     });
                 });
+
             }
         });
     });
@@ -188,17 +208,35 @@ module.exports = function(app, passport) {
                 return next(new Error('Could find the Post'));
             else {
                 var len = post.votesDown.length;
+                var voteWeight = 10; //TODO change vote weight according to role
                 post.votesUp.remove(req.user.id);
                 post.votesDown.remove(req.user.id);
-                if (len === post.votesDown.length) {
-                    post.votesDown.push(req.user.id);
-                }
-                post.totalVotes = post.votesUp.length - post.votesDown.length;
-                post.save(function(err, model) {
-                    if (err)
-                        next(err);
-                    res.json({
-                        model: model
+                //Decreasing Post Author's reputation
+                User.findById(post.author).exec(function(err, user) {
+                    if (err) return next(err);
+                    if (!user) return res.send(404, "Not Found");
+                    if (len === post.votesDown.length) {
+                        //Voting Down
+                        post.votesDown.push(req.user.id);
+                        user.rp = user.rp - voteWeight;
+                    } else {
+                        //Removing a vote Down
+                        user.rp = user.rp + voteWeight;
+                    }
+                    //Saving The User
+                    user.save(function(err, u) {
+                        if (err)
+                            next(err);
+                        console.log(u.rp);
+                        //Saving The Post
+                        post.totalVotes = post.votesUp.length - post.votesDown.length;
+                        post.save(function(err, model) {
+                            if (err)
+                                next(err);
+                            res.json({
+                                model: model
+                            });
+                        });
                     });
                 });
             }
