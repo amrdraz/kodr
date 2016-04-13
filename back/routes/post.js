@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 var Post = require('../models/post');
+var Comment = require('../models/comment');
 var User = require('../models/user');
 var ExpiringToken = require('../models/expiringToken');
 var access = require('./access');
@@ -71,6 +72,7 @@ module.exports = function(app, passport) {
     app.post('/api/posts', access.requireRole(), function(req, res, next) {
         if (req.body.challenge) {
             var challenge = JSON.parse(req.body.challenge);
+            var solution = req.body.solution;
             var challenge_id = req.body.challenge_id;
             Post.findOne({
                 'challenge': challenge_id
@@ -84,9 +86,6 @@ module.exports = function(app, passport) {
                     var type = challenge.content.type;
                     post.totalVotes = 0;
                     post.title = challenge.content.name;
-                    post.text = "**Author's Solution:** \n ~~~\n" +
-                        challenge.content.blueprint.solution +
-                        "\n~~~";
                     var tags = [];
                     tags.push(challenge.content.type);
                     post.findOrCreateTags(0, tags, post.tags, function(err, result) {
@@ -97,16 +96,46 @@ module.exports = function(app, passport) {
                         post.save(function(err, model) {
                             if (err)
                                 next(err);
-                            res.json({
-                                post: model
-                            });
+                            if (solution) {
+                              var comment = new Comment();
+                              comment.text = solution;
+                              comment.author = comment.user || req.user.id;
+                              comment.totalVotes = 0;
+                              comment.save(function(err,comment) {
+                                  if(err)
+                                    next(err);
+                                  res.json({
+                                    solution: comment,
+                                    post: model
+                                  });
+                              });
+                            } else {
+                                res.json({
+                                    post: model
+                                });
+                            }
                         });
                     });
                 } else {
-                    console.log("hereeee");
-                    res.json({
-                        post: post
+                  if (solution) {
+                    var comment = new Comment();
+                    comment.text = "~~~\n"+solution.substring(1,solution.length-1)+"\n~~~";
+                    comment.author = comment.user || req.user.id;
+                    comment.totalVotes = 0;
+                    comment.post = post;
+                    comment.save(function(err,comment) {
+                        if(err)
+                          next(err);
+                        res.json({
+                          solution: comment,
+                          post: post
+                        });
                     });
+                  } else {
+                      res.json({
+                          post: post
+                      });
+                  }
                 }
             });
         } else {
