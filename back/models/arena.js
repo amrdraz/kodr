@@ -69,8 +69,13 @@ var ArenaSchema = new mongoose.Schema({
     */
     prerequisit: {
         type: ObjectId,
-        ref: 'Arena'
+        ref: 'Arena',
+        default: null
     },
+    mock: {
+        type: Boolean,
+        default: false
+    }
 });
 
 ArenaSchema.plugin(relationship, {

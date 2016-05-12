@@ -2,7 +2,8 @@ var _ = require('lodash');
 var User = require('../models/user');
 
 exports.hasToken = function(req, res, next) {
-
+    //req.set('X-K-Authorization', req.body['X-K-Authorization'])
+    
     if (!req.get('X-K-Authorization')) {
         res.send(401, "Unauthorized");
         return;

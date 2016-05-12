@@ -25,4 +25,20 @@ module.exports = function(app, passport) {
         }).catch(next);
     });
 
+    /**
+     * get all activities.
+     *
+     * @param range
+     * @returns {object} activity
+     */
+
+    app.get('/api/activities', function(req, res, next) {
+
+        Activity.getByQuery(req.query).then(function(model) {
+            res.json({
+                activity: model
+            });
+        }).catch(next);
+    });
+
 };

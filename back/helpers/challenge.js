@@ -5,13 +5,38 @@ var observer = require('../observer');
 var javaRunner = require('java-code-runner');
 
 var Arena = require('../models/arena');
+var Concept = require('../models/concept');
+var UserConcept = require('../models/userConcept');
+var captainHook  = require('captain-hook');
+var mongoose = require('mongoose');
+ 
+ 
+
 
 module.exports = function(schema, options) {
     var Model = options.model || options;
     schema.plugin(require('./_common_helper'), options);
+    schema.plugin(captainHook);
 
-    var Concept = this.db.model('Concept');
-    var UserConcept = this.db.model('UserConcept');
+    // function to run after saving a new challenge instance
+
+    schema.postCreate(function(challenge, next){
+      var Concept = mongoose.model('Concept');
+      _.map(challenge.concepts, function(cid) {
+        Concept.findOne({
+            _id: cid
+        }).exec().then(function(concept) {
+            var conChs = concept.challenges;
+            conChs.push(challenge._id);
+            Concept.update({
+                _id: cid
+            }, {
+                challenges: conChs
+            }).exec();
+        });
+      });
+      next();
+    });
 
     schema.methods.run = function(code) {
         var Challenge = this.db.model('Challenge');

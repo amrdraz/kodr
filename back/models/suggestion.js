@@ -16,22 +16,30 @@ var SuggestionSchema = new mongoose.Schema({
 		type: ObjectId,
 		ref: 'User'
 	},
-	// List of dates suggested
-	// List of dates resolved
+	dates_suggested: [{
+		type: Date
+	}],
+	dates_resolved: [{
+		type: Date
+	}],
 	date: {
+		// Last time it was suggested, might be redundant
 		type: Date,
 		default: Date.now()
 	},
 	solved: {
-		type: Boolean
+		type: Boolean,
+		default: false
 	},
 	times_suggested: {
 		// Number of times a concept was suggested
-		type: Number
+		type: Number,
+		default: 2
 	},
 	times_resolved: {
 		// Number of times a suggestion was resovled
-		type: Number
+		type: Number,
+		default: 0
 	}
 });
 

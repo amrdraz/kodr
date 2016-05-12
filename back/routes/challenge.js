@@ -98,6 +98,7 @@ module.exports = function(app, passport) {
         Challenge.getById_404(req.params.id).then(function(model) {
             model.set(req.body.challenge);
             model.save(function(err, model) {
+                console.log(model)
                 res.json({
                     challenge: model
                 });

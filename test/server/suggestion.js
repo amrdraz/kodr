@@ -22,15 +22,15 @@ var sinon = require('sinon');
 
 describe('Suggestion', function() {
   before(function(done) {
-    // setup.clearDB(done);
-    done()
+    setup.clearDB(done);
+    // done()
     
   });
 
   describe('Trials', function() {
     require('../../back/events/userConcept_events');
-    var challenge, userArena, user, trials, num = 1;
-    var suggestion, userConcept, concept, concept2, userConcept2;
+    var challenge, userArena, user, user2, trials, num = 1;
+    var suggestion, userConcept, concept, concept2, userConcept2, userConcept3, suggestion2;
     beforeEach(function(done) {
         Promise.fulfilled().then(function() {
             var at = UserArena.create({});
@@ -40,6 +40,11 @@ describe('Suggestion', function() {
             usr = User.create({
                 username: 'testuser',
                 password: 'testuser12'
+            });
+            usr2 = User.create({
+              username: 'testuser2',
+              password: 'testuser12',
+              email: 'testuser2@mail.com'
             });
             con1 = Concept.create({
               author: usr._id,
@@ -65,11 +70,12 @@ describe('Suggestion', function() {
             });
 
             
-            return [at, ch, ch2, usr, con1, con2, usrCon];
-        }).spread(function(at, ch, ch2, usr, con1, con2, usrCon) {
+            return [at, ch, ch2, usr, con1, con2, usrCon, usr2, usrCon2];
+        }).spread(function(at, ch, ch2, usr, con1, con2, usrCon, usr2, usrCon2) {
             challenge = ch;
             userArena = at;
             user = usr;
+            user2 = usr2;
             concept = Concept.create({
               author: usr._id,
               name: 'Nested Loops'
@@ -119,29 +125,50 @@ describe('Suggestion', function() {
                 });
             });
 
-            return [chs, chs2, concept, con1];
-        }).spread(function(chs, chs2, con, con1) {
+            usrCon3 = UserConcept.create({
+              concept: con1._id,
+              user: user2._id,
+              slope: 0.5
+            });
+            uc = UserConcept.create({
+              concept: con1._id,
+              user: user._id,
+              slope: 0.5,
+              x: 0.5
+            })
+
+            return [chs, chs2, concept, con1, usrCon3, uc];
+        }).spread(function(chs, chs2, con, con1, usrCon3, uc) {
+            userConcept3 = usrCon3;
             concept = con;
             concept2 = con1;
-            userConcept = UserConcept.create({
-              concept: concept2._id,
+            
+            userConcept = uc;
+            suggestion = Suggestion.create({
+              user_concept: userConcept,
               user: user._id,
-              slope: 0.5
-            }).then(function(uc) {
-              userConcept = uc;
-              suggestion = Suggestion.create({
-                user_concept: userConcept,
-                user: user._id
-              }).then(function(s) {
-                suggestion = s;
-              });
+              times_resolved: 1,
+              dates_suggested: [Date.now(), Date.now()],
+              dates_resolved: [Date.now()]
+            }).then(function(s) {
+              suggestion = s;
             });
+            
 
             UserConcept.create({
               concept: con._id,
               user: user._id
             }).then(function(uc) {
               userConcept2 = uc;
+            });
+
+            Suggestion.create({
+              user_concept: userConcept3._id,
+              user: user2._id,
+              times_suggested: 2,
+              dates_suggested: [Date.now(), Date.now()]
+            }).then(function(s) {
+              suggestion2 = s;
             });
             
             trials = chs.concat(chs2);
@@ -162,7 +189,6 @@ describe('Suggestion', function() {
     afterEach(setup.clearDB);
 
     it('should get trials for a suggestion', function(done) {
-
       Promise.fulfilled().then(function() {
         return suggestion.getTrialsForSuggestion();
       }).then(function(trials) {
@@ -187,7 +213,7 @@ describe('Suggestion', function() {
 
     it('should create suggestion', function(done) {
       Suggestion.createOrIncrementSuggestion(userConcept2).then(function(s) {
-        s.times_suggested.should.equal(1);
+        s.times_suggested.should.equal(2);
         done();
       });
     });
@@ -226,15 +252,30 @@ describe('Suggestion', function() {
         Suggestion.findOne({
           _id: suggestion._id
         }).then(function(sugg) {
-          sugg.dates_resolved.length.should.equal(1);
+          sugg.dates_resolved.length.should.equal(2);
           sugg.solved.should.equal(true);
-          sugg.times_resolved.should.equal(1);
+          sugg.times_resolved.should.equal(2);
           done();
         }); 
       });
     });
 
     it('should add slope to X after resolving suggestion', function(done) {
+      suggestion2.resolve().then(function() {
+        Suggestion.findOne({
+          _id: suggestion._id
+        }).then(function(sugg) {
+          UserConcept.findOne({
+            _id: userConcept3._id
+          }).exec().then(function(uc) {
+            uc.x.should.equal(0.5);
+            done();
+          }); 
+        }); 
+      });
+    });
+
+    it('should reset x and slope after solving a suggestion and increment exp', function(done) {
       suggestion.resolve().then(function() {
         Suggestion.findOne({
           _id: suggestion._id
@@ -242,22 +283,14 @@ describe('Suggestion', function() {
           UserConcept.findOne({
             _id: userConcept._id
           }).exec().then(function(uc) {
-            uc.x.should.equal(0.5);
-            console.log(sugg)
+            uc.exp.should.equal(1);
+            uc.slope.should.equal(1);
+            uc.x.should.equal(0);
             done();
-          }); 
+          });
         }); 
       });
     });
-
-    // it('should emit', function(done) {
-    //   observer.on('test.test', function(string) {
-    //     console.log(string);
-    //   });
-    //   observer.emit('test.test', 'ok');
-    //   observer.emit('suggestion.generateOrIncrement');
-    //   done();
-    // });
 
   });
 

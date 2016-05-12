@@ -4,7 +4,8 @@ var Activity = require('../models/activity');
 var Challenge = require('../models/challenge');
 var User = require('../models/user');
 var mail = require('../config/mail');
-
+var Suggestion = require('../models/suggestion');
+require('../../back/events/userConcept_events');
     
 /**
  * Event listner for when a trial is complete
@@ -29,6 +30,14 @@ observer.on('trial.complete', function(trial) {
 observer.on('trial.event', function(event) {
     var object = event.trial;
     var uid = event.user || object.user;
+    // console.log("EVENT", event.trial, uid);
+    // if (event.meta.passed === false) {
+    //     observer.emit('trial.failed', event.trial, uid);
+    // } else {
+    //     observer.emit('trial.passed', event.trial, uid);
+    // }
+    if (event.meta.passed !== undefined)
+        observer.emit('trial.faliedOrPassed', event.trial, uid, event.meta.passed);
     Activity.new({
         subjectId:uid,
         subjectModel:'User',

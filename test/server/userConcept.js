@@ -67,7 +67,8 @@ describe('UserConcept', function() {
             var arr = Array(num);
             suggestion = Suggestion.create({
               user_concept: usrCon2._id,
-              user: usr._id
+              user: usr._id,
+              times_resolved: 1
             });
             var chs = Promise.each(arr, function() {
                 return Trial.create({

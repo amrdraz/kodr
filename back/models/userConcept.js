@@ -27,6 +27,21 @@ var UserConceptSchema = new mongoose.Schema({
 	},
 	last_practiced: {
 		type: Date
+	},
+	slope: {
+		type: Number,
+		default: 1.0,
+		min: 0.125
+	},
+	x: {
+		/*
+			Used in accordance with the slope.
+			Accumlates slope value if slope is less then 1.
+			When it reaches 1.0, it means that a suggestion is solved
+			and it is reset to 0.
+		*/
+		type: Number,
+		default: 0.0
 	}
 });
 

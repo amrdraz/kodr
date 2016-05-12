@@ -32,7 +32,7 @@ module.exports = function(app, passport) {
      * @returns {object} person
      */
 
-    app.get('/api/arenas', function(req, res, next) {
+    app.get('/api/arenas', access.requireRole(), function(req, res, next) {
         Arena.getByQuery(req.query).then(function(model) {
             res.json({
                 arena: model
@@ -64,6 +64,7 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/arenas', access.requireRole(['teacher','admin']), function(req, res, next) {
+        console.log(req.body)
         req.body.arena.author = req.user.id;
         Arena.create(req.body.arena, function(err, model) {
             if (err) return next(err);

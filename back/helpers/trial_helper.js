@@ -2,10 +2,48 @@ var Promise = require('bluebird');
 var mongoose = require('mongoose');
 var _ = require('lodash');
 var observer = require('../observer');
+var captainHook  = require('captain-hook');
+var Concept = require('../models/concept');
 
 module.exports = exports = function lastModifiedPlugin(schema, options) {
     var Model = options.model || options;
     schema.plugin(require('./_common_helper'), options);
+    schema.plugin(captainHook);
+
+    // function to run after saving a new trial instance 
+    schema.postCreate(function(trial, next){
+      /*
+
+      */
+      var Challenge = mongoose.model('Challenge');
+      var Concept = mongoose.model('Concept');
+      var Trial = mongoose.model('Trial');
+      Challenge.findOne({
+        _id: trial.challenge
+      }).then(function(challenge) {
+        Trial.update({
+            _id: trial._id
+        }, {
+            concepts: challenge.concepts
+        }).exec().then(function(h) {
+            _.map(challenge.concepts, function(cid) {
+                Concept.findOne({
+                    _id: cid
+                }).then(function(concept) {
+                    var conTrials = concept.trials;
+                    conTrials.push(trial._id);
+                    Concept.update({
+                        _id: cid
+                    }, {
+                        trials: conTrials
+                    }).exec();
+                });
+            });
+        });
+        
+      });
+      next();
+    });
 
     schema.pre('save', true, function(next, done) {
         var Challenge = mongoose.model('Challenge');

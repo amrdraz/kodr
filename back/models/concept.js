@@ -19,7 +19,8 @@ var observer = require('../observer');
 var ConceptSchema = new mongoose.Schema({
 	author: {
 		type: ObjectId,
-		ref: 'User'
+		ref: 'User',
+		unique: false
 	},
 	name: {
 		type: String,

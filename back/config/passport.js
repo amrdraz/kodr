@@ -42,11 +42,11 @@ module.exports = function(passport) {
         passwordField: 'password',
         passReqToCallback: true // allows request in the callback
     }, function(req, identity, password, done) {
-
         // make things asynchronus
         // only fire findOne when we have data
         process.nextTick(function() {
             User.findByIdentity(identity).then(function(user) {
+
                 // check if user with this email already exists
                 if (!user) {
                     return done(null, false, req.flash('loginMessage', 'Invalide username or password'));

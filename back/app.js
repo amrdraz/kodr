@@ -141,7 +141,7 @@ http.listen(config.port, function() {
 // var httpApp = express();
 // var http = require('http').createServer(httpApp);
 // // set up a route to redirect http to https
-// httpApp.get('*',function(req,res){  
+// httpApp.get('*',function(req,res){
 //     res.redirect('https://'+config.host+req.url);
 // });
 // http.listen(config.port);

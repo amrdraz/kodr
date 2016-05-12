@@ -30,6 +30,10 @@ module.exports = function(app, passport) {
     require('./routes/userQuest')(app, passport);
     // activity routes
     require('./routes/activity')(app, passport);
+    // concept routes
+    require('./routes/concept')(app, passport);
+    // user concept routes
+    require('./routes/userConcept')(app, passport);
 
     if (process.env.NODE_ENV !== 'production') {
         app.get('/seed_db', require('./seed_db'));
@@ -66,6 +70,8 @@ module.exports = function(app, passport) {
 
     app.post('/token', function(req, res, next) {
         req = processFields(req);
+        if (!req.body['identification'] && req.body.username)
+          req.body['identification'] = req.body.username;
         passport.authenticate('local-login', function(err, user) {
             if (err) return next(err);
             if (user) {
@@ -77,7 +83,11 @@ module.exports = function(app, passport) {
                 observer.emit('user.login', user);
                 res.send({
                     access_token: user.token,
-                    user_id: user._id
+                    token: user.token,
+                    email: user.email,
+                    user_id: user._id,
+                    username: user.username,
+                    user: user
                 });
             } else res.send(403, {
                 message: 'Incorrect username or password.'
@@ -87,6 +97,7 @@ module.exports = function(app, passport) {
 
     // logout
     app.del('/logout', access.hasToken, function(req, res) {
+      console.log(req)
         observer.emit('user.logout', req.user);
         req.logout();
         res.send(204);
