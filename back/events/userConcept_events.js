@@ -7,6 +7,7 @@ var mail = require('../config/mail');
 var UserConcept = require('../models/userConcept');
 var Suggestion = require('../models/suggestion');
 var Trial = require('../models/trial');
+var _ = require('lodash');
 
     
 /**
@@ -31,12 +32,14 @@ var Trial = require('../models/trial');
 */
 
 observer.on('trial.faliedOrPassed', function(trialId, uid, failed) {
-	console.log(failed);
+	console.log("EVENT ****************************************************");
+	
 	Trial.findOne({
 		_id: trialId
 	}).then(function(trial) {
 		var concepts = trial.concepts;
-		_.map(concept, function(cid) {
+		_.map(concepts, function(cid) {
+			console.log(cid)
 			UserConcept.findOne({
 				user: uid,
 				concept:cid
@@ -49,11 +52,11 @@ observer.on('trial.faliedOrPassed', function(trialId, uid, failed) {
 					console.log("FAILED");
 					Suggestion.createOrIncrementSuggestion(userConcept);
 				} else {
+					console.log("PASSED ****************************************************");
 					/*
 						addSlopeToX automatically detects the need to resetX, resolve a Suggestion
 						or IncExp
 					*/
-					console.log("PASSED");
 					userConcept.addSlopeToX();
 				}		
 			});

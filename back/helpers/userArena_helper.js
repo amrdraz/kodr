@@ -57,56 +57,56 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
         var Trial = mongoose.model('Trial');
         // var obj = {arena:userArena.arena, userArena:userArena.id, user:userArena.user};
         // var update = _.clone(obj);
-        return Arena.getOneByQuery({
-            // Return the arena to check for prerequisits
-            arena: userArena.arena
-        }).then(function(arena) {
+        // return Arena.getOneByQuery({
+        //     // Return the arena to check for prerequisits
+        //     _id: userArena._id
+        // }).then(function(arena) {
 
-            //////////// Aly Yakan ////////////////
-            var prerequisit = arena.prerequisit;
-            if (prerequisit) {
-                UserArena.getOneByQuery({
-                    // Get the userArena of the prerequisit to check if it's cleared or not
-                    arena: prerequisit
-                }).then(function(preUserArena) {
-                    var locked = false;
-                    if (preUserArena.complete === false)
-                        locked = true;
+        //     //////////// Aly Yakan ////////////////
+        //     var prerequisit = arena.prerequisit;
+        //    // if (false) {
+        //         UserArena.getOneByQuery({
+        //             // Get the userArena of the prerequisit to check if it's cleared or not
+        //             arena: prerequisit
+        //         }).then(function(preUserArena) {
+        //             var locked = false;
+        //             if (preUserArena.complete === false)
+        //                 locked = true;
 
-                    // return findOrCreateWithTrialsHelper({
-                    //     user: userArena.user,
-                    //     arena: userArena.arena,
-                    //     locked: locked
-                    // }, userArena);
+        //             // return findOrCreateWithTrialsHelper({
+        //             //     user: userArena.user,
+        //             //     arena: userArena.arena,
+        //             //     locked: locked
+        //             // }, userArena);
 
-                    return UserArena.getOneByQueryOrCreate({
-                        user: userArena.user,
-                        arena: userArena.arena,
-                        locked: locked,
-                        prerequisit: prerequisit
-                    }, userArena).then(function(model) {
-                        var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
-                            return Trial.findOrCreate({
-                                userArena: model._id,
-                                arena: model.arena,
-                                user: model.user,
-                                challenge: challenge._id,
-                                work: getInitialWorkObj(challenge, userArena.user),
-                                blueprint: challenge.blueprint,
-                                group: challenge.group,
-                                order: challenge.order,
-                                code: challenge.setup,
-                                completed: 0
-                            });
-                        });
-                        var at = trials.then(function(mods) {
-                            return UserArena.getById(model.id);
-                        });
-                        return [at, trials];
-                    });
+        //             return UserArena.getOneByQueryOrCreate({
+        //                 user: userArena.user,
+        //                 arena: userArena.arena,
+        //                 locked: locked,
+        //                 prerequisit: prerequisit
+        //             }, userArena).then(function(model) {
+        //                 var trials = Promise.map(model.getArenaChallenges(), function(challenge) {
+        //                     return Trial.findOrCreate({
+        //                         userArena: model._id,
+        //                         arena: model.arena,
+        //                         user: model.user,
+        //                         challenge: challenge._id,
+        //                         work: getInitialWorkObj(challenge, userArena.user),
+        //                         blueprint: challenge.blueprint,
+        //                         group: challenge.group,
+        //                         order: challenge.order,
+        //                         code: challenge.setup,
+        //                         completed: 0
+        //                     });
+        //                 });
+        //                 var at = trials.then(function(mods) {
+        //                     return UserArena.getById(model.id);
+        //                 });
+        //                 return [at, trials];
+        //             });
 
-                });
-            } else {
+        //         });
+           // } else {
                 // No prerequisit, locked's default is false
 
                 // return findOrCreateWithTrialsHelper({
@@ -124,6 +124,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
                             arena: model.arena,
                             user: model.user,
                             challenge: challenge._id,
+                            exp: challenge.exp,
                             work: getInitialWorkObj(challenge, userArena.user),
                             blueprint: challenge.blueprint,
                             group: challenge.group,
@@ -137,9 +138,9 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
                     });
                     return [at, trials];
                 });
-            }
+           // }
             
-        });
+       // });
         /////////////// End Aly Yakan //////////////////
 
 

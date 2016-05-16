@@ -97,27 +97,27 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
 		
 	}
 
-		schema.methods.resetSlopeAndIncExp = function() {
-		/*
-			If x reached 1.0, then the user is back on track in this concept,
-			now we will reset the slope to 1.0 and x back to 0.0
-		*/
-		var UserConcept = this.db.model('UserConcept');
-		var doc = this;
-			return UserConcept.update({
-				_id: doc._id
-			}, {
-				x: 0.0,
-				slope: 1.0,
-				$inc: { exp: 1 }
-			}).exec().then(function(h) {
-				return Suggestion.findOne({
-					user_concept: doc._id
-				}).then(function(suggestion) {
-					return suggestion.resolve();
-				})
-			});
-			// TODO: resolve suggestion
+	schema.methods.resetSlopeAndIncExp = function() {
+	/*
+		If x reached 1.0, then the user is back on track in this concept,
+		now we will reset the slope to 1.0 and x back to 0.0
+	*/
+	var UserConcept = this.db.model('UserConcept');
+	var doc = this;
+		return UserConcept.update({
+			_id: doc._id
+		}, {
+			x: 0.0,
+			slope: 1.0,
+			$inc: { exp: 1 }
+		}).exec().then(function(h) {
+			return Suggestion.findOne({
+				user_concept: doc._id
+			}).then(function(suggestion) {
+				return suggestion.resolve();
+			})
+		});
+		// TODO: resolve suggestion
 		
 	}
 
@@ -141,7 +141,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
 				return doc.resetSlopeAndIncExp();
 			}
 		} else {
-			return {}
+			return doc.IncExp();
 		}
 		
 	}

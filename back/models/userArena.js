@@ -62,6 +62,14 @@ var UserArenaSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    mock: {
+        type: Boolean,
+        default: false
+    },
+    max_exp: {
+        type: Number,
+        default: 0
+    },
     /*
     Prerequisit defines the arena that has to be unlocked before
     accessing this one. Could be null.

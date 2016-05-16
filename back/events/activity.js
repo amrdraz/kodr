@@ -13,6 +13,7 @@ require('../../back/events/userConcept_events');
  * @return {[type]}       [description]
  */
 observer.on('trial.complete', function(trial) {
+
     Activity.new({
         subjectId:trial.user,
         subjectModel:'User',
@@ -20,6 +21,7 @@ observer.on('trial.complete', function(trial) {
         verb:'completed',
         object:trial
     });
+    observer.emit('trial.faliedOrPassed', trial.id, trial.user, false);
 });
 
 /**

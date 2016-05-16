@@ -64,12 +64,16 @@ module.exports = function(app, passport) {
      */
 
     app.post('/api/arenas', access.requireRole(['teacher','admin']), function(req, res, next) {
-        console.log(req.body)
+        
         req.body.arena.author = req.user.id;
+
         Arena.create(req.body.arena, function(err, model) {
             if (err) return next(err);
-            res.json({
-                arena: model
+            UserArena.findOrCreateWithTrials({user:req.user.id,arena:model})
+            .spread(function(ua, trials) {
+                res.json({
+                    arena: model
+                });
             });
         });
     });

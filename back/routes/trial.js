@@ -35,62 +35,67 @@ module.exports = function(app, passport) {
     app.get('/api/trials', access.requireRole(), function(req, res, next) {
         var promise;
         // UserArena.findOrCreateWithTrials({user:req.query.user,arena:req.query.arena});
-        if(req.query.ids) {
-            req.query._id = {$in:req.query.ids};
-            delete req.query.ids;
-            promise = Trial.getByQuery(req.query).then(function(model) {
+        Trial.getByQuery(req.query).then(function(model) {
                 res.json({
                     trial: model
                 });
-            });
-        } else if(req.query.arena || req.query.userArena) {
-            var userId;
-            if(req.user.isStudent) {
-                userId = req.user.id;
-            } else {
-                userId = req.query.user || req.user.id;
-            }
-            promise = Promise.fulfilled().then(function () {
-                if(!req.query.arena) {
-                    return Arena.getByQuery({users: {$in:[req.query.userArena]}});
-                } else {
-                    return {id:req.query.arena};
-                }            
-            }).then(function (arena) {
-                var userarena = {};
-                if(req.query.userArena) {
-                    userarena.id = req.query.userArena;
-                } else {
-                    var obj = {arena:arena.id, user:userId};
-                    userarena = UserArena.getOneByQueryOrCreate(obj, obj);
-                }
-                return [Challenge.getByQuery({arena:arena.id}), userarena, arena];
-            }).spread(function (challenges, ua, arena) {
-                challenges = _.filter(challenges, 'isPublished');
-                return [
-                    challenges,
-                    Promise.map(challenges, function (ch) {
-                        var obj = {arena:arena.id, userArena:ua.id, challenge:ch.id, user:userId};
-                        var update = _.clone(obj);
-                        update.order = ch.order;
-                        update.group = ch.group;
-                        return Trial.getOneByQueryOrCreateOrUpdate(obj, update);
-                    })
-                ];
-            }).spread(function (challenges, trials) {
-                res.json({
-                    challenge:challenges,
-                    trial: _.filter(trials, null)
-                });
-            });
-        } else {
-            promise = Trial.getByQuery(req.query).then(function(model) {
-                res.json({
-                    trial: model
-                });
-            });
-        }
-        promise.catch(next);
+            }).catch(next)
+        // if(req.query.ids) {
+        //     req.query._id = {$in:req.query.ids};
+        //     delete req.query.ids;
+        //     promise = Trial.getByQuery(req.query).then(function(model) {
+        //         res.json({
+        //             trial: model
+        //         });
+        //     });
+        // } else if(req.query.arena || req.query.userArena) {
+        //     var userId;
+        //     if(req.user.isStudent) {
+        //         userId = req.user.id;
+        //     } else {
+        //         userId = req.query.user || req.user.id;
+        //     }
+        //     promise = Promise.fulfilled().then(function () {
+        //         if(!req.query.arena) {
+        //             return Arena.getByQuery({users: {$in:[req.query.userArena]}});
+        //         } else {
+        //             return {id:req.query.arena};
+        //         }            
+        //     }).then(function (arena) {
+        //         var userarena = {};
+        //         if(req.query.userArena) {
+        //             userarena.id = req.query.userArena;
+        //         } else {
+        //             var obj = {arena:arena.id, user:userId};
+        //             userarena = UserArena.getOneByQueryOrCreate(obj, obj);
+        //         }
+        //         return [Challenge.getByQuery({arena:arena.id}), userarena, arena];
+        //     }).spread(function (challenges, ua, arena) {
+        //         challenges = _.filter(challenges, 'isPublished');
+        //         return [
+        //             challenges,
+        //             Promise.map(challenges, function (ch) {
+        //                 var obj = {arena:arena.id, userArena:ua.id, challenge:ch.id, user:userId};
+        //                 var update = _.clone(obj);
+        //                 update.order = ch.order;
+        //                 update.group = ch.group;
+        //                 return Trial.getOneByQueryOrCreateOrUpdate(obj, update);
+        //             })
+        //         ];
+        //     }).spread(function (challenges, trials) {
+        //         res.json({
+        //             challenge:challenges,
+        //             trial: _.filter(trials, null)
+        //         });
+        //     });
+        // } else {
+        //     promise = Trial.getByQuery(req.query).then(function(model) {
+        //         res.json({
+        //             trial: model
+        //         });
+        //     });
+        // }
+        // promise.catch(next);
     });
 
     /**

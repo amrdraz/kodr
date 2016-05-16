@@ -18,6 +18,7 @@ module.exports = function(app, passport) {
 
     app.get('/api/userArenas/:id', access.requireRole(), function(req, res, next) {
         UserArena.findById(req.params.id, function(err, model) {
+            
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             // var userArena = req.params.id
@@ -62,8 +63,7 @@ module.exports = function(app, passport) {
                 return [
                     arenas,
                     Promise.map(arenas, function (arena) {
-                        console.log(arena.flags, req.user.flags);
-                        if(arena.isPublished && arena.matchFlags(req.user.flags)) {
+                        if(arena.isPublished && arena.matchFlags(req.user.flags) || arena.mock) {
                             var obj = {arena:arena.id, user:req.user.id};
                             return UserArena.getOneByQueryOrCreate(obj, obj);
                         }
