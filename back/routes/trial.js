@@ -19,10 +19,21 @@ module.exports = function(app, passport) {
 
     app.get('/api/trials/:id', access.requireRole(), function(req, res, next) {
         Trial.getById(req.params.id).then(function(model) {
-            res.json({
-                trial: model
+            Challenge.getById(model.challenge).then(function(challenge) {
+                Trial.update({
+                    _id: req.params.id
+                }, {
+                    concepts: challenge.concepts
+                }).exec().then(function() {
+                    Trial.getById(req.params.id).then(function(trial) {
+                        res.json({
+                            trial: trial
+                        });
+                    }).catch(next);
+                });
             });
-        }).catch(next);
+            
+        });
     });
 
     /**

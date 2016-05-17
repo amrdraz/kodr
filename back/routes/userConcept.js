@@ -47,7 +47,8 @@ module.exports = function(app, passport) {
 
     app.put('/api/userConcepts/:id', access.requireRole(), function(req, res, next) {
         UserConcept.getById_404(req.params.id).then(function(model) {
-            model.set(req.body.challenge);
+            // console.log(req.body)
+            model.set(req.body.userConcept);
             model.save(function(err, model) {
                 console.log(model)
                 res.json({

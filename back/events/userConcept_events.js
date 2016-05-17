@@ -39,7 +39,7 @@ observer.on('trial.faliedOrPassed', function(trialId, uid, failed) {
 	}).then(function(trial) {
 		var concepts = trial.concepts;
 		_.map(concepts, function(cid) {
-			console.log(cid)
+			
 			UserConcept.findOne({
 				user: uid,
 				concept:cid
@@ -52,6 +52,7 @@ observer.on('trial.faliedOrPassed', function(trialId, uid, failed) {
 					console.log("FAILED");
 					Suggestion.createOrIncrementSuggestion(userConcept);
 				} else {
+					
 					console.log("PASSED ****************************************************");
 					/*
 						addSlopeToX automatically detects the need to resetX, resolve a Suggestion
