@@ -6,6 +6,7 @@ var Challenge = require('../models/challenge');
 var Arena = require('../models/arena');
 var Trial = require('../models/trial');
 var UserArena = require('../models/userArena');
+var observer = require('../observer');
 
 module.exports = function(app, passport) {
 
@@ -23,6 +24,7 @@ module.exports = function(app, passport) {
                 Trial.update({
                     _id: req.params.id
                 }, {
+                    exp: challenge.exp,
                     concepts: challenge.concepts
                 }).exec().then(function() {
                     Trial.getById(req.params.id).then(function(trial) {
@@ -32,6 +34,37 @@ module.exports = function(app, passport) {
                     }).catch(next);
                 });
             });
+            
+        });
+    });
+
+    /**
+     * Find trial by id.
+     *
+     * @param {string} id
+     * @returns {object} trial
+     */
+
+    app.get('/api/trials/:id/failed', access.requireRole(), function(req, res, next) {
+        Trial.getById(req.params.id).then(function(model) {
+            observer.emit('trial.failed', model);
+            res.json({
+                trial: model
+            });
+            // Challenge.getById(model.challenge).then(function(challenge) {
+            //     Trial.update({
+            //         _id: req.params.id
+            //     }, {
+            //         exp: challenge.exp,
+            //         concepts: challenge.concepts
+            //     }).exec().then(function() {
+            //         Trial.getById(req.params.id).then(function(trial) {
+            //             res.json({
+            //                 trial: trial
+            //             });
+            //         }).catch(next);
+            //     });
+            // });
             
         });
     });

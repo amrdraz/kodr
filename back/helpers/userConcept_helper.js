@@ -115,7 +115,7 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
 				user_concept: doc._id
 			}).then(function(suggestion) {
 				return suggestion.resolve();
-			})
+			});
 		});
 		// TODO: resolve suggestion
 		
@@ -136,7 +136,13 @@ module.exports = exports = function lastModifiedPlugin(schema, options) {
 					_id: doc._id
 				}, {
 					x: new_x
-				}).exec();
+				}).exec().then(function() {
+					return Suggestion.findOne({
+						user_concept: doc._id
+					}).then(function(suggestion) {
+						return suggestion.incrementResolved();
+					});
+				});
 			} else {
 				return doc.resetSlopeAndIncExp();
 			}

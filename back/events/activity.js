@@ -25,6 +25,25 @@ observer.on('trial.complete', function(trial) {
 });
 
 /**
+ * Event listner for when a trial is failed
+ * @param  {Trial} trial trial that was just failed for the first time
+ * @return {[type]}       [description]
+ */
+observer.on('trial.failed', function(trial) {
+
+    Activity.new({
+        subjectId:trial.user,
+        subjectModel:'User',
+        action:'fail',
+        verb:'failed',
+        object:trial,
+        objectModel:'Trial',
+        objectId:trial.id
+    });
+    observer.emit('trial.faliedOrPassed', trial.id, trial.user, true);
+});
+
+/**
  * Event listner for when a trial is complete
  * @param  {Trial} trial trial that was just complete for the first time
  * @return {[type]}       [description]

@@ -17,15 +17,27 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/userArenas/:id', access.requireRole(), function(req, res, next) {
+        
         UserArena.findById(req.params.id, function(err, model) {
-            
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
+            var arena = model.arena;
+            if (arena) {
+                UserArena.findOrCreateWithTrials({user:req.user.id,arena:arena})
+                    .spread(function(model, trials) {
+                        res.json({
+                            userArena: model,
+                            trials: trials
+                        });
+                    }).catch(next);
+            }
+            
+            
             // var userArena = req.params.id
             // UserArena.findOrCreateWithTrials({user:req.user.id,arena:arena});
-            res.json({
-                userArena: model
-            });
+            // res.json({
+            //     userArena: model
+            // });
         });
     });
 
