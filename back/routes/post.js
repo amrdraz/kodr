@@ -39,7 +39,7 @@ module.exports = function(app, passport) {
     app.get('/api/posts', function(req, res, next) {
         if (req.query.tag) {
             Post.find({
-                'tags._id': req.query.tag
+                'tags._id': req.query.tag , challenge: null
             }, function(err, model) {
                 if (err)
                     return next(err);
@@ -97,18 +97,19 @@ module.exports = function(app, passport) {
                             if (err)
                                 next(err);
                             if (solution) {
-                              var comment = new Comment();
-                              comment.text = solution;
-                              comment.author = comment.user || req.user.id;
-                              comment.totalVotes = 0;
-                              comment.save(function(err,comment) {
-                                  if(err)
-                                    next(err);
-                                  res.json({
-                                    solution: comment,
-                                    post: model
-                                  });
-                              });
+                                var comment = new Comment();
+                                comment.text = "~~~\n" + solution.substring(1, solution.length - 1) + "\n~~~";
+                                comment.author = comment.user || req.user.id;
+                                comment.totalVotes = 0;
+                                comment.post = model;
+                                comment.save(function(err, comment) {
+                                    if (err)
+                                        next(err);
+                                    res.json({
+                                        solution: comment,
+                                        post: model
+                                    });
+                                });
                             } else {
                                 res.json({
                                     post: model
@@ -117,25 +118,25 @@ module.exports = function(app, passport) {
                         });
                     });
                 } else {
-                  if (solution) {
-                    var comment = new Comment();
-                    comment.text = "~~~\n"+solution.substring(1,solution.length-1)+"\n~~~";
-                    comment.author = comment.user || req.user.id;
-                    comment.totalVotes = 0;
-                    comment.post = post;
-                    comment.save(function(err,comment) {
-                        if(err)
-                          next(err);
-                        res.json({
-                          solution: comment,
-                          post: post
+                    if (solution) {
+                        var comment = new Comment();
+                        comment.text = "~~~\n" + solution.substring(1, solution.length - 1) + "\n~~~";
+                        comment.author = comment.user || req.user.id;
+                        comment.totalVotes = 0;
+                        comment.post = post;
+                        comment.save(function(err, comment) {
+                            if (err)
+                                next(err);
+                            res.json({
+                                solution: comment,
+                                post: post
+                            });
                         });
-                    });
-                  } else {
-                      res.json({
-                          post: post
-                      });
-                  }
+                    } else {
+                        res.json({
+                            post: post
+                        });
+                    }
                 }
             });
         } else {
