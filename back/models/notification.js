@@ -34,11 +34,9 @@ var NotificationSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Question'
     },
-    subject: {
-        type: ObjectId
-    },
     seen: {
-        type: Boolean
+        type: Boolean,
+        default: false
     },
     verb: {
         type: String

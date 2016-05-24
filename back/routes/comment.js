@@ -90,13 +90,14 @@ module.exports = function(app, passport) {
         comment = new Comment(comment);
         var container = comment.post ? Post : Question;
         var containerId = comment.post || comment.question;
-        console.log(containerId);
         container.findById(containerId)
             .select('')
             .exec(function(err, container) {
+              console.log(container);
                 var notification = new Notification({
                     actor: comment.author,
-                    subject: comment.question || comment.post,
+                    post: comment.post,
+                    question: comment.question,
                     reciever: container.author,
                     verb: "Comment"
                 });

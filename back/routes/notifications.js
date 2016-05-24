@@ -15,7 +15,7 @@ module.exports = function(app, passport) {
 
     app.get('/api/notifications', access.requireRole() , function(req, res, next) {
         Notification.find({
-                reciever: req.body.user
+                reciever: req.user,seen: false
             })
             .select('')
             .exec()
@@ -27,7 +27,7 @@ module.exports = function(app, passport) {
             }, next);
     });
 
-    app.put('/api/notifications', function(req, res, next) {
+    app.put('/api/notifications/:id', function(req, res, next) {
         Notification.findById(req.params.id, function(err, model) {
             if (!model) return res.send(404, "Not Found");
             model.set(req.body.notification);
