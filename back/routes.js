@@ -42,6 +42,8 @@ module.exports = function(app, passport) {
     require('./routes/tag')(app, passport);
     // wiki routes
     require('./routes/wiki')(app, passport);
+    // notifications routes
+    require('./routes/notifications')(app, passport);
 
     if (process.env.NODE_ENV !== 'production') {
         app.get('/seed_db', require('./seed_db'));

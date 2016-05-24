@@ -44,6 +44,10 @@ var QuestionSchema =  new mongoose.Schema({
       type: Number,
       default: 0
   }],
+  answer: {
+      type: ObjectId,
+      ref: 'Comment'
+  },
   comments: [{
       type: ObjectId,
       ref: 'Comment'

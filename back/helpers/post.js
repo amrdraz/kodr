@@ -9,7 +9,7 @@ module.exports = exports = function (schema, options) {
 
     var findOrCreateTags = schema.methods.findOrCreateTags = function(index, tags, result, cb) {
         if(tags[index]){
-            var title = tags[index].toLowerCase()
+            var title = tags[index].toLowerCase();
             Tag.findOne({title: title})
                .then(function(tag) {
                   if(!tag){

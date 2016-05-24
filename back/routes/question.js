@@ -174,6 +174,7 @@ module.exports = function(app, passport) {
                 return next(new Error('Could find the Question'));
             else {
                 if (req.user._id.toString() === question.author.toString()) {
+                    console.log(req.body.question);
                     var tags = req.body.question.tags;
                     delete req.body.question['tags'];
                     question.set(req.body.question);
