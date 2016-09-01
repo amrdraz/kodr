@@ -47,6 +47,16 @@ module.exports = function(app, passport) {
                     posts: model
                 });
             });
+        } else if (req.query.author) {
+            Post.find({
+                'author': req.query.author , challenge: null
+            }, function(err, model) {
+                if (err)
+                    return next(err);
+                res.json({
+                    posts: model
+                });
+            });
         } else {
             Post.find({
                     challenge: null
