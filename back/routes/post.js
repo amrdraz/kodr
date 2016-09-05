@@ -37,38 +37,44 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/posts', function(req, res, next) {
-        if (req.query.tag) {
-            Post.find({
-                'tags._id': req.query.tag , challenge: null
-            }, function(err, model) {
-                if (err)
-                    return next(err);
-                res.json({
-                    posts: model
+        var page = req.query.page || 1;
+        var count = req.query.count || false;
+        var perPage = req.query.perPage || 10;
+        var author = req.query.author;
+        var tag = req.query.tag;
+        var query = {
+            challenge: null
+        };
+        if (author)
+            query["author"] = author;
+        if (tag)
+            query["tags._id"] = tag;
+        if (count) {
+            console.log(query);
+            Post.find(query)
+                .count()
+                .then(function(count) {
+                    res.json({
+                        count: count
+                    });
+                }, function(err) {
+                    console.log(err);
+                    next();
                 });
-            });
-        } else if (req.query.author) {
-            Post.find({
-                'author': req.query.author , challenge: null
-            }, function(err, model) {
-                if (err)
-                    return next(err);
-                res.json({
-                    posts: model
-                });
-            });
         } else {
-            Post.find({
-                    challenge: null
-                })
-                .select('')
+            Post.find(query)
+                .skip((page - 1) * perPage)
+                .limit(perPage)
                 .exec()
                 .then(function(model) {
                     if (!model) return res.send(404, "Not Found");
                     res.json({
                         posts: model
                     });
-                }, next);
+                }, function(err) {
+                    console.log(err);
+                    next();
+                });
         }
     });
 
