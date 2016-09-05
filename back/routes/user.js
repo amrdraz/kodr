@@ -53,7 +53,7 @@ module.exports = function(app, passport) {
      */
 
     app.get('/api/users/:id', access.requireRole(), function(req, res, next) {
-        User.findById(req.params.id, function(err, model) {
+        User.findById(req.params.id).exec(function(err, model) {
             if (err) return next(err);
             if (!model) return res.send(404, "Not Found");
             res.json({

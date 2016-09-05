@@ -148,9 +148,8 @@ module.exports = function(req, res, next) {
     }).spread(function(q) {
         return q;
     }).then(function(q) {
-        res.send('All Seeded');
+        console.log("seeded");
     }).catch(function(err) {
         console.log(err);
-        res.send(err);
     });
 };

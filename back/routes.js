@@ -30,6 +30,20 @@ module.exports = function(app, passport) {
     require('./routes/userQuest')(app, passport);
     // activity routes
     require('./routes/activity')(app, passport);
+    // post routes
+    require('./routes/post')(app, passport);
+    // question routes
+    require('./routes/question')(app, passport);
+    // comment routes
+    require('./routes/comment')(app, passport);
+    // reply routes
+    require('./routes/reply')(app, passport);
+    // tag routes
+    require('./routes/tag')(app, passport);
+    // wiki routes
+    require('./routes/wiki')(app, passport);
+    // notifications routes
+    require('./routes/notifications')(app, passport);
 
     if (process.env.NODE_ENV !== 'production') {
         app.get('/seed_db', require('./seed_db'));
